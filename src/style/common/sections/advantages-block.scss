@@ -1,0 +1,87 @@
+@use "../variables.scss" as *;
+
+// Блок с преимуществами
+.advantages {
+	margin-top: 180px;
+		&__wrapper {
+			display: flex;
+			flex-direction: column;
+			align-items: center;
+			gap: 80px;
+		}
+		&__title {
+		}
+		&__cards {
+			display: flex;
+			justify-content: center;
+			// background-color: red;
+			&>*:nth-child(1) {
+				transform: translateX(225px) rotate(30deg);
+			}
+			&>*:nth-child(2) {
+				transform: translateX(175px) rotate(30deg);
+			}
+			&>*:nth-child(3) {
+				transform: translateX(125px) rotate(30deg);
+			}
+			&>*:nth-child(4) {
+				transform: translateX(75px) rotate(30deg);
+			}
+			&>*:nth-child(5) {
+				transform: translateX(25px) rotate(30deg);
+			}
+			&>*:nth-child(6) {
+				transform: translateX(-25px) rotate(30deg);
+			}
+			&>*:nth-child(7) {
+				transform: translateX(-75px) rotate(30deg);
+			}
+			&>*:nth-child(8) {
+				transform: translateX(-125px) rotate(30deg);
+			}
+			&>*:nth-child(9) {
+				transform: translateX(-175px) rotate(30deg);
+			}
+			&>*:nth-child(10) {
+				transform: translateX(-225px) rotate(30deg);
+			}
+		}
+		&__card {
+		}
+		&__items {
+			display: grid;
+			grid-template-columns: repeat(3, 1fr);
+			column-gap: 64px;
+			row-gap: 40px;
+		}
+		&__item {
+			display: flex;
+			flex-direction: column;
+			background-color: transparent;
+
+			&_title {
+				padding: 20px 0px;
+				font-size: 24px;
+				color: $neutral-dark;
+				letter-spacing: -1%;
+			}
+			&>*:last-child {
+				display: none;
+			}
+			&:hover {
+				&>*:last-child {
+					display: block;
+				}
+				&>*:nth-child(2) {
+					display: none;
+				}
+			}
+		}
+}
+
+.advantage {
+		&__item {
+			&_title {
+			}
+		}
+}

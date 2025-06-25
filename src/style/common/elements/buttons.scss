@@ -1,0 +1,85 @@
+@use "../variables.scss" as *;
+
+// Кнопка в шапке сайта
+.dark-filled-button {
+	background-color: $neutral-dark;
+	color: #FFFFFF;
+	height: 54px;
+	padding: 14px 24px;
+	display: flex;
+	align-items: center;
+	gap: 10px;
+	text-transform: uppercase;
+	border-radius: 360px;
+	transition: all 0.3s ease 0s;
+	&:hover {
+		transition: all 0.3s ease 0s;
+		background-color: $accent-blue;
+		cursor: pointer;
+	}
+}
+
+// Светлая кнопка с точкой и стрелкой (как в блоке works)
+.light-filled-button {
+	background-color: #FFFFFF;
+	color: #FFFFFF;
+	height: 54px;
+	padding: 14px 24px;
+	display: flex;
+	align-items: center;
+	gap: 10px;
+	text-transform: uppercase;
+	border-radius: 360px;
+	transition: all 0.3s ease 0s;
+	&:hover {
+		transition: all 0.3s ease 0s;
+		background-color: $accent-blue;
+		cursor: pointer;
+	}
+}
+
+// Кнопка с тремя точками
+.three-dots-button {
+	display: flex;
+	flex-direction: row;
+	align-items: center;
+	justify-content: center;
+	position: absolute;
+	top: 0px;
+	gap: 8px;
+	background-color: rgba($color: #e8ebf7, $alpha: 1);
+	border: 1px solid rgba($color: #FFFFFF, $alpha: 0.4);
+	backdrop-filter: blur(6px);
+	border-radius: 360px;
+	//max-width: 62px;
+	width: 100%;
+	height: 150px;
+	overflow: hidden;
+	// Точки
+	&__button-dots {
+		display: flex;
+		flex-direction: row;
+		align-items: center;
+		justify-content: center;
+		gap: 45px;
+	}
+	&__dot {
+		width: 35px;
+		height: 35px;
+		border-radius: 50%;
+		background-color: $neutral-grey;
+		opacity: 1;
+		transition: opacity 0.4s ease 0s;
+	}
+	&:hover {
+		padding: 12px 18px;
+		border: 1px solid transparent;
+		box-shadow: 0 0 0 0.5px rgba(255, 255, 255, 0.4);
+		transition: border 0.1s ease 0s;
+		.three-dots-button__dot {
+			opacity: 0;
+			transition: opacity 0.08s ease 0s;
+		}
+	}
+
+}

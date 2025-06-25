@@ -1,0 +1,162 @@
+@use "../variables.scss" as *;
+
+// Стартовый блок с шапкой
+.start-section {
+	width: 100%;
+	max-width: $layout-width;
+	//min-height: 100vh;
+		&__wrapper {
+			padding-top: 4.01vh;
+			display: flex;
+			flex-direction: column;
+			gap: 6.02vh;
+		}
+		&__header {
+		}
+		&__block {
+		}
+}
+.header {
+	width: 100%;
+	display: flex;
+	align-items: center;
+	justify-content: space-between;
+		&__logo {
+		}
+		&__logo-letter {
+		}
+		&__contacts {
+			display: flex;
+			flex-direction: column;
+			align-items: center;
+			gap: 2px;
+			&>*:nth-child(1) {
+				gap: 2px;
+			}
+			&>*:nth-child(2) {
+				gap: 6px;
+			}
+			&_contact {
+				display: flex;
+				align-items: center;
+				position: relative;
+				transform: translateX(0px);
+				transition: all 0.2s ease 0s;
+				&:hover {
+					transform: translateX(-10px);
+					transition: all 0.2s ease 0s;
+					& img {
+						right: -25px;
+						transition: opacity 0.2s ease 0s, transform 0.3s ease 0s;
+						overflow: hidden;
+						opacity: 1;
+						width: 17px;
+						height: 17px;
+						transform: translateX(0px) translateY(-1px);
+					}
+				}
+				& img {
+					right: -30px;
+					transition: opacity 0.2s ease 0s, width 0.3s ease 0s, transform 0.3s ease 0s;
+					overflow: hidden;
+					opacity: 0;
+					width: 17px;
+					height: 17px;
+					transform: translateX(10px) translateY(-1px);
+				}
+			}
+			&_contact-text {
+			}
+		}
+		&__button {
+			position: relative;
+			display: flex;
+			justify-content: space-between;
+			min-width: 154px;
+			padding-right: 25px;
+			&:hover {
+				&>*:first-child {
+					opacity: 1;
+					transition: all 0.25s ease 0.05s;
+				}
+				&>*:last-child {
+					opacity: 0;
+					transition: all 0.3s ease 0s;
+				}
+			}
+			&_arrow {
+				position: absolute;
+				left: 22px;
+				opacity: 0;
+				transition: all 0.2s ease 0s;
+			}
+			&_text {
+				font-size: 16px;
+			}
+			&_dot {
+				margin-left: -5px;
+				margin-bottom: -1px;
+				background-color: #FFFFFF;
+				opacity: 1;
+				transition: all 0.2s ease 0s;
+			}
+		}
+}
+.start-block {
+	display: flex;
+	flex-direction: column;
+	align-items: center;
+	gap: 4.01vh;
+		&__main-title {
+			color: $neutral-dark;
+		}
+		&__cards {
+			// background-color: red;
+			position: relative;
+			display: flex;
+			justify-content: center;
+			height: 310px;
+			padding-top: 50px;
+			&>*:nth-child(1) {
+				position: absolute;
+				//transform: translateX(245.22px) translateY(-0.5px) rotate(3.21deg);
+				z-index: 2;
+				left: -245.22px;
+				top: -0.5px;
+				transform: rotate(3.21deg);
+			}
+			&>*:nth-child(2) {
+				position: relative;
+				transform: translateX(490px) translateY(63.41px) rotate(-2deg);
+				z-index: 3;
+				transform: rotate(-2deg);
+			}
+			&>*:nth-child(3) {
+				position: absolute;
+				transform: translateX(757.03px) translateY(-2.5px) rotate(4.75deg);
+				z-index: 1;
+				left: 257.03px;
+				top: -2.5px;
+				transform: rotate(4.75deg);
+			}
+		}
+		&__card {
+		}
+		&__second-title {
+			color: $light-grey;
+		}
+		&__socials-button {
+			margin-top: -4.01vh;
+			padding: 30px 0px;
+			width: 100%;
+			display: flex;
+			justify-content: center;
+			padding: 3.01vh 0px;
+			position: relative;
+		}
+		&__socials-button-elem {
+		}
+		&__dot {
+			background-color: $neutral-grey;
+		}
+}

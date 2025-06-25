@@ -1,0 +1,61 @@
+// Логотип (имя из отдельных букв)
+.logotype {
+	width: 110px;
+	height: 64px;
+	position: relative;
+	// background-color: red;
+			//box-shadow: 0px 7.06194px 30px rgba(0, 0, 0, 0.2);
+	&>*:nth-child(1) {
+		position: absolute;
+		left: 4.5%;
+		right: 87.35%;
+		top: 7.86%;
+		bottom: 36.56%;
+		transform: rotate(10.46deg);
+	}
+	&>*:nth-child(2) {
+		position: absolute;
+		left: 14.36%;
+		right: 66.17%;
+		top: 50.05%;
+		bottom: 15.61%;
+		transform: rotate(21.16deg);
+	}
+	&>*:nth-child(3) {
+		position: absolute;
+		left: 20.9%;
+		right: 55.89%;
+		top: 6.62%;
+		bottom: 50.1%;
+	}
+	&>*:nth-child(4) {
+		position: absolute;
+		left: 32.43%;
+		right: 46.43%;
+		top: 54.93%;
+		bottom: 5.53%;
+	}
+	&>*:nth-child(5) {
+		position: absolute;
+		left: 48%;
+		right: 35.5%;
+		top: 1.67%;
+		bottom: 37.38%;
+	}
+	&>*:nth-child(6) {
+		position: absolute;
+		left: 63%;
+		right: 20.32%;
+		top: 57%;
+		bottom: -1.37%;
+		transform: rotate(-17.32deg);
+	}
+	&>*:nth-child(7) {
+		position: absolute;
+		left: 72.06%;
+		right: 7.86%;
+		top: 7.21%;
+		bottom: 39.47%;
+		transform: rotate(-11.32deg);
+	}
+}

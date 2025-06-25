@@ -1,0 +1,14 @@
+@use "../variables.scss" as *;
+
+// Точка, которая используется в кнопках
+.dot {
+	width: 6px;
+	height: 6px;
+	border-radius: 50%;
+}
+
+// Иконка внутри кнопки
+.button-icon {
+	width: 16px;
+	height: 16px;
+}

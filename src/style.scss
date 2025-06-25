@@ -1,0 +1,24 @@
+// --------- Imports
+
+// Base
+@use "./style/common/base.scss" as *; // Base styles
+@use "./style/common/variables.scss" as *; 
+@use "./style/common/nullstyle.scss" as *; // Сброс стилей
+@use "./style/common/fonts.scss" as *;
+
+// Sections
+@use "./style/common/sections/start-block.scss"; // Стартовая секция
+@use "./style/common/sections/works-block.scss"; // Вторая секция (с работами)
+@use "./style/common/sections/about-block.scss"; // Третья секция "Обо мне"
+@use "./style/common/sections/advantages-block.scss"; // Блок с преимуществами
+@use "./style/common/sections/history-block.scss"; // Блок с историей работы
+@use "./style/common/sections/product-thinking-block.scss"; // Блок с описанием идеи и принципов
+@use "./style/common/sections/footer.scss" as *; // Footer styles
+
+// Elements
+@use "./style/common/elements/titles.scss";
+@use "./style/common/elements/cards.scss";
+@use "./style/common/elements/buttons.scss";
+@use "./style/common/elements/other.scss";
+@use "./style/common/elements/logo.scss";
+@use "./style/common/elements/widgets.scss";

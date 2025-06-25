@@ -1,0 +1,96 @@
+.history {
+	margin-top: 180px;
+		&__wrapper {
+			display: flex;
+			flex-direction: column;
+			gap: 50px;
+			//background-color: orange;
+		}
+		&__title {
+		}
+		&__draggable-zone {
+			min-height: 900px;
+			position: relative;
+			width: 100%;
+			left: 0%;
+			top: 0px;
+			background-color: deepskyblue;
+		}
+		&__draggable-path {
+			width: 100%;
+			position: relative;
+			//background-color: red;
+			& path {
+				width: 100%;
+				height: 100px;
+				left: -20px;
+				position: absolute;
+				stroke:black;
+			}
+		}
+		&__draggable-points {
+			position: absolute;
+			top: 0px;
+			left: 0px;
+			width: 100%;
+			height: 100%;
+			//overflow: hidden;
+			&>*:nth-child(1) {
+				position: absolute;
+				top: 10%;
+				left: 50%;
+			}
+			&>*:nth-child(2) {
+				position: absolute;
+				top: 30%;
+				left: 25%;
+			}
+			&>*:nth-child(3) {
+				position: absolute;
+				top: 50%;
+				left: 0%;
+			}
+			&>*:nth-child(4) {
+				position: absolute;
+				top: 30%;
+				right: 25%;
+			}
+			&>*:nth-child(5) {
+				position: absolute;
+				top: 50%;
+				right: 0%;
+			}
+		}
+		&__draggable-point {
+			width: 20px;
+			height: 20px;
+			background-color: rgb(52, 0, 148);
+			border-radius: 50%;
+			border: 3px solid #FFFFFF;
+		}
+		&__cards {
+			display: flex;
+			position: absolute;
+			top: 0px;
+			//display: none;
+		}
+		&__card {
+			min-width: 360px;
+			position: absolute;
+			transform: translateX(-50%) translateY(-10%);
+		}
+		&__drag-widget {
+		}
+}
+.secondary-title {
+}
+.work-history-card {
+		&__wrapper {
+		}
+		&__title {
+		}
+		&__subtitle {
+		}
+		&__info {
+		}
+}

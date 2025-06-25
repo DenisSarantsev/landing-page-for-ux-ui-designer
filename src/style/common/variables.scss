@@ -1,0 +1,15 @@
+@use "./fonts.scss" as *;
+
+// Размеры
+$layout-width: 1320px; // Размер полотна сайта
+
+// Цвета
+$background-color: #F3F4FE;
+$neutral-dark: #2B2E3A;
+$neutral-grey: #89899D;
+$light-grey: #CAD4DE;
+$accent-blue: #04F;
+
+// Шрифты
+$main-font: "Outfit", Arial, sans-serif;
+$accent-font: "Futura Bold Condensed BT", Arial, sans-serif;

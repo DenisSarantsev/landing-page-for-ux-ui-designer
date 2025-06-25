@@ -1,0 +1,51 @@
+@use "../variables.scss" as *;
+
+// Основной заголовок в стартовом блоке
+.main-title {
+	font-size: 100px;
+	font-weight: 500;
+	line-height: 115%;
+	letter-spacing: -1%;
+	font-family: $accent-font;
+	text-transform: uppercase;
+	text-align: center;
+}
+
+// Основной заголовок в остальных блоках сайта (кроме основного)
+.secondary-title {
+	font-size: 77px;
+	font-weight: 500;
+	letter-spacing: -0.2%;
+	font-family: $accent-font;
+	text-transform: uppercase;
+	text-align: center;
+}
+
+// Серый подзаголовок (под заголовками вторичных блоков)
+.subtitle {
+	font-size: 16px;
+	line-height: 162.5%;
+	color: $neutral-grey;
+	letter-spacing: 0.5%;
+	font-weight: 500;
+}
+
+// Жирный шрифт контакта (например адрес в шапке)
+.contact-title {
+	color: $neutral-dark;
+	font-size: 20px;
+	font-weight: 700px;
+	font-family: $accent-font;
+	text-transform: uppercase;
+	font-style: normal;
+}
+// Текст контакта, например почта в шапке
+.contact-item {
+	font-size: 16px;
+	color: $neutral-grey;
+	letter-spacing: 0.5%;
+	line-height: 162.5%;
+	text-transform: uppercase;
+	font-style: normal;
+	font-family: "Outfit";
+}

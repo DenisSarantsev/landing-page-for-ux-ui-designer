@@ -1,0 +1,33 @@
+@use "../variables.scss" as *;
+
+.product-thinking {
+	margin-top: 180px;
+		&__wrapper {
+			display: grid;
+			grid-template-columns: repeat(2, 1fr);
+			gap: 25px;
+		}
+		&__left {
+			font-weight: bold;
+			font-size: 64px;
+			line-height: 128%;
+			letter-spacing: -0.2%;
+			text-transform: uppercase;
+			font-family: $accent-font;
+			line-height: 128%;
+			color: $neutral-dark;
+			& span {
+				font-family: $accent-font;
+			}
+		}
+		&__right {
+			display: flex;
+			flex-direction: column;
+			justify-content: space-between;
+			gap: 15px;
+			font-size: 20px;
+			letter-spacing: -1%;
+			line-height: 125%;
+			color: $neutral-dark;
+		}
+}

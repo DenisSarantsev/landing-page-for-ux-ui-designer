@@ -1,0 +1,17 @@
+// Outfit - основной шрифт
+@import url('https://fonts.googleapis.com/css2?family=Outfit:wght@100;200;300;400;500;600;700;800;900&display=swap');
+
+// Futura - акцентный шрифт для заголовков
+@font-face {
+		font-family: "Futura Bold Condensed BT";
+    src: url("/fonts/77fb6637911ebc8dafcfe5019b57546f.eot");
+    src: url("/fonts/77fb6637911ebc8dafcfe5019b57546f.eot?#iefix")format("embedded-opentype"),
+        url("/fonts/77fb6637911ebc8dafcfe5019b57546f.woff")format("woff"),
+        url("/fonts/77fb6637911ebc8dafcfe5019b57546f.woff2")format("woff2"),
+        url("/fonts/77fb6637911ebc8dafcfe5019b57546f.ttf")format("truetype"),
+        url("/fonts/77fb6637911ebc8dafcfe5019b57546f.svg#Futura Bold Condensed BT")format("svg");
+    font-weight:normal;
+    font-style:normal;
+    font-display:swap;
+}
+

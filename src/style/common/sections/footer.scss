@@ -1,0 +1,81 @@
+@use "../variables.scss" as *;
+  
+.footer {
+	margin-top: 248px;
+	width: 100%;
+	//min-height: 100vh;
+	//background-color: violet;
+	padding-bottom: 441px;
+	&__wrapper {
+		display: flex;
+		flex-direction: column;
+		align-items: center;
+	}
+	&__titles {
+		display: flex;
+		flex-direction: column;
+		align-items: center;
+		text-align: center;
+	}
+	&__subtitle {
+		font-size: 16px;
+		line-height: 162%;
+		color: $neutral-grey;
+		text-transform: uppercase;
+	}
+	&__title {
+		&>* {
+			margin-top: 20px;
+			font-size: 140px;
+			font-family: $accent-font;
+			text-transform: uppercase;
+			color: $neutral-dark;
+			border-bottom: 12px solid $neutral-dark;
+		}
+	}
+	&__contacts {
+		margin-top: 36px;
+		display: flex;
+		flex-direction: column;
+		gap: 10px;
+	}
+}
+
+	
+	
+	
+	
+	canvas {
+    display: block;
+    background: black;
+    width: 100vw;
+    height: 100vh;
+  }
+  input {
+    width: 250px;
+    height: 40px;
+    line-height: 40px;
+    position: absolute;
+    bottom: 35px;
+    left: calc(50% - 125px);
+    background: rgba(255,255,255,0.2);
+    color: white;
+    font-size: 30px;
+    font-family: arial;
+    text-align: center;
+    border: 1px solid white;
+    z-index: 10;
+  }
+  p {
+    position: fixed;
+    left: 0;
+    bottom: 5px;
+    color: #fff;
+    z-index: 10;
+    font-size: 16px;
+    font-family: Helvetica, Verdana, sans-serif;
+    opacity: 0.5;
+    width: 100%;
+    text-align: center;
+    margin: 0;
+  }

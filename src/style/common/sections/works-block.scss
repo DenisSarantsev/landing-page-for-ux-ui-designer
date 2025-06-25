@@ -1,0 +1,74 @@
+@use "../variables.scss" as *;
+
+// Блок с карточками работ
+.works {
+	margin-top: 128px;
+		&__wrapper {
+			display: flex;
+			flex-direction: column;
+			align-items: center;
+			gap: 80px;
+		}
+		&__titles {
+			display: flex;
+			flex-direction: column;
+			gap: 12px;
+			align-items: center;
+		}
+		&__title {
+			color: $neutral-dark;
+		}
+		&__subtitle {
+		}
+		&__cards {
+			width: 100%;
+			display: grid;
+			grid-template-columns: repeat(3, 1fr);
+			row-gap: 64px;
+			column-gap: 60px;
+		}
+		&__card {
+		}
+		&__button {
+		}
+		&__button-element {
+		}
+}
+
+.works-button {
+	position: relative;
+	min-width: 208px;
+	display: flex;
+	justify-content: center;
+	align-items: center;
+	&:hover {
+		&>* {
+			&:first-child {
+				background-color: #FFFFFF;
+				transition: all 0.3s ease 0s;
+				opacity: 0;
+			}
+			&:last-child {
+				opacity: 1;
+				transition: all 0.4s ease 0s;
+			}
+			color: #FFFFFF;
+		}
+	}
+		&__dot {
+			background-color: $neutral-dark;
+			transition: all 0.3s ease 0s;
+			margin-right: 3px;
+		}
+		&__text {
+			color: $neutral-dark;
+			font-size: 16px;
+			//transition: all 0.3s ease 0s;
+		}
+		&__arrow {
+			position: absolute;
+			top: 19px;
+			right: 20px;
+			opacity: 0;
+		}
+}
