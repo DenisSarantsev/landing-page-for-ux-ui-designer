@@ -14,7 +14,7 @@ const showCurrentElement = (section: string, cardsCount: number): void => {
 		for ( let i = 1; i < cardsCount + 1; i++  ) {
 			smallCardsContainer.insertAdjacentHTML("beforeend", `
 				<div class="advantages__card advantage-card">
-					<img src="/img/small-cards/${section}-image-${i}.png" alt="project screenshot" class="advantage-card__image">
+					<img src="/landing-page-for-ux-ui-designer/dist/img/small-cards/${section}-image-${i}.png" alt="project screenshot" class="advantage-card__image">
 				</div>
 			`)
 		};
