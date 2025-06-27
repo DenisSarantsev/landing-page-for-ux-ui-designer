@@ -10,4 +10,5 @@ import "./script/socials-widget"; // Виджет с социальными ик
 import "./script/scroll-show-cards"; // Анимация появления карточек в блоке heatured work
 import "./script/about-me-slider"; // Анимация слайдера и начала работы слайдера
 import "./script/small-cards"; // Анимация сжатия и переключения карточек
+//import "./script/swiper"
 //import "./script/dispersion-effect" // Эффект рассыпающихся элементов
