@@ -64,7 +64,7 @@ var xa=Object.defineProperty;var va=(o,t,e)=>t in o?xa(o,t,{enumerable:!0,config
 		`})},hu=()=>{tr.length=0,[...Re].forEach(o=>{const t=getComputedStyle(o).transform;let e=0,i=0;if(t&&t!=="none"){const r=t.match(/matrix.*\((.+)\)/);if(r){const n=r[1].split(", ");e=parseFloat(n[4]),i=parseFloat(n[5])}}tr.push({x:e,y:i})})},du=o=>{const t=[...Re][0].offsetWidth,e=mt instanceof HTMLElement?mt.offsetWidth/2-t/2:0,i=o-e;return Math.abs(i)/3*1.6},Di=document.querySelector(".socials-widget"),an=document.querySelector(".three-dots-button");Di&&an&&(Di.addEventListener("mouseenter",()=>{an.style.display="none",H.to(Di,{duration:.6,scale:1,ease:"elastic(0.7, 0.4)",transformOrigin:"center bottom"})}),Di.addEventListener("mouseleave",()=>{an.style.display="flex",H.to(Di,{duration:.5,scale:.2,ease:"elastic(0.5, 0.8)"})}));const _u=async()=>{try{return(await(await fetch("/data/projects.json")).json()).projects}catch(o){return console.error("Error loading projects:",o),[]}},pu=async()=>{try{return await(await fetch("/data/settings.json")).json()}catch{return null}},gu=(o,t,e)=>{console.log(t);let i;e==="/"?i=document.querySelector(".works__cards"):e==="/projects"&&(i=document.querySelector(".projects-page__cards"),t=o.length),i&&(i.innerHTML="",o.forEach((r,n)=>{if(n+1<=t){const s=`
 				<div data-project-id="${r.id}" class="works__card work-card">
 					<div class="work-card__card">
-						<img src="/img/project/${r.id}/miniature.png" alt="${r["project-name"]}">
+						<img src="/landing-page-for-ux-ui-designer/dist/img/project/${r.id}/miniature.png" alt="${r["project-name"]}">
 					</div>
 					<div class="work-card__text">${r["project-name"]}</div>
 				</div>

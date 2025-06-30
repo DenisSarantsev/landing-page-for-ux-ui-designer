@@ -56,7 +56,7 @@ const createProjectCards = (projects: Project[], count: number, pathname: string
 			const cardHTML = `
 				<div data-project-id="${project.id}" class="works__card work-card">
 					<div class="work-card__card">
-						<img src="/img/project/${project.id}/miniature.png" alt="${project['project-name']}">
+						<img src="/landing-page-for-ux-ui-designer/dist/img/project/${project.id}/miniature.png" alt="${project['project-name']}">
 					</div>
 					<div class="work-card__text">${project['project-name']}</div>
 				</div>
