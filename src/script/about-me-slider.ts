@@ -1,4 +1,5 @@
 import { gsap } from "gsap";
+import { advancedScrollWatcher } from "./scroll-checker";
 
 // Получаем все слайды
 const allSlides = document.querySelectorAll<HTMLElement>(".about__slide");
@@ -104,7 +105,19 @@ const changeSlides = (maxSlides: number) => {
 		} else {
 			newIndex++
 		}
-	}, 2500)
+	}, 5000)
 }
 
-changeSlides(5);
+
+// Статус запуска слайдера
+let sliderWorks: boolean = false;
+// Отслеживание прокрутки
+advancedScrollWatcher.watch({
+  selector: '.about',
+  onScroll: (_element, data) => {
+    if ( data.scrolledPercentage > 30 && !sliderWorks ) {
+			sliderWorks = true;
+			changeSlides(5);
+		}
+  }
+});

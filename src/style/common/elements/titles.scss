@@ -1,4 +1,5 @@
 @use "../variables.scss" as *;
+@use "../functions.scss" as *;
 
 // Основной заголовок в стартовом блоке
 .main-title {
@@ -9,6 +10,15 @@
 	font-family: $accent-font;
 	text-transform: uppercase;
 	text-align: center;
+	@media (max-height: $first-height-bp){
+		font-size: px-to-vh(100px, $first-height-bp);
+	}
+	@media (max-width: $tablet-bp){
+		font-size: px-to-vw(100px, $tablet-bp);
+	}
+	@media (max-width: $small-tablet-bp){
+		font-size: px-to-vw(80px, $small-tablet-bp);
+	}
 }
 
 // Основной заголовок в остальных блоках сайта (кроме основного)
@@ -19,6 +29,15 @@
 	font-family: $accent-font;
 	text-transform: uppercase;
 	text-align: center;
+	@media (max-width: $first-bp){
+		font-size: px-to-vw(77px, $first-bp);
+	}
+	@media (max-width: $tablet-bp){
+		font-size: px-to-vw(58px, $tablet-bp);
+	}
+	@media (max-width: $small-mobile-bp){
+		font-size: 24px;
+	}
 }
 
 // Серый подзаголовок (под заголовками вторичных блоков)
@@ -28,6 +47,16 @@
 	color: $neutral-grey;
 	letter-spacing: 0.5%;
 	font-weight: 500;
+	text-align: center;
+	@media (max-width: $first-bp){
+		font-size: px-to-vw(16px, $first-bp);
+	}
+	@media (max-width: $tablet-bp){
+		font-size: 14px;
+	}
+	@media (max-width: $small-mobile-bp){
+		font-size: 13px;
+	}
 }
 
 // Жирный шрифт контакта (например адрес в шапке)
@@ -38,6 +67,12 @@
 	font-family: $accent-font;
 	text-transform: uppercase;
 	font-style: normal;
+	@media (max-width: $small-tablet-bp){
+		font-size: 18px;
+	}
+	@media (max-width: $mobile-bp){
+		font-size: 16px;
+	}
 }
 // Текст контакта, например почта в шапке
 .contact-item {
@@ -48,4 +83,20 @@
 	text-transform: uppercase;
 	font-style: normal;
 	font-family: "Outfit";
+	@media (max-width: $small-tablet-bp){
+		font-size: 14px;
+	}
+	@media (max-width: $mobile-bp){
+		font-size: 12px;
+	}
+}
+
+.titles-gap {
+	gap: 12px;
+	@media (max-width: $first-bp){
+		gap: px-to-vw(12px, $first-bp);
+	}
+	@media (max-width: $mobile-bp){
+		gap: 8px;
+	}
 }

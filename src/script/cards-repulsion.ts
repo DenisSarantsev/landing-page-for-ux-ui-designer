@@ -1,4 +1,5 @@
 import { gsap } from "gsap";
+import { isMobileScreen } from "./resize";
 
 const cards = document.querySelectorAll<HTMLElement>(".start-block__card");
 
@@ -14,8 +15,10 @@ const settings = {
 let prevMouseX = 0;
 let prevMouseY = 0;
 let lastTime = performance.now();
+let eventsAttached = false; // Флаг состояния обработчиков
 
-document.addEventListener("mousemove", (e) => {
+// Обработчик движения мыши
+const handleMouseMove = (e: MouseEvent) => {
   const mouseX = e.clientX;
   const mouseY = e.clientY;
 
@@ -71,4 +74,43 @@ document.addEventListener("mousemove", (e) => {
       });
     }
   });
+};
+
+// Сброс позиций всех карточек
+const resetCardsPosition = () => {
+  cards.forEach((card) => {
+    gsap.to(card, {
+      x: 0,
+      y: 0,
+      duration: 0.5,
+      ease: "power2.out",
+      overwrite: "auto",
+    });
+  });
+};
+
+// Функция управления обработчиками событий
+const manageEventListeners = () => {
+  if (!isMobileScreen && !eventsAttached) {
+    // Включаем обработчики на больших экранах
+    document.addEventListener("mousemove", handleMouseMove);
+    eventsAttached = true;
+  } else if (isMobileScreen && eventsAttached) {
+    // Отключаем обработчики на маленьких экранах
+    document.removeEventListener("mousemove", handleMouseMove);
+    eventsAttached = false;
+    
+    // Возвращаем карточки в исходное положение
+    resetCardsPosition();
+  }
+};
+
+// Инициализация при загрузке
+document.addEventListener("DOMContentLoaded", () => {
+  manageEventListeners();
+});
+
+// Слушаем изменения размера экрана
+window.addEventListener("resize", () => {
+  manageEventListeners();
 });

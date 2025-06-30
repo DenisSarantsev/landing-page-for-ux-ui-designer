@@ -1,0 +1,134 @@
+@use "../variables.scss" as *;
+@use "../functions.scss" as *;
+
+// Модальное окно для проекта
+.project-modal {
+	position: fixed;
+	top: 0px;
+	left: 0px;
+  width: 100%;
+  height: 100vh; // Используем vh вместо %
+  z-index: 1000; // Высокий z-index чтобы быть поверх всего
+	background-color: #787878;
+	padding: 20px;
+	overflow-y: auto;
+
+	// Скрываем скроллбар для всех браузеров
+	scrollbar-width: none; /* Firefox */
+	-ms-overflow-style: none; /* Internet Explorer 10+ */
+
+	&::-webkit-scrollbar {
+		display: none; /* Chrome, Safari, Opera */
+	}
+	@media (max-width: $small-tablet-bp){
+		padding: 12px;
+	}
+		&__wrapper {
+			background-color: #FFFFFF;
+			border-radius: 80px;
+			padding: 100px 24px 170px 24px;
+			display: flex;
+			flex-direction: column;
+			align-items: center;
+			gap: 64px;
+			@media (max-width: $first-bp){
+				border-radius: px-to-vw(80px, $first-bp);
+				gap: px-to-vw(64px, $first-bp);
+				padding: px-to-vw(100px, $first-bp) 24px px-to-vw(170px, $first-bp) 24px;
+			}
+			@media (max-width: $small-tablet-bp){
+				padding: 72px 12px 12px 12px;
+			}
+		}
+		&__close-button {
+		}
+		&__titles {
+			max-width: 872px;
+			display: flex;
+			flex-direction: column;
+			gap: 12px;
+		}
+		&__title {
+		}
+		&__subtitle {
+			text-align: center;
+			font-size: 16px;
+			font-weight: 400;
+			max-width: 600px;
+		}
+		&__images-wrapper {
+			max-width: 872px;
+			display: flex;
+			flex-direction: column;
+			gap: 24px;
+			& img {
+				border-radius: 16px;
+			}
+			@media (max-width: $small-tablet-bp){
+				gap: 12px;
+			}
+			&_one {
+				& img {
+					width: 100%;
+					height: auto;
+				}
+			}
+			&_two {
+				display: grid;
+				grid-template-columns: 1fr 1fr;
+				gap: 24px;
+				@media (max-width: $small-tablet-bp){
+					gap: 12px;
+				}
+				& img {
+					width: 100%;
+					height: auto;
+				}
+			}
+			&_three {
+				& img {
+					width: 100%;
+					height: auto;
+				}
+			}
+			&_four {
+				display: grid;
+				grid-template-columns: 1fr 1fr;
+				gap: 24px;
+				@media (max-width: $small-tablet-bp){
+					gap: 12px;
+				}
+				& img {
+					width: 100%;
+					height: auto;
+				}
+			}
+		}
+}
+
+// Общие классы для модалок
+.modal-close-button {
+	position: absolute;
+	width: 48px;
+	height: 48px;
+	border-radius: 50%;
+	display: flex;
+	justify-content: center;
+	align-items: center;
+	top: 70px;
+	right: 80px;
+	background-color: $light-grey;
+	filter: drop-shadow(0px 7px 23.4px rgba(0, 0, 0, 0.12));
+	@media (max-width: $first-bp){
+		top: px-to-vw(70px, $first-bp);
+		right: px-to-vw(80px, $first-bp);
+	}
+	@media (max-width: $mobile-bp){
+		top: 25px;
+		right: 30px;
+	}
+		&__image {
+			width: 20px;
+			height: 20px;
+		}
+}

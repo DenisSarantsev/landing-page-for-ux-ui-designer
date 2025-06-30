@@ -1,4 +1,5 @@
 @use "../variables.scss" as *;
+@use "../functions.scss" as *;
 
 // Точка, которая используется в кнопках
 .dot {
@@ -11,4 +12,18 @@
 .button-icon {
 	width: 16px;
 	height: 16px;
+}
+
+// Отступ между контентом и заголовокм блока
+.block-gap {
+	gap: 80px;
+	@media (max-width: $first-bp){
+		gap: px-to-vw(80px, $first-bp);
+	}
+	@media (max-width: $small-tablet-bp){
+		gap: px-to-vw(45px, $small-tablet-bp);
+	}
+	@media (max-width: $mobile-bp){
+		gap: 35px;
+	}
 }

@@ -1,4 +1,5 @@
 @use "../variables.scss" as *;
+@use "../functions.scss" as *;
 
 // Стартовый блок с шапкой
 .start-section {
@@ -6,10 +7,16 @@
 	max-width: $layout-width;
 	//min-height: 100vh;
 		&__wrapper {
-			padding-top: 4.01vh;
+			min-height: 100%;
+			padding-top: 40px;
 			display: flex;
 			flex-direction: column;
-			gap: 6.02vh;
+			@media (max-height: $first-height-bp){
+				padding-top: px-to-vh(40px, $first-height-bp);
+			}
+			@media (max-width: $tablet-bp){
+				gap: px-to-vw(40px, $first-height-bp);
+			}
 		}
 		&__header {
 		}
@@ -21,7 +28,11 @@
 	display: flex;
 	align-items: center;
 	justify-content: space-between;
+		&__left-block {
+			min-width: 154px;
+		}
 		&__logo {
+			
 		}
 		&__logo-letter {
 		}
@@ -29,6 +40,7 @@
 			display: flex;
 			flex-direction: column;
 			align-items: center;
+			justify-content: center;
 			gap: 2px;
 			&>*:nth-child(1) {
 				gap: 2px;
@@ -42,17 +54,20 @@
 				position: relative;
 				transform: translateX(0px);
 				transition: all 0.2s ease 0s;
-				&:hover {
-					transform: translateX(-10px);
-					transition: all 0.2s ease 0s;
-					& img {
-						right: -25px;
-						transition: opacity 0.2s ease 0s, transform 0.3s ease 0s;
-						overflow: hidden;
-						opacity: 1;
-						width: 17px;
-						height: 17px;
-						transform: translateX(0px) translateY(-1px);
+				// Ховер только на весктопных устройствах
+				@media (min-width: $tablet-bp){
+						&:hover {
+						transform: translateX(-10px);
+						transition: all 0.2s ease 0s;
+						& img {
+							right: -25px;
+							transition: opacity 0.2s ease 0s, transform 0.3s ease 0s;
+							overflow: hidden;
+							opacity: 1;
+							width: 17px;
+							height: 17px;
+							transform: translateX(0px) translateY(-1px);
+						}
 					}
 				}
 				& img {
@@ -106,7 +121,13 @@
 	display: flex;
 	flex-direction: column;
 	align-items: center;
-	gap: 4.01vh;
+	justify-content: center;
+	flex-grow: 1;
+	gap: 40px;
+	padding-bottom: 25px;
+	@media (max-height: $first-height-bp){
+		gap: px-to-vh(40px, $first-height-bp);
+	}
 		&__main-title {
 			color: $neutral-dark;
 		}
@@ -117,6 +138,14 @@
 			justify-content: center;
 			height: 310px;
 			padding-top: 50px;
+			@media (max-height: $first-height-bp){
+				height: px-to-vh(310px, $first-height-bp);
+				padding-top: px-to-vh(50px, $first-height-bp);
+			}
+			@media (max-width: $tablet-bp){
+				height: px-to-vw(310px, $tablet-bp);
+				padding-top: px-to-vw(50px, $tablet-bp);
+			}
 			&>*:nth-child(1) {
 				position: absolute;
 				//transform: translateX(245.22px) translateY(-0.5px) rotate(3.21deg);
@@ -124,6 +153,14 @@
 				left: -245.22px;
 				top: -0.5px;
 				transform: rotate(3.21deg);
+				@media (max-height: $first-height-bp){
+					left: px-to-vh(-245.22px, $first-height-bp);
+					top: px-to-vh(-0.5px, $first-height-bp);
+				}
+				@media (max-width: $tablet-bp){
+					left: px-to-vw(-245.22px, $tablet-bp);
+					top: px-to-vw(-0.5px, $tablet-bp);
+				}
 			}
 			&>*:nth-child(2) {
 				position: relative;
@@ -138,6 +175,14 @@
 				left: 257.03px;
 				top: -2.5px;
 				transform: rotate(4.75deg);
+				@media (max-height: $first-height-bp){
+					left: px-to-vh(257.03px, $first-height-bp);
+					top: px-to-vh(-2.5px, $first-height-bp);
+				}
+				@media (max-width: $tablet-bp){
+					left: px-to-vw(257.03px, $tablet-bp);
+					top: px-to-vw(-2.5px, $tablet-bp);
+				}
 			}
 		}
 		&__card {
@@ -145,7 +190,8 @@
 		&__second-title {
 			color: $light-grey;
 		}
-		&__socials-button {
+		&__socials-button-outer {
+			height: 76px;
 			margin-top: -4.01vh;
 			padding: 30px 0px;
 			width: 100%;
@@ -154,9 +200,27 @@
 			padding: 3.01vh 0px;
 			position: relative;
 		}
+		&__socials-button {
+
+		}
 		&__socials-button-elem {
 		}
 		&__dot {
 			background-color: $neutral-grey;
 		}
+}
+
+.button-fixed {
+	position: fixed;
+	bottom: -10px;
+	width: 100%;
+	padding: 15px;
+	display: flex;
+	justify-content: center;
+	z-index: 9999;
+}
+
+.max-height {
+	height: 100vh;
+	min-height: 100vh; 
 }

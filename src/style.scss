@@ -22,3 +22,10 @@
 @use "./style/common/elements/other.scss";
 @use "./style/common/elements/logo.scss";
 @use "./style/common/elements/widgets.scss";
+@use "./style/common/elements/modals.scss";
+
+// Functions
+@use "./style/common/functions.scss";
+
+// Pages
+@use "./style/pages/projects.scss"; // Страница с проектами

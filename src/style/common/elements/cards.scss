@@ -1,4 +1,5 @@
 @use "../variables.scss" as *;
+@use "../functions.scss" as *;
 
 // Карточка в первом блоке
 .start-card {
@@ -9,6 +10,16 @@
 	box-shadow: 0px 7.06194px 30px rgba(0, 0, 0, 0.2);
 	position: relative;
 	overflow: hidden;
+	@media (max-height: $first-height-bp){
+		width: px-to-vh(370px, $first-height-bp);
+		height: px-to-vh(260px, $first-height-bp);
+		border-radius: px-to-vh(50px, $first-height-bp);
+	}
+	@media (max-width: $tablet-bp){
+		width: px-to-vw(370px, $tablet-bp);
+		height: px-to-vw(260px, $tablet-bp);
+		border-radius: px-to-vw(50px, $tablet-bp);
+	}
 	& img {
 		object-fit: cover;
 		width: 100%;
@@ -23,6 +34,9 @@
 	flex-direction: column;
 	align-items: center;
 	gap: 32px;
+	@media (max-width: $first-bp){
+		gap: 2.22vw;
+	}
 	&:hover {
 		cursor: pointer;
 		&>*:last-child {
@@ -34,11 +48,25 @@
 		height: 280px;
 		max-width: 400px;
 		width: 100%;
-		background-color: #FFFFFF;
+		//background-color: #FFFFFF;
 		box-shadow: 0px 7.06194px 40px rgba(0, 0, 0, 0.08);
 		border-radius: 50px;
 		position: relative;
 		overflow: hidden;
+		@media (max-width: $second-bp){
+			height: px-to-vw(280px, $second-bp);
+			max-width: px-to-vw(400px, $second-bp);
+			border-radius: px-to-vw(50px, $second-bp);
+		}
+		@media (max-width: $small-tablet-bp){
+			height: px-to-vw(260px, $small-tablet-bp);
+			max-width: 100%;
+			border-radius: px-to-vw(40px, $small-tablet-bp);
+		}
+		@media (max-width: $mobile-bp){
+			height: px-to-vw(266px, $mobile-bp);
+			border-radius: px-to-vw(40px, $mobile-bp);
+		}
 		& img {
 			object-fit: cover;
 			width: 100%;
@@ -51,6 +79,12 @@
 		text-align: center;
 		color: $neutral-dark;
 		opacity: 0;
+		@media (max-width: $second-bp){
+			font-size: px-to-vw(18px, $second-bp);
+		}
+		@media (max-width: $tablet-bp){
+			display: none;
+		}
 	}
 }
 
@@ -69,6 +103,24 @@
 	font-size: 28px;
 	color: #c7c7c7;
 	overflow: hidden;
+	@media (max-width: $first-bp){
+		width: px-to-vw(140px, $first-bp);
+		height: px-to-vw(140px, $first-bp);
+		border-radius: px-to-vw(22px, $first-bp);
+		border: px-to-vw(5px, $first-bp) solid #FFFFFF;
+	}
+	@media (max-width: $third-bp){
+		width: px-to-vw(120px, $third-bp);
+		height: px-to-vw(120px, $third-bp);
+		border-radius: px-to-vw(20px, $third-bp);
+		border: px-to-vw(4px, $third-bp) solid #FFFFFF;
+	}
+	@media (max-width: $tablet-bp){
+		width: px-to-vw(120px, $tablet-bp);
+		height: px-to-vw(120px, $tablet-bp);
+		border-radius: px-to-vw(20px, $tablet-bp);
+		border: px-to-vw(4px, $tablet-bp) solid #FFFFFF;
+	}
 	&__image {
 		position: absolute;
 		top: 0;

@@ -1,50 +1,35 @@
 @use "../variables.scss" as *;
+@use "../functions.scss" as *;
 
 // Блок с преимуществами
 .advantages {
 	margin-top: 180px;
+	@media (max-width: $first-bp){
+		margin-top: px-to-vw(180px, $first-bp);
+	}
+	@media (max-width: $small-tablet-bp){
+		margin-top: px-to-vw(248px, $tablet-bp);
+	}
 		&__wrapper {
 			display: flex;
 			flex-direction: column;
 			align-items: center;
 			gap: 80px;
+			@media (max-width: $first-bp){
+				gap: px-to-vw(80px, $first-bp);
+			}
+			@media (max-width: $small-tablet-bp){
+				gap: px-to-vw(45px, $small-tablet-bp);
+			}
+			@media (max-width: $mobile-bp){
+				gap: 52px;
+			}
 		}
 		&__title {
 		}
 		&__cards {
 			display: flex;
 			justify-content: center;
-			// background-color: red;
-			// &>*:nth-child(1) {
-			// 	transform: translateX(225px) rotate(30deg);
-			// }
-			// &>*:nth-child(2) {
-			// 	transform: translateX(175px) rotate(30deg);
-			// }
-			// &>*:nth-child(3) {
-			// 	transform: translateX(125px) rotate(30deg);
-			// }
-			// &>*:nth-child(4) {
-			// 	transform: translateX(75px) rotate(30deg);
-			// }
-			// &>*:nth-child(5) {
-			// 	transform: translateX(25px) rotate(30deg);
-			// }
-			// &>*:nth-child(6) {
-			// 	transform: translateX(-25px) rotate(30deg);
-			// }
-			// &>*:nth-child(7) {
-			// 	transform: translateX(-75px) rotate(30deg);
-			// }
-			// &>*:nth-child(8) {
-			// 	transform: translateX(-125px) rotate(30deg);
-			// }
-			// &>*:nth-child(9) {
-			// 	transform: translateX(-175px) rotate(30deg);
-			// }
-			// &>*:nth-child(10) {
-			// 	transform: translateX(-225px) rotate(30deg);
-			// }
 		}
 		&__card {
 		}
@@ -53,17 +38,42 @@
 			grid-template-columns: repeat(3, 1fr);
 			column-gap: 64px;
 			row-gap: 40px;
+			@media (max-width: $first-bp){
+				column-gap: px-to-vw(64px, $first-bp);
+				row-gap: px-to-vw(40px, $first-bp);
+			}
+			@media (max-width: $mobile-bp){
+				grid-template-columns: repeat(2, 1fr);
+				row-gap: 40px;
+				column-gap: 24px;
+			}
 		}
 		&__item {
 			display: flex;
 			flex-direction: column;
 			background-color: transparent;
-
+			& img {
+				width: 100%;
+			}
 			&_title {
 				padding: 20px 0px;
 				font-size: 24px;
 				color: $neutral-dark;
 				letter-spacing: -1%;
+				@media (max-width: $first-bp){
+					font-size: px-to-vw(24px, $first-bp);
+				}
+				@media (max-width: $tablet-bp){
+					font-size: 16px;
+					padding: px-to-vw(20px, $first-bp) 0px;
+				}
+				@media (max-width: $small-tablet-bp){
+					padding: 10px 0px;
+					font-size: 14px;
+				}
+				@media (max-width: $mobile-bp){
+					padding: 12px 0px;
+				}
 			}
 			&>*:last-child {
 				display: none;

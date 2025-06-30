@@ -1,0 +1,20 @@
+@use "../common/variables.scss" as *;
+@use "../common/functions.scss" as *;
+
+.projects-page {
+	&__wrapper {
+		padding-top: 100px;
+		display: flex;
+		flex-direction: column;
+		gap: 80px;
+		@media (max-width: $first-bp){
+			gap: px-to-vw(80px, $first-bp);
+			padding-top: px-to-vw(100px, $first-bp);
+		}
+	}
+	&__titles {
+		display: flex;
+		flex-direction: column;
+		align-items: center;
+	}
+}

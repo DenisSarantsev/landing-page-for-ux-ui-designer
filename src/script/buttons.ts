@@ -12,8 +12,8 @@ import { gsap } from "gsap";
   const springEase = "elastic.out(1, 1)";
   const duration = 0.35;
 
-  let explodeTweens = [];
-  let implodeTweens = [];
+  let explodeTweens: gsap.core.Tween[] = [];
+  let implodeTweens: gsap.core.Tween[] = [];
 
   const explode = () => {
     // Отменяем возвратную анимацию, если она еще идет
@@ -46,8 +46,10 @@ import { gsap } from "gsap";
       implodeTweens.push(tween);
   };
 
-  button.addEventListener('mouseenter', explode);
-  button.addEventListener('mouseleave', implode);
+  if (button) {
+    button.addEventListener('mouseenter', explode);
+    button.addEventListener('mouseleave', implode);
+  }
 
 
 	// ------------- Кнопка в блоке featured works
@@ -62,8 +64,8 @@ import { gsap } from "gsap";
 	const workButtonSpringEase = "elastic.out(1, 1)";
   const workButtonDuration = 0.35;
 
-  let workButtonExplodeTweens = [];
-  let workButtonImplodeTweens = [];
+  let workButtonExplodeTweens: gsap.core.Tween[] = [];
+  let workButtonImplodeTweens: gsap.core.Tween[] = [];
 
 	const workButtonExplode = () => {
     // Отменяем возвратную анимацию, если она еще идет
@@ -96,7 +98,9 @@ import { gsap } from "gsap";
       workButtonImplodeTweens.push(tween);
   };
 
-  worksButton.addEventListener('mouseenter', workButtonExplode);
-  worksButton.addEventListener('mouseleave', workButtonImplode);
+  if (worksButton) {
+    worksButton.addEventListener('mouseenter', workButtonExplode);
+    worksButton.addEventListener('mouseleave', workButtonImplode);
+  }
 
 

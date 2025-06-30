@@ -1,11 +1,20 @@
 @use "../variables.scss" as *;
+@use "../functions.scss" as *;
   
 .footer {
+	position: relative;
 	margin-top: 248px;
 	width: 100%;
-	//min-height: 100vh;
+	min-height: 100vh;
 	//background-color: violet;
-	padding-bottom: 441px;
+	padding: 50px 0px 441px 0px;
+	@media (max-width: $first-bp){
+		padding: 50px 0px px-to-vw(441px, $first-bp) 0px;
+		margin-top: px-to-vw(248px, $first-bp);
+	}
+	@media (max-width: $tablet-bp){
+		padding: 50px 0px px-to-vw(441px, $tablet-bp) 0px;
+	}
 	&__wrapper {
 		display: flex;
 		flex-direction: column;
@@ -31,6 +40,14 @@
 			text-transform: uppercase;
 			color: $neutral-dark;
 			border-bottom: 12px solid $neutral-dark;
+			@media (max-width: 1920px){
+				margin-top: px-to-vw(20px, $first-bp);
+				font-size: px-to-vw(140px, 1920px);
+				border-bottom: px-to-vw(12px, $first-bp) solid $neutral-dark;
+			}
+			@media (max-width: $tablet-bp){
+				font-size: px-to-vw(140px, $tablet-bp);
+			}
 		}
 	}
 	&__contacts {
@@ -38,6 +55,9 @@
 		display: flex;
 		flex-direction: column;
 		gap: 10px;
+		@media (max-width: $tablet-bp){
+			margin-top: px-to-vw(36px, $tablet-bp);
+		}
 	}
 }
 
@@ -45,37 +65,47 @@
 	
 	
 	
-	canvas {
-    display: block;
-    background: black;
-    width: 100vw;
-    height: 100vh;
-  }
-  input {
-    width: 250px;
-    height: 40px;
-    line-height: 40px;
-    position: absolute;
-    bottom: 35px;
-    left: calc(50% - 125px);
-    background: rgba(255,255,255,0.2);
-    color: white;
-    font-size: 30px;
-    font-family: arial;
-    text-align: center;
-    border: 1px solid white;
-    z-index: 10;
-  }
-  p {
-    position: fixed;
-    left: 0;
-    bottom: 5px;
-    color: #fff;
-    z-index: 10;
-    font-size: 16px;
-    font-family: Helvetica, Verdana, sans-serif;
-    opacity: 0.5;
-    width: 100%;
-    text-align: center;
-    margin: 0;
-  }
+canvas {
+	position: absolute;
+	bottom: 0px;
+	left: 0px;
+	display: block;
+	background: transparent;
+	width: 100vw;
+	height: 150vh;
+}
+input {
+	width: 250px;
+	height: 40px;
+	line-height: 40px;
+	position: absolute;
+	bottom: 35px;
+	left: calc(50% - 125px);
+	background: rgba(255,255,255,0.2);
+	color: white;
+	font-size: 30px;
+	font-family: arial;
+	text-align: center;
+	border: 1px solid white;
+	z-index: 10;
+}
+p {
+	position: fixed;
+	left: 0;
+	bottom: 5px;
+	color: #fff;
+	z-index: 10;
+	font-size: 16px;
+	font-family: Helvetica, Verdana, sans-serif;
+	opacity: 0.5;
+	width: 100%;
+	text-align: center;
+	margin: 0;
+}
+
+// Элементы внизу футера
+.particle {
+	padding: 5px;
+	width: 20px;
+	height: 20px;
+}

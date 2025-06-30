@@ -13,3 +13,15 @@ $accent-blue: #04F;
 // Шрифты
 $main-font: "Outfit", Arial, sans-serif;
 $accent-font: "Futura Bold Condensed BT", Arial, sans-serif;
+
+// Брейкпоинты для адаптива
+// Ширина
+$first-bp: 1440px;
+$second-bp: 1320px;
+$third-bp: 1100px;
+$tablet-bp: 992px;
+$small-tablet-bp: 768px;
+$mobile-bp: 480px;
+$small-mobile-bp: 360px;
+// Высота
+$first-height-bp: 1000px;

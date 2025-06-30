@@ -1,11 +1,21 @@
 @use "../variables.scss" as *;
+@use "../functions.scss" as *;
 
 .product-thinking {
 	margin-top: 180px;
+	@media (max-width: $first-bp){
+		margin-top: px-to-vw(180px, $first-bp);
+	}
+	@media (max-width: $small-tablet-bp){
+		margin-top: px-to-vw(248px, $tablet-bp);
+	}
 		&__wrapper {
 			display: grid;
 			grid-template-columns: repeat(2, 1fr);
 			gap: 25px;
+			@media (max-width: $second-bp){
+				grid-template-columns: repeat(1, 1fr);
+			}
 		}
 		&__left {
 			font-weight: bold;
@@ -16,6 +26,21 @@
 			font-family: $accent-font;
 			line-height: 128%;
 			color: $neutral-dark;
+			@media (max-width: $first-bp){
+				font-size: px-to-vw(64px, $first-bp);
+			}
+			@media (max-width: $tablet-bp){
+				font-size: px-to-vw(58px, $tablet-bp);
+			}
+			@media (max-width: $small-tablet-bp){
+				font-size: px-to-vw(40px, $small-tablet-bp);
+			}
+			@media (max-width: $mobile-bp){
+				font-size: px-to-vw(30px, $mobile-bp);
+			}
+			@media (max-width: $small-mobile-bp){
+				font-size: 24px;
+			}
 			& span {
 				font-family: $accent-font;
 			}
@@ -29,5 +54,13 @@
 			letter-spacing: -1%;
 			line-height: 125%;
 			color: $neutral-dark;
+			@media (max-width: $second-bp){
+				display: flex;
+				flex-direction: column;
+				gap: 20px;
+			}
+			@media (max-width: $small-tablet-bp){
+				font-size: 18px;
+			}
 		}
 }

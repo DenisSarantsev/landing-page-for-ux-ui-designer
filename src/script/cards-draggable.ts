@@ -129,7 +129,6 @@ const addEventsToCards = (): void => {
 						}
 					}
 					// Запоминаем координаты всех карточек
-					console.log(startTranslateX, startTranslateY)
 					cardOffsets.push({
 						x: startTranslateX,
 						y: startTranslateY
@@ -203,7 +202,7 @@ const moveCardsToPoints = () => {
 	});
 };
 
-// Смещаем картоки по вертикали в зависимости от смещения по горизонтали
+// Смещаем карточки по вертикали в зависимости от смещения по горизонтали
 const computeVerticalTranslate = (x: number): number => {
 	// Находим центр вьюпорта
 	const cardWidth: number = [...cards][0].offsetWidth;

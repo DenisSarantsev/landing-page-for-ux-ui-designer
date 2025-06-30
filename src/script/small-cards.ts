@@ -12,9 +12,10 @@ const showCurrentElement = (section: string, cardsCount: number): void => {
 		smallCardsContainer.innerHTML = "";
 		// Вставляем нужные карточки
 		for ( let i = 1; i < cardsCount + 1; i++  ) {
+			/// landing-page-for-ux-ui-designer/dist
 			smallCardsContainer.insertAdjacentHTML("beforeend", `
 				<div class="advantages__card advantage-card">
-					<img src="/landing-page-for-ux-ui-designer/dist/img/small-cards/${section}-image-${i}.png" alt="project screenshot" class="advantage-card__image">
+					<img src="landing-page-for-ux-ui-designer/dist/img/small-cards/${section}-image-${i}.png" alt="project screenshot" class="advantage-card__image">
 				</div>
 			`)
 		};
@@ -25,12 +26,13 @@ const showCurrentElement = (section: string, cardsCount: number): void => {
 			const centerIndex = (allCards.length - 1) / 2;
 			gsap.fromTo(card, {
 				opacity: 0,
+				x: (index - centerIndex) * -33,
 			},
 			{
 				duration: 1.2,
 				delay: 0,
 				opacity: 1,
-				x: (index - centerIndex) * -20,
+				x: (index - centerIndex) * -33,
 				ease: "elastic.out(2, 0.7)",
 			})
 		})

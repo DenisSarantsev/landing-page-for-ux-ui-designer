@@ -1,18 +1,20 @@
 @use "../variables.scss" as *;
+@use "../functions.scss" as *;
 
 // Блок с карточками работ
 .works {
 	margin-top: 128px;
+	@media (max-width: $first-bp){
+		margin-top: px-to-vw(128px, $first-bp);
+	}
 		&__wrapper {
 			display: flex;
 			flex-direction: column;
 			align-items: center;
-			gap: 80px;
 		}
 		&__titles {
 			display: flex;
 			flex-direction: column;
-			gap: 12px;
 			align-items: center;
 		}
 		&__title {
@@ -26,6 +28,23 @@
 			grid-template-columns: repeat(3, 1fr);
 			row-gap: 64px;
 			column-gap: 60px;
+			@media (max-width: $first-bp){
+				column-gap: px-to-vw(60px, $first-bp);
+				row-gap: px-to-vw(64px, $first-bp);
+			}
+			@media (max-width: $tablet-bp){
+				column-gap: px-to-vw(24px, $first-bp);
+				row-gap: px-to-vw(24px, $first-bp);
+			}
+			@media (max-width: $small-tablet-bp){
+				grid-template-columns: repeat(2, 1fr);
+				column-gap: px-to-vw(40px, $first-bp);
+				row-gap: px-to-vw(40px, $first-bp);
+			}
+			@media (max-width: $mobile-bp){
+				grid-template-columns: repeat(1, 1fr); 
+				row-gap: px-to-vw(25px, $mobile-bp);
+			}
 		}
 		&__card {
 		}

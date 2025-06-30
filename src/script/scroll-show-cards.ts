@@ -1,9 +1,80 @@
 import { gsap } from "gsap";
+import { isMobileScreen } from "./resize";
 
-const allFeaturedWorksCards = document.querySelectorAll<HTMLElement>(".work-card__card");
+interface Project {
+	"id": number,
+	"project-name": string,
+	"description": string
+}
+interface ProjectsData {
+  projects: Project[];
+}
+interface Settings {
+	"project-items-on-home-page": number, 
+	"about-me-slider-interval": number
+}
+
+// Функция загрузки JSON
+const loadProjects = async (): Promise<Project[]> => {
+  try {
+    const response = await fetch('/data/projects.json');
+    const data: ProjectsData = await response.json();
+    return data.projects;
+  } catch (error) {
+    console.error('Error loading projects:', error);
+    return [];
+  }
+};
+
+// Функция загрузки JSON
+const loadCount = async (): Promise<Settings | null> => {
+	try {
+		const response = await fetch('/data/settings.json');
+		const data: Settings = await response.json();
+		return data;
+	} catch (error) {
+		return null;
+	}
+};
+
+// Функция создания карточек
+const createProjectCards = (projects: Project[], count: number, pathname: string) => {
+		console.log(count)
+  let workCardsContainer;
+	if ( pathname === "/" ) {
+		 workCardsContainer = document.querySelector<HTMLElement>(".works__cards");
+	} else if ( pathname === "/projects" ) {
+		workCardsContainer = document.querySelector<HTMLElement>(".projects-page__cards");
+		count = projects.length
+	}
+  if (!workCardsContainer) return;
+
+  workCardsContainer.innerHTML = ''; // Очищаем контейнер
+
+  projects.forEach((project, index) => {
+		if ( index + 1 <= count ) {
+			const cardHTML = `
+				<div data-project-id="${project.id}" class="works__card work-card">
+					<div class="work-card__card">
+						<img src="landing-page-for-ux-ui-designer/dist/img/project/${project.id}/miniature.png" alt="${project['project-name']}">
+					</div>
+					<div class="work-card__text">${project['project-name']}</div>
+				</div>
+			`;
+			workCardsContainer.insertAdjacentHTML('beforeend', cardHTML);
+		} else {
+			return
+		}
+    
+  });
+};
+
+// Переменная для хранения карточек (обновляется после создания)
+let allFeaturedWorksCards: NodeListOf<HTMLElement>;
 
 // Проверка направления скролла
 let lastScrollY = window.scrollY;
+let hoverEventsAttached = false; // Флаг для hover-обработчиков
 
 // Эффекты при скролле
 const checkScroll = () => {
@@ -26,27 +97,27 @@ const checkScroll = () => {
 			// Увеличиваем карточки при входе в вьюпорт (скролл снизу вверх)
 			if ( cardTop - (rect.height * 1) < scrollFromBottom && cardBottom - (rect.height * 0.5) <= scrollFromTop ) {
 				gsap.to(card, {
-					duration: 1,
+					duration: 0.7,
 					scale: 1,
-					ease: "elastic(0.7, 0.4)",
+					ease: "elastic(1, 0.4)",
 					transformOrigin: "center bottom",
 				});
 			}
 			// Увеличиваем карточки при входе в вьюпорт (скролл сверху вниз)
 			if ( cardTop - (rect.height * 1) < scrollFromBottom + 400 && isScrollingDown ) {
 				gsap.to(card, {
-					duration: 1,
+					duration: 0.7,
 					scale: 1,
-					ease: "elastic(0.7, 0.4)",
+					ease: "elastic(1, 0.4)",
 					transformOrigin: "center bottom",
 				});
 			}
 			// Уменьшаем карточки при выходе из вьюпорта
 			if ( cardTop + rect.height < scrollFromTop || cardTop > scrollFromBottom ) {
 				gsap.to(card, {
-					duration: 0.5,
-					scale: 0.5,
-					ease: "power2.out",
+					duration: 0.2,
+					scale: 0.7,
+					ease: "elastic(1, 0.4)",
 					transformOrigin: "center bottom",
 				});
 			} 
@@ -56,30 +127,69 @@ const checkScroll = () => {
 }
 
 // Эффекты при ховерах
+// Обработчики hover-эффектов (вынесены отдельно)
+const handleMouseEnter = (e: Event) => {
+	const card = e.currentTarget as HTMLElement;
+	gsap.to(card, {
+		duration: 0.4,
+		scale: 1.05,
+		ease: "elastic(1, 1)",
+		transformOrigin: "center center",
+	});
+};
+
+const handleMouseLeave = (e: Event) => {
+	const card = e.currentTarget as HTMLElement;
+	gsap.to(card, {
+		duration: 0.5,
+		scale: 1,
+		ease: "elastic(0.7, 0.4)",
+		transformOrigin: "center center",
+	});
+};
+
+// Эффекты при ховерах (теперь управляемые)
 const hoverCardEffect = (card: HTMLElement): void => {
-	card.addEventListener("mouseenter", () => {
-		gsap.to(card, {
-			duration: 0.6,
-			scale: 1.05,
-			ease: "elastic(0.3, 0.1)",
-			transformOrigin: "center center",
+	card.addEventListener("mouseenter", handleMouseEnter);
+	card.addEventListener("mouseleave", handleMouseLeave);
+};
+
+// Удаление hover-эффектов
+const removeHoverCardEffect = (card: HTMLElement): void => {
+	card.removeEventListener("mouseenter", handleMouseEnter);
+	card.removeEventListener("mouseleave", handleMouseLeave);
+	
+	// Возвращаем карточку в базовое состояние
+	gsap.to(card, {
+		duration: 0.5,
+		scale: 1,
+		ease: "power2.out",
+		transformOrigin: "center center",
+	});
+};
+
+// Функция управления hover-обработчиками
+const manageHoverListeners = () => {
+	if (!isMobileScreen && !hoverEventsAttached) {
+		// Включаем hover-эффекты на больших экранах
+		[...allFeaturedWorksCards].forEach((card) => {
+			hoverCardEffect(card);
 		});
-	})
-	card.addEventListener("mouseleave", () => {
-		gsap.to(card, {
-			duration: 1,
-			scale: 1,
-			ease: "elastic(0.7, 0.4)",
-			transformOrigin: "center center",
+		hoverEventsAttached = true;
+	} else if (isMobileScreen && hoverEventsAttached) {
+		// Отключаем hover-эффекты на маленьких экранах
+		[...allFeaturedWorksCards].forEach((card) => {
+			removeHoverCardEffect(card);
 		});
-	})
-}
+		hoverEventsAttached = false;
+	}
+};
 
 // Эффекты при нажатиях (кликах)
 const activeCardEffect = (card: HTMLElement): void => {
 	card.addEventListener("mousedown", () => {
 		gsap.to(card, {
-			duration: 0.4,
+			duration: 0.2,
 			scale: 1,
 			ease: "elastic(0.1, 0.3)",
 			transformOrigin: "center center",
@@ -87,7 +197,7 @@ const activeCardEffect = (card: HTMLElement): void => {
 	})
 	card.addEventListener("mouseup", () => {
 		gsap.to(card, {
-			duration: 1,
+			duration: 0.2,
 			scale: 1.05,
 			ease: "elastic(0.7, 0.4)",
 			transformOrigin: "center center",
@@ -96,16 +206,35 @@ const activeCardEffect = (card: HTMLElement): void => {
 }
 
 
-// Первично уменьшаем все элементы
-[...allFeaturedWorksCards].forEach((card) => {
-	// gsap.to(card, {
-	// 	duration: 0.6,
-	// 	scale: 0.3,
-	// 	ease: "elastic(0.7, 0.4)",
-	// 	transformOrigin: "center bottom",
-	// });
-	hoverCardEffect(card);
-	activeCardEffect(card)
-})
+// Инициализация
+document.addEventListener("DOMContentLoaded", async () => {
+  // Загружаем проекты и создаем карточки
+  const projects = await loadProjects();
+	const settings = await loadCount();
+	console.log(settings)
+	let itemsCount = settings?.["project-items-on-home-page"] ?? 9;
+	const pathname = window.location.pathname;
 
-checkScroll();
+  if (projects.length > 0) {
+    createProjectCards(projects, itemsCount, pathname);
+    
+    // Обновляем ссылку на карточки после их создания
+    allFeaturedWorksCards = document.querySelectorAll<HTMLElement>(".work-card__card");
+    
+    // Применяем эффекты к созданным карточкам
+    [...allFeaturedWorksCards].forEach((card) => {
+      activeCardEffect(card);
+    });
+    
+    // Управляем hover-эффектами
+    manageHoverListeners();
+  }
+  
+  // Запускаем scroll-эффекты
+  checkScroll();
+});
+
+// Слушаем изменения размера экрана
+window.addEventListener("resize", () => {
+  manageHoverListeners();
+});
