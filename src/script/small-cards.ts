@@ -1,4 +1,5 @@
 import { gsap } from "gsap";
+const BASE_PATH = import.meta.env.VITE_BASE_PATH || '';
 
 // Контейнер для карточек
 const smallCardsContainer = document.querySelector<HTMLElement>(".advantages__cards");
@@ -12,10 +13,10 @@ const showCurrentElement = (section: string, cardsCount: number): void => {
 		smallCardsContainer.innerHTML = "";
 		// Вставляем нужные карточки
 		for ( let i = 1; i < cardsCount + 1; i++  ) {
-			/// landing-page-for-ux-ui-designer/dist
+			//  /landing-page-for-ux-ui-designer/dist
 			smallCardsContainer.insertAdjacentHTML("beforeend", `
 				<div class="advantages__card advantage-card">
-					<img src="/landing-page-for-ux-ui-designer/dist/img/small-cards/${section}-image-${i}.png" alt="project screenshot" class="advantage-card__image">
+					<img src="${BASE_PATH}/img/small-cards/${section}-image-${i}.png" alt="project screenshot" class="advantage-card__image">
 				</div>
 			`)
 		};

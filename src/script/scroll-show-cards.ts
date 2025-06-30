@@ -1,6 +1,9 @@
 import { gsap } from "gsap";
 import { isMobileScreen } from "./resize";
 
+// Получаем базовый путь из переменных окружения
+const BASE_PATH = import.meta.env.VITE_BASE_PATH || '';
+
 interface Project {
 	"id": number,
 	"project-name": string,
@@ -53,10 +56,13 @@ const createProjectCards = (projects: Project[], count: number, pathname: string
 
   projects.forEach((project, index) => {
 		if ( index + 1 <= count ) {
+
+			const imagePath = `${BASE_PATH}/img/project/${project.id}/miniature.png`;
+
 			const cardHTML = `
 				<div data-project-id="${project.id}" class="works__card work-card">
 					<div class="work-card__card">
-						<img src="/landing-page-for-ux-ui-designer/dist/img/project/${project.id}/miniature.png" alt="${project['project-name']}">
+						<img src="${imagePath}" alt="${project['project-name']}">
 					</div>
 					<div class="work-card__text">${project['project-name']}</div>
 				</div>
