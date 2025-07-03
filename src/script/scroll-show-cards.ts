@@ -1,9 +1,6 @@
 import { gsap } from "gsap";
 import { isMobileScreen } from "./resize";
 
-// Получаем базовый путь из переменных окружения
-const BASE_PATH = import.meta.env.VITE_BASE_PATH || '';
-
 interface Project {
 	"id": number,
 	"project-name": string,
@@ -41,12 +38,14 @@ const loadCount = async (): Promise<Settings | null> => {
 };
 
 // Функция создания карточек
-const createProjectCards = (projects: Project[], count: number, pathname: string) => {
-		console.log(count)
+const createProjectCards = (projects: Project[], count: number) => {
   let workCardsContainer;
-	if ( pathname === "/" ) {
+	// Этот проверочный селевтор есть только на главной
+	const container = document.querySelector(".main-works");
+
+	if ( container ) {
 		 workCardsContainer = document.querySelector<HTMLElement>(".works__cards");
-	} else if ( pathname === "/projects" ) {
+	} else {
 		workCardsContainer = document.querySelector<HTMLElement>(".projects-page__cards");
 		count = projects.length
 	}
@@ -57,7 +56,7 @@ const createProjectCards = (projects: Project[], count: number, pathname: string
   projects.forEach((project, index) => {
 		if ( index + 1 <= count ) {
 
-			const imagePath = `${BASE_PATH}/img/project/${project.id}/miniature.png`;
+			const imagePath = `/img/project/${project.id}/miniature.png`;
 
 			const cardHTML = `
 				<div data-project-id="${project.id}" class="works__card work-card">
@@ -219,10 +218,9 @@ document.addEventListener("DOMContentLoaded", async () => {
 	const settings = await loadCount();
 	console.log(settings)
 	let itemsCount = settings?.["project-items-on-home-page"] ?? 9;
-	const pathname = window.location.pathname;
 
   if (projects.length > 0) {
-    createProjectCards(projects, itemsCount, pathname);
+    createProjectCards(projects, itemsCount);
     
     // Обновляем ссылку на карточки после их создания
     allFeaturedWorksCards = document.querySelectorAll<HTMLElement>(".work-card__card");

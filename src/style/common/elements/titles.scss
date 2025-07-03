@@ -73,6 +73,9 @@
 	@media (max-width: $mobile-bp){
 		font-size: 16px;
 	}
+	@media (max-width: $small-mobile-bp){
+		font-size: 14px;
+	}
 }
 // Текст контакта, например почта в шапке
 .contact-item {
@@ -88,6 +91,9 @@
 	}
 	@media (max-width: $mobile-bp){
 		font-size: 12px;
+	}
+	@media (max-width: $small-mobile-bp){
+		font-size: 10px;
 	}
 }
 

@@ -1,12 +1,27 @@
-/*
+
 import Swiper from 'swiper';
 import 'swiper/css';
 import 'swiper/css/effect-creative';
+import { loadWorkplaces } from './common';
 
+// Получаем данные из json
+const swiperWorkplaces = await loadWorkplaces();
 
 const swiper = new Swiper('.swiper', {
-	slidesPerView: 5, // Показывать 3 слайда одновременно
-  spaceBetween: 50,
+	slidesPerView: 2.2, // Показывать 3 слайда одновременно
+  spaceBetween: 20,
+
+	// Адаптивные настройки
+	// breakpoints: {
+	// 	280: {
+	// 		slidesPerView: 2.05,
+	// 		spaceBetween: 20
+	// 	},
+	// 	600: {
+	// 		slidesPerView: 2,
+	// 		spaceBetween: 20
+	// 	},
+	// }
 });
 
 const slidesWrapper = document.querySelector<HTMLElement>(".swiper-wrapper");
@@ -53,6 +68,3 @@ const checkCardsMove = (): void => {
 	}
 }
 
-
-
-*/

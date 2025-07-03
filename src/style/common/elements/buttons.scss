@@ -12,11 +12,18 @@
 	text-transform: uppercase;
 	border-radius: 360px;
 	transition: all 0.3s ease 0s;
-	&:hover {
-		transition: all 0.3s ease 0s;
-		background-color: $accent-blue;
-		cursor: pointer;
+	@media (min-width: $tablet-bp){
+		&:hover {
+			transition: all 0.3s ease 0s;
+			background-color: $accent-blue;
+			cursor: pointer;
+		}
 	}
+	@media (max-width: $tablet-bp){
+		background-color: #E4E6EF;
+		padding: 0px;
+	}
+
 }
 
 // Светлая кнопка с точкой и стрелкой (как в блоке works)
@@ -31,10 +38,12 @@
 	text-transform: uppercase;
 	border-radius: 360px;
 	transition: all 0.3s ease 0s;
-	&:hover {
-		transition: all 0.3s ease 0s;
-		background-color: $accent-blue;
-		cursor: pointer;
+	@media (min-width: $tablet-bp){
+		&:hover {
+			transition: all 0.3s ease 0s;
+			background-color: $accent-blue;
+			cursor: pointer;
+		}
 	}
 }
 

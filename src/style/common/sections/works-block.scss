@@ -60,18 +60,20 @@
 	display: flex;
 	justify-content: center;
 	align-items: center;
-	&:hover {
-		&>* {
-			&:first-child {
-				background-color: #FFFFFF;
-				transition: all 0.3s ease 0s;
-				opacity: 0;
+	@media (min-width: $tablet-bp){
+		&:hover {
+			&>* {
+				&:first-child {
+					background-color: #FFFFFF;
+					transition: all 0.3s ease 0s;
+					opacity: 0;
+				}
+				&:last-child {
+					opacity: 1;
+					transition: all 0.4s ease 0s;
+				}
+				color: #FFFFFF;
 			}
-			&:last-child {
-				opacity: 1;
-				transition: all 0.4s ease 0s;
-			}
-			color: #FFFFFF;
 		}
 	}
 		&__dot {

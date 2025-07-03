@@ -24,6 +24,9 @@
 			left: 0%;
 			top: 0px;
 			background-color: deepskyblue;
+			@media (max-width: $tablet-bp){
+				display: none;
+			}
 		}
 		&__draggable-path {
 			width: 100%;
@@ -107,11 +110,14 @@
 
 .swiper {
 	position: relative;
+	@media (min-width: $tablet-bp){
+		display: none !important;
+	}
 }
 .swiper-wrapper {
 	height: auto;
-	max-width: 1320px;
-	width: 100%;
+	width: auto;
+	max-width: 100vw;
 	display: flex;
 	background-color: green;
 	position: absolute;
@@ -124,7 +130,9 @@
 	max-height: auto;
 	display: flex;
 	justify-content: center;
-	min-width: 360px;
-	pointer-events: auto !important;
+	width: 360px;
 	background-color: red;
+	@media (max-width: $tablet-bp){
+		padding: px-to-vw(50px, $tablet-bp) 0px;
+	}
 }

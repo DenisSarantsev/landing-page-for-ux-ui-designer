@@ -20,6 +20,11 @@
 		height: px-to-vw(260px, $tablet-bp);
 		border-radius: px-to-vw(50px, $tablet-bp);
 	}
+	@media (max-width: $mobile-bp){
+		width: px-to-vw(215px, $mobile-bp);
+		height: px-to-vw(155px, $mobile-bp);
+		border-radius: px-to-vw(30px, $mobile-bp);
+	}
 	& img {
 		object-fit: cover;
 		width: 100%;
@@ -121,6 +126,12 @@
 		border-radius: px-to-vw(20px, $tablet-bp);
 		border: px-to-vw(4px, $tablet-bp) solid #FFFFFF;
 	}
+	@media (max-width: $mobile-bp){
+		width: px-to-vw(66px, $mobile-bp);
+		height: px-to-vw(66px, $mobile-bp);
+		border-radius: px-to-vw(8px, $mobile-bp);
+		border: px-to-vw(3px, $mobile-bp) solid #FFFFFF;
+	}
 	&__image {
 		position: absolute;
 		top: 0;
@@ -144,11 +155,23 @@
 	&:hover {
 		cursor: pointer;
 	}
+	@media (max-width: $small-tablet-bp){
+		max-width: px-to-vw(360px, $small-tablet-bp);
+		border-radius: px-to-vw(40px, $small-tablet-bp);
+		min-width: 290px;
+	}
 		&__wrapper {
 			padding: 32px;
 			display: flex;
 			flex-direction: column;
 			gap: 32px;
+			@media (max-width: $tablet-bp){
+				padding: px-to-vw(32px, $tablet-bp);
+			}
+			@media (max-width: $small-tablet-bp){
+				padding: 24px;
+				gap: 28px;
+			}
 		}
 		&__top {
 			display: flex;
@@ -161,6 +184,9 @@
 			color: $neutral-dark;
 			font-weight: 400;
 			line-height: 126.6%;
+			@media (max-width: $small-tablet-bp){
+				font-size: px-to-vw(30px, $small-tablet-bp);
+			}
 		}
 		&__subtitle {
 			font-size: 18px;
@@ -175,6 +201,12 @@
 			border-top: 1px solid $light-grey;
 			border-bottom: 1px solid $light-grey;
 			&_image {
+				width: 46px;
+				height: 46px;
+				@media (max-width: $small-tablet-bp){
+					width: 36px;
+					height: 36px;
+				}
 			}
 			&_data {
 				display: flex;

@@ -30,10 +30,28 @@
 		&__cards {
 			display: flex;
 			justify-content: center;
+			@media (max-width: $tablet-bp){
+				display: grid;
+				grid-template-columns: repeat(7, 1fr);
+				margin-left: px-to-vw(-22px, $tablet-bp);
+				&>*:nth-child(8) {
+					display: none;
+				}
+				&>*:nth-child(9) {
+					display: none;
+				}
+				&>*:nth-child(10) {
+					display: none;
+				}
+			}
 		}
 		&__card {
+			@media (max-width: $tablet-bp){
+				margin-left: 20px;
+			}
 		}
 		&__items {
+			width: 100%;
 			display: grid;
 			grid-template-columns: repeat(3, 1fr);
 			column-gap: 64px;
@@ -44,16 +62,28 @@
 			}
 			@media (max-width: $mobile-bp){
 				grid-template-columns: repeat(2, 1fr);
-				row-gap: 40px;
+				row-gap: px-to-vw(25px, $mobile-bp);
 				column-gap: 24px;
 			}
 		}
 		&__item {
+			width: 100%;
 			display: flex;
 			flex-direction: column;
 			background-color: transparent;
+			position: relative;
+			padding-bottom: 10px;
+			@media (max-width: $tablet-bp){
+				padding-bottom: 7px;
+			}
+			@media (max-width: $mobile-bp){
+				padding-bottom: 5px;
+			}
 			& img {
 				width: 100%;
+				position: absolute;
+				bottom: 0px;
+				left: 0px;
 			}
 			&_title {
 				padding: 20px 0px;
@@ -76,14 +106,19 @@
 				}
 			}
 			&>*:last-child {
-				display: none;
+				opacity: 0;
+				transition: all 0.2s ease 0s;
 			}
-			&:hover {
-				&>*:last-child {
-					display: block;
-				}
-				&>*:nth-child(2) {
-					display: none;
+			@media (min-width: $tablet-bp){
+				&:hover {
+					&>*:last-child {
+						opacity: 1;
+						transition: all 0.2s ease 0s;
+					}
+					&>*:nth-child(2) {
+						opacity: 0;
+						transition: all 0.2s ease 0s;
+					}
 				}
 			}
 		}
@@ -94,4 +129,28 @@
 			&_title {
 			}
 		}
+}
+
+// Анимация появления карточек
+@keyframes hiddenCards {
+	0% {
+		opacity: 1;
+	}
+	100% {
+		opacity: 0;
+	}
+}
+@keyframes showCards {
+	0% {
+		opacity: 0;
+	}
+	100% {
+		opacity: 1;
+	}
+}
+.hidden-advantage-cards {
+	animation: hiddenCards 0.4s ease 0s forwards;
+}
+.show-advantage-cards {
+	animation: showCards 0.4s ease 0s forwards;
 }
