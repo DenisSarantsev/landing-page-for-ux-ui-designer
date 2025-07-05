@@ -15,4 +15,6 @@ import "./script/fixed-widget"; // Фиксируем виджет при скр
 import "./script/resize"; // Определяем текущую ширину
 import "./script/modals"; // Скрипты для работы модальных окон
 import "./script/swiper"; // Скрипты для работы слайдера на мобильном
-import "./script/dispersion-effect" // Эффект рассыпающихся элементов
+import "./script/dispersion-effect"; // Эффект рассыпающихся элементов
+import "./script/animations"; // Анимации появления (функции).
+import "./script/appearance-animations"; // Анимации появления применение функций.

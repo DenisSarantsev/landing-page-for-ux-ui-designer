@@ -94,7 +94,7 @@ function showSlide(oldIndex: number, newIndex: number) {
 }
 
 // Интервал для смены слайдов
-const changeSlides = (maxSlides: number) => {
+export const changeSlides = (maxSlides: number) => {
 	setInterval(() => {
 		// Показываем слайд
 		showSlide(oldIndex, newIndex)
@@ -107,17 +107,3 @@ const changeSlides = (maxSlides: number) => {
 		}
 	}, 5000)
 }
-
-
-// Статус запуска слайдера
-let sliderWorks: boolean = false;
-// Отслеживание прокрутки
-advancedScrollWatcher.watch({
-  selector: '.about',
-  onScroll: (_element, data) => {
-    if ( data.scrolledPercentage > 30 && !sliderWorks ) {
-			sliderWorks = true;
-			changeSlides(5);
-		}
-  }
-});

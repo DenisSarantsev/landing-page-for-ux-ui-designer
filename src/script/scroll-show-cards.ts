@@ -1,30 +1,15 @@
 import { gsap } from "gsap";
 import { isMobileScreen } from "./resize";
+import { loadProjects } from "./common";
+import type { Project } from "../types/project.type"
+import { addActualProjectDataToModalWindow } from "./common";
 
-interface Project {
-	"id": number,
-	"project-name": string,
-	"description": string
-}
-interface ProjectsData {
-  projects: Project[];
-}
+
 interface Settings {
 	"project-items-on-home-page": number, 
 	"about-me-slider-interval": number
 }
 
-// Функция загрузки JSON
-const loadProjects = async (): Promise<Project[]> => {
-  try {
-    const response = await fetch('/data/projects.json');
-    const data: ProjectsData = await response.json();
-    return data.projects;
-  } catch (error) {
-    console.error('Error loading projects:', error);
-    return [];
-  }
-};
 
 // Функция загрузки JSON
 const loadCount = async (): Promise<Settings | null> => {
@@ -70,8 +55,9 @@ const createProjectCards = (projects: Project[], count: number) => {
 		} else {
 			return
 		}
-    
   });
+
+
 };
 
 // Переменная для хранения карточек (обновляется после создания)
@@ -233,6 +219,40 @@ document.addEventListener("DOMContentLoaded", async () => {
     // Управляем hover-эффектами
     manageHoverListeners();
   }
+
+	// Получаем все карточки проектов на странице
+const allProjectCards = document.querySelectorAll<HTMLElement>(".work-card");
+const projectModal = document.querySelector<HTMLElement>(".project-modal");
+if ( allProjectCards && [...allProjectCards].length > 0 ) {
+	[...allProjectCards].forEach((card) => {
+		console.log("add")
+		card.addEventListener("click", () => {
+			const currentId = card.getAttribute("data-project-id");
+			if ( currentId ) {
+				addActualProjectDataToModalWindow(+currentId)
+			}
+			const projectModalWrapper = projectModal?.firstElementChild;
+			projectModal?.classList.remove("modal-hidden");
+			gsap.fromTo(projectModal, {
+				opacity: 0
+			}, {
+				duration: 0.3,
+				opacity: 1,
+			});
+			if ( projectModalWrapper )
+			gsap.fromTo(projectModalWrapper, {
+				scale: 0.8,
+				opacity: 0
+			}, {
+				delay: 0.15,
+				duration: 0.3,
+				opacity: 1,
+				scale: 1,
+				ease: "elastic(1, 1)",
+			})
+		})
+	})
+}
   
   // Запускаем scroll-эффекты
   checkScroll();

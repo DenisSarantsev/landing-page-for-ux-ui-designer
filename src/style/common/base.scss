@@ -12,6 +12,15 @@ body {
 	width: 100%;
 }
 
+/* Пока страница загружается */
+body.loading {
+  opacity: 0;
+}
+/* После загрузки */
+body.loaded {
+  opacity: 1;
+}
+
 .body-padding {
 	padding: 0px 15px;
 }

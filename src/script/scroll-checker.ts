@@ -142,6 +142,14 @@ private calculateScrollData(element: Element): ScrollData {
 // Создаём экземпляр расширенного наблюдателя
 export const advancedScrollWatcher = new AdvancedScrollWatcher();
 
+
+
+
+
+
+
+
+
 // Примеры использования:
 
 // 1. Отслеживание точного процента видимости блока

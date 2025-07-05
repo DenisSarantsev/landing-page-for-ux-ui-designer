@@ -1,3 +1,5 @@
+/*
+
 const canvas = document.getElementById("scene");
   const ctx = canvas.getContext("2d");
 
@@ -200,3 +202,5 @@ const canvas = document.getElementById("scene");
   // Старт
   createParticles();
   animate();
+
+	*/

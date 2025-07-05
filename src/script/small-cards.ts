@@ -1,10 +1,12 @@
 import { gsap } from "gsap";
 import { isMobileScreen } from "./resize";
+import { isCardsShow } from "./appearance-animations";
 
 // Контейнер для карточек
 const smallCardsContainer = document.querySelector<HTMLElement>(".advantages__cards");
 // Контейнер с кнопками
 const buttonsContainer = document.querySelector<HTMLElement>(".advantages__items");
+
 
 // Переключаем на нужные карточки
 const showCurrentElement = (section: string, cardsCount: number): void => {
@@ -27,7 +29,7 @@ const showCurrentElement = (section: string, cardsCount: number): void => {
 					// Вставляем нужные карточки
 					for (let i = 1; i < cardsCount + 1; i++) {
 						smallCardsContainer.insertAdjacentHTML("beforeend", `
-							<div class="advantages__card advantage-card">
+							<div style="opacity: 0" class="advantages__card advantage-card">
 								<img src="/img/small-cards/${section}-image-${i}.png" alt="project screenshot" class="advantage-card__image">
 							</div>
 						`)
@@ -51,7 +53,7 @@ const showCurrentElement = (section: string, cardsCount: number): void => {
 						gsap.to(card, {
 							duration: 0.15,
 							delay: index * 0.02,
-							opacity: 1,
+							opacity: isCardsShow[0],
 							y: 0,
 							scale: 1,
 							ease: "back.out(1.7)"
@@ -66,7 +68,7 @@ const showCurrentElement = (section: string, cardsCount: number): void => {
 		// Вставляем нужные карточки
 		for (let i = 1; i < cardsCount + 1; i++) {
 			smallCardsContainer.insertAdjacentHTML("beforeend", `
-				<div class="advantages__card advantage-card">
+				<div style="opacity: 0" class="advantages__card advantage-card">
 					<img src="/img/small-cards/${section}-image-${i}.png" alt="project screenshot" class="advantage-card__image">
 				</div>
 			`)
@@ -85,7 +87,7 @@ const showCurrentElement = (section: string, cardsCount: number): void => {
 			}, {
 				duration: 0.15,
 				delay: index * 0.02,
-				opacity: 1,
+				opacity: isCardsShow[0],
 				y: 0,
 				scale: 1,
 				ease: "back.out(1.7)"

@@ -6,38 +6,41 @@ gsap.registerPlugin(Draggable);
 
 // Контейнер для карточек на десктопе
 const desktopWorkCardsWrapper = document.querySelector<HTMLElement>(".history__cards");
-// Если контейнера нет, значит код не выполняем, потому что мы на другой странице
-if ( desktopWorkCardsWrapper ) {
-// Вставляем нужное количество карточек
-const jsonCards = await loadWorkplaces();
-// Выводим карточки в контейнере
-jsonCards.forEach((card) => {
-	desktopWorkCardsWrapper.insertAdjacentHTML("beforeend", `
-		<div data-card-id=${card.id} class="history__card work-history-card desktop-workplace-card">
-			<div class="work-history-card__wrapper">
-				<div class="work-history-card__top">
-					<h3 class="work-history-card__title">${card.post}</h3>
-					<div class="work-history-card__subtitle">${card.formate}</div>
-				</div>
-				<div class="work-history-card__info">
-					<img src="/img/workplace/${card.id}/company-logo.png" alt="company logo" class="work-history-card__info_image">
-					<div class="work-history-card__info_data">
-						<div class="work-history-card__info_company-name">${card.company}</div>
-						<div class="work-history-card__info_address">${card["company-address"]}</div>
+const addDesktopWorkCards = async () => {
+	// Если контейнера нет, значит код не выполняем, потому что мы на другой странице
+	if ( desktopWorkCardsWrapper ) {
+	// Вставляем нужное количество карточек
+	const jsonCards = await loadWorkplaces();
+	// Выводим карточки в контейнере
+	jsonCards.forEach((card) => {
+		desktopWorkCardsWrapper.insertAdjacentHTML("beforeend", `
+			<div data-card-id=${card.id} class="history__card work-history-card desktop-workplace-card">
+				<div class="work-history-card__wrapper">
+					<div class="work-history-card__top">
+						<h3 class="work-history-card__title">${card.post}</h3>
+						<div class="work-history-card__subtitle">${card.formate}</div>
+					</div>
+					<div class="work-history-card__info">
+						<img src="/img/workplace/${card.id}/company-logo.png" alt="company logo" class="work-history-card__info_image">
+						<div class="work-history-card__info_data">
+							<div class="work-history-card__info_company-name">${card.company}</div>
+							<div class="work-history-card__info_address">${card["company-address"]}</div>
+						</div>
+					</div>
+					<div class="work-history-card__period">
+						<div class="work-history-card__period_title">From</div>
+						<div class="work-history-card__period_subtitle">${card.period.from}</div>
+					</div>
+					<div class="work-history-card__period">
+						<div class="work-history-card__period_title">To</div>
+						<div class="work-history-card__period_subtitle">${card.period.to}</div>
 					</div>
 				</div>
-				<div class="work-history-card__period">
-					<div class="work-history-card__period_title">From</div>
-					<div class="work-history-card__period_subtitle">${card.period.from}</div>
-				</div>
-				<div class="work-history-card__period">
-					<div class="work-history-card__period_title">To</div>
-					<div class="work-history-card__period_subtitle">${card.period.to}</div>
-				</div>
 			</div>
-		</div>
-	`)
-})
+		`)
+	})
+}
+addDesktopWorkCards()
 
 const draggableZone = document.querySelector<HTMLElement>(".history__draggable-points");
 const cards = document.querySelectorAll<HTMLElement>(".desktop-workplace-card");
