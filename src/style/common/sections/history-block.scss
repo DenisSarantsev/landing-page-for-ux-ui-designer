@@ -10,10 +10,13 @@
 		margin-top: px-to-vw(248px, $tablet-bp);
 	}
 		&__wrapper {
+			position: relative;
 			display: flex;
 			flex-direction: column;
-			gap: 50px;
-			//background-color: orange;
+			gap: 80px;
+			@media (max-width: $tablet-bp){
+				gap: 50px;
+			}
 		}
 		&__title {
 		}
@@ -23,7 +26,7 @@
 			width: 100%;
 			left: 0%;
 			top: 0px;
-			background-color: deepskyblue;
+			//background-color: deepskyblue;
 			@media (max-width: $tablet-bp){
 				display: none;
 			}
@@ -46,6 +49,7 @@
 			left: 0px;
 			width: 100%;
 			height: 100%;
+			opacity: 0;
 			//overflow: hidden;
 			&>*:nth-child(1) {
 				position: absolute;
@@ -126,9 +130,6 @@
 	position: absolute;
 	top: 0px;
 	left: 0px;
-	@media (max-width: $small-tablet-bp){
-		margin-top: -40px;
-	}
 }
 .swiper-slide {
 	padding: 50px 0px;
@@ -150,5 +151,65 @@
 		display: flex !important;
 		justify-content: center;
 		padding-left: 0px !important;
+	}
+}
+
+.drag-widget {
+	display: flex;
+	justify-content: center;
+	position: absolute;
+	top: 0px;
+	width: 100%;
+	@media (max-width: $tablet-bp){
+		display: none
+	}
+	&__wrapper {
+		width: auto;
+		position: relative;
+		display: flex;
+		flex-direction: column;
+		align-items: center;
+	}
+	&__images {
+		padding: 5px 23px 13px 23px;
+	}
+	&__arrow-image {
+		width: 110px;
+	}
+	&__hand-image {
+		width: 100px;
+		height: 100px;
+		position: absolute;
+		top: 18px;
+		left: 30px;
+		animation: draggableHand 8s ease 0s infinite;
+		& img {
+			width: 21px;
+			height: 19px;
+			transform: rotate(-50deg);
+		}
+	}
+	&__text {
+		font-size: 18px;
+		letter-spacing: -0.2%;
+		color: $neutral-grey;
+	}
+}
+
+@keyframes draggableHand {
+	0% {
+		transform: rotate(105deg);
+	}
+	20% {
+		transform: rotate(0deg);
+	}
+	40% {
+		transform: rotate(105deg);
+	}
+	60% {
+		transform: rotate(0deg);
+	}
+	100% {
+		transform: rotate(105deg);
 	}
 }

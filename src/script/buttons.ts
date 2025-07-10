@@ -47,9 +47,12 @@ const implode = () => {
 		implodeTweens.push(tween);
 };
 
-if (button) {
+if ( button instanceof HTMLElement ) {
 	button.addEventListener('mouseenter', explode);
 	button.addEventListener('mouseleave', implode);
+	button.addEventListener('mousedown', () => {
+		activeButton(button)
+	})
 }
 
 
@@ -101,9 +104,19 @@ const workButtonImplode = () => {
 		workButtonImplodeTweens.push(tween);
 };
 
-if (worksButton) {
+if ( worksButton instanceof HTMLElement ) {
 	worksButton.addEventListener('mouseenter', workButtonExplode);
 	worksButton.addEventListener('mouseleave', workButtonImplode);
+	worksButton.addEventListener('mousedown', () => {
+		activeButton(worksButton)
+	});
 }
 
 
+// Общая функция active для всех кнопок
+const activeButton = (button: HTMLElement) => {
+	gsap.to(button, {
+		duration: 0,
+		scale: 0.9
+	})
+}

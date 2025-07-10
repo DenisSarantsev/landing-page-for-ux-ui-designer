@@ -1,6 +1,7 @@
 import { gsap } from "gsap";
 import { isMobileScreen } from "./resize";
 
+
 const cards = document.querySelectorAll<HTMLElement>(".start-block__card");
 
 const settings = {
@@ -75,6 +76,8 @@ const handleMouseMove = (e: MouseEvent) => {
     }
   });
 };
+
+
 
 // Сброс позиций всех карточек
 const resetCardsPosition = () => {

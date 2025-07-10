@@ -153,7 +153,13 @@
 	-moz-user-select: none;
 	-ms-user-select: none;
 	&:hover {
-		cursor: pointer;
+		cursor: grab;
+	}
+	&.dragging {
+		cursor: grabbing !important;
+	}
+	&.dragging * {
+		pointer-events: none !important;
 	}
 	@media (max-width: $small-tablet-bp){
 		max-width: px-to-vw(360px, $small-tablet-bp);

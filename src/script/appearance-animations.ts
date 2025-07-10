@@ -196,7 +196,7 @@ advancedScrollWatcher.watch({
   selector: '.footer',
   onScroll: (element, data) => {
 		// Показываем заголовок
-		if ( !footerBlock?.classList.contains("scrolled-title") && data.scrolledPercentage > 20 ) {
+		if ( !footerBlock?.classList.contains("scrolled-title") && data.scrolledPercentage > 40 ) {
 			if ( footerBlock instanceof HTMLElement ) footerBlock.classList.add("scrolled-title");
 			if ( topFooterSubtitle instanceof HTMLElement ) animateWordsByWord(topFooterSubtitle, 0.5);
 			const topTitle = footerTitleWrapper?.firstElementChild;

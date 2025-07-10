@@ -7,16 +7,16 @@
 	top: 0px;
 	left: 0px;
   width: 100%;
-  height: 100vh; // Используем vh вместо %
+	max-height: 100vh;
+  height: 100%; // Используем vh вместо %
   z-index: 1000; // Высокий z-index чтобы быть поверх всего
 	background-color: #787878;
 	padding: 20px;
-	overflow-y: auto;
+	overflow: hidden;
 
 	// Скрываем скроллбар для всех браузеров
 	scrollbar-width: none; /* Firefox */
 	-ms-overflow-style: none; /* Internet Explorer 10+ */
-
 	&::-webkit-scrollbar {
 		display: none; /* Chrome, Safari, Opera */
 	}
@@ -24,7 +24,8 @@
 		padding: 12px;
 	}
 		&__wrapper {
-			position: relative;
+			height: calc(100vh - 40px);
+			overflow-y: scroll;
 			background-color: #FFFFFF;
 			border-radius: 80px;
 			@media (max-width: $first-bp){
@@ -35,11 +36,19 @@
 			}
 		}
 		&__content-wrapper {
+			overflow-y: scroll;
 			display: flex;
 			flex-direction: column;
 			align-items: center;
 			gap: 64px;
+			height: 100vh;
 			padding: 150px 24px 170px 24px;
+			// Скрываем скроллбар для всех браузеров
+			// scrollbar-width: none; /* Firefox */
+			// -ms-overflow-style: none; /* Internet Explorer 10+ */
+			// &::-webkit-scrollbar {
+			// 	display: none; /* Chrome, Safari, Opera */
+			// }
 			@media (max-width: $first-bp){
 				border-radius: px-to-vw(80px, $first-bp);
 				gap: px-to-vw(64px, $first-bp);

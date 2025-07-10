@@ -1,6 +1,8 @@
 @use "./variables.scss" as *;
 @use "./fonts.scss" as *;
 
+
+
 body {
 	background-color: $background-color;
 	font-size: 16px;
@@ -10,6 +12,7 @@ body {
 	align-items: center;
 	border-radius: 360px;
 	width: 100%;
+	overflow-x: hidden;
 }
 
 /* Пока страница загружается */

@@ -43,7 +43,42 @@ const addCardsInMobileSlider = async () => {
 				</div>
 			</div>
 		`)
-	})
+	});
+
+	// навешиваем прослушиватели на все мобильные карточки
+	const allSwiperCards = document.querySelectorAll<HTMLElement>('.work-history-card');
+	const projectModal = document.querySelector<HTMLElement>(".project-modal");
+	if ( allSwiperCards && allSwiperCards.length > 0 ) {
+		[...allSwiperCards].forEach((card) => {
+			if ( card instanceof HTMLElement ) {
+				const cardId = card.getAttribute("data-workplace-swiper-slide-id");
+				if ( cardId ){
+					card.addEventListener("click", () => {
+						addActualWorkplaceDataToModalWindow(+cardId);
+						const projectModalWrapper = projectModal?.firstElementChild;
+						projectModal?.classList.remove("modal-hidden");
+						gsap.fromTo(projectModal, {
+							opacity: 0
+						}, {
+							duration: 0.3,
+							opacity: 1,
+						});
+						if ( projectModalWrapper )
+						gsap.fromTo(projectModalWrapper, {
+							scale: 0.8,
+							opacity: 0
+						}, {
+							delay: 0.15,
+							duration: 0.3,
+							opacity: 1,
+							scale: 1,
+							ease: "elastic(1, 1)",
+						})
+					})
+				}
+			}
+		})
+	}
 };
 addCardsInMobileSlider()
 
