@@ -7,7 +7,7 @@
 	top: 0px;
 	left: 0px;
   width: 100%;
-	max-height: 100vh;
+	//max-height: 100vh;
   height: 100%; // Используем vh вместо %
   z-index: 1000; // Высокий z-index чтобы быть поверх всего
 	background-color: #787878;
@@ -20,19 +20,30 @@
 	&::-webkit-scrollbar {
 		display: none; /* Chrome, Safari, Opera */
 	}
+	@media (max-width: $tablet-bp){
+		max-height: 100dvh;
+	}
 	@media (max-width: $small-tablet-bp){
 		padding: 12px;
 	}
 		&__wrapper {
-			height: calc(100vh - 40px);
+			height: calc( 100dvh - 40px );
 			overflow-y: scroll;
 			background-color: #FFFFFF;
 			border-radius: 80px;
+
+			// Скрываем скроллбар для всех браузеров
+			scrollbar-width: none; /* Firefox */
+			-ms-overflow-style: none; /* Internet Explorer 10+ */
+			&::-webkit-scrollbar {
+				display: none; /* Chrome, Safari, Opera */
+			}
 			@media (max-width: $first-bp){
 				border-radius: px-to-vw(80px, $first-bp);
 			}
 			@media (max-width: $small-tablet-bp){
 				border-radius: 40px;
+				height: calc( 100dvh - 25px );
 			}
 		}
 		&__content-wrapper {
@@ -44,11 +55,11 @@
 			height: 100vh;
 			padding: 150px 24px 170px 24px;
 			// Скрываем скроллбар для всех браузеров
-			// scrollbar-width: none; /* Firefox */
-			// -ms-overflow-style: none; /* Internet Explorer 10+ */
-			// &::-webkit-scrollbar {
-			// 	display: none; /* Chrome, Safari, Opera */
-			// }
+			scrollbar-width: none; /* Firefox */
+			-ms-overflow-style: none; /* Internet Explorer 10+ */
+			&::-webkit-scrollbar {
+				display: none; /* Chrome, Safari, Opera */
+			}
 			@media (max-width: $first-bp){
 				border-radius: px-to-vw(80px, $first-bp);
 				gap: px-to-vw(64px, $first-bp);
@@ -184,6 +195,7 @@
 	right: 60px;
 	background-color: $light-grey;
 	filter: drop-shadow(0px 7px 23.4px rgba(0, 0, 0, 0.12));
+	z-index: 100;
 	&:hover {
 		cursor: pointer;
 	}

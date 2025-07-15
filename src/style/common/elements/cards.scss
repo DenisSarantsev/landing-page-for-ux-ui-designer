@@ -120,17 +120,17 @@
 		border-radius: px-to-vw(20px, $third-bp);
 		border: px-to-vw(4px, $third-bp) solid #FFFFFF;
 	}
-	@media (max-width: $tablet-bp){
-		width: px-to-vw(120px, $tablet-bp);
-		height: px-to-vw(120px, $tablet-bp);
-		border-radius: px-to-vw(20px, $tablet-bp);
-		border: px-to-vw(4px, $tablet-bp) solid #FFFFFF;
+	@media (max-width: $small-tablet-bp){
+		width: 74px;
+		height: 74px;
+		border-radius: 12px;
+		border: 3px solid #FFFFFF;
 	}
-	@media (max-width: $mobile-bp){
-		width: px-to-vw(66px, $mobile-bp);
-		height: px-to-vw(66px, $mobile-bp);
-		border-radius: px-to-vw(8px, $mobile-bp);
-		border: px-to-vw(3px, $mobile-bp) solid #FFFFFF;
+	@media (max-width: $small-mobile-bp){
+		width: 63px;
+		height: 63px;
+		border-radius: 10px;
+		border: 2px solid #FFFFFF;
 	}
 	&__image {
 		position: absolute;

@@ -26,23 +26,23 @@ class CanvasPhysics {
     private animationId: number | null = null;
     
     private config = {
-        gravity: 0.1,
-        friction: 0.99,
-        bounce: 0.2,
-        mouseForce: 500,
-        mouseRadius: 150,
-        mouseVelocityMultiplier: 8,
-        elementCount: 360,
-        elementSize: 28,
-        elementPadding: 10,
-        restThreshold: 0.1,
-        restTimeThreshold: 60,
+        gravity: 0.15,
+        friction: 0.94,
+        bounce: 0.3,
+        mouseForce: 25000,
+        mouseRadius: 30,
+        mouseVelocityMultiplier: 25,
+        elementCount: 300,
+        elementSize: 32,
+        elementPadding: 8,
+        restThreshold: 0.01,
+        restTimeThreshold: 30,
         damping: 0.99,
-        separationForce: 100000,
-        rotationDamping: 0.8,           // Очень быстрое затухание
-        maxRotationSpeed: 0.5,         // Маленький максимальный наклон
-        rotationIntensity: 0.5,        // Очень слабый эффект наклона
-        fallSpeed: 8,
+        separationForce: 150000,
+        rotationDamping: 0.95,
+        maxRotationSpeed: 0.3,
+        rotationIntensity: 0.8,
+        fallSpeed: 0.4,
         animationSpeed: 30,
         // Настройки масс для разных форм
         massConfig: {
@@ -214,7 +214,7 @@ class CanvasPhysics {
                 restingTime: 0,
                 collisionRadius: baseRadius + this.config.elementPadding,
                 visualRadius: baseRadius,
-                rotation: Math.random() * 0.2 - 0.1, // Случайный начальный небольшой наклон
+                rotation: Math.random() * 0.2 - 0.1,
                 rotationSpeed: 0
             };
             
@@ -246,20 +246,16 @@ class CanvasPhysics {
                 if (Math.abs(element.vy) < 0.01) element.vy = 0;
             }
             
-            // ПРОСТАЯ логика наклона - только затухание
             element.rotationSpeed *= this.config.rotationDamping;
             
-            // Останавливаем очень медленное движение
             if (Math.abs(element.rotationSpeed) < 0.002) {
                 element.rotationSpeed = 0;
             }
             
-            // Применяем изменение угла только если есть скорость
             if (element.rotationSpeed !== 0) {
                 element.rotation += element.rotationSpeed;
             }
             
-            // Ограничиваем максимальную скорость наклона
             if (Math.abs(element.rotationSpeed) > this.config.maxRotationSpeed) {
                 element.rotationSpeed = Math.sign(element.rotationSpeed) * this.config.maxRotationSpeed;
             }
@@ -324,22 +320,24 @@ class CanvasPhysics {
             const velocityForceX = (dx / distance) * mouseSpeed * (this.config.mouseVelocityMultiplier / this.config.animationSpeed);
             const velocityForceY = (dy / distance) * mouseSpeed * (this.config.mouseVelocityMultiplier / this.config.animationSpeed);
             
-            const inertiaForceX = mouseVx * (0.4 / this.config.animationSpeed);
-            const inertiaForceY = mouseVy * (0.4 / this.config.animationSpeed);
+            // УВЕЛИЧИЛИ силу инерции для более сильного эффекта
+            const inertiaForceX = mouseVx * (1.2 / this.config.animationSpeed); // Было 0.4
+            const inertiaForceY = mouseVy * (1.2 / this.config.animationSpeed); // Было 0.4
             
             const totalForceX = baseForceX + velocityForceX + inertiaForceX;
             const totalForceY = baseForceY + velocityForceY + inertiaForceY;
             
-            const proximityMultiplier = distance < this.config.mouseRadius * 0.5 ? 2.5 : 1;
+            // УВЕЛИЧИЛИ множитель близости для более сильного эффекта
+            const proximityMultiplier = distance < this.config.mouseRadius * 0.5 ? 4.0 : 1.5; // Было 2.5 : 1
             const interpolationMultiplier = 1 / Math.max(1, Math.ceil(mouseSpeed / (10 * this.config.animationSpeed)));
             const animationCompensation = 1 / this.config.animationSpeed;
             
             element.vx += totalForceX * proximityMultiplier * interpolationMultiplier * animationCompensation;
             element.vy += totalForceY * proximityMultiplier * interpolationMultiplier * animationCompensation;
             
-            // ТОЛЬКО НЕБОЛЬШОЙ наклон от быстрого движения мыши
-            if (mouseSpeed > 10) {
-                const tiltForce = force * this.config.rotationIntensity * 0.2;
+            // УСИЛИЛИ эффект вращения
+            if (mouseSpeed > 5) { // Уменьшили порог с 10 до 5
+                const tiltForce = force * this.config.rotationIntensity * 0.8; // Увеличили с 0.2 до 0.8
                 const direction = (mouseVx * dy - mouseVy * dx) > 0 ? 1 : -1;
                 element.rotationSpeed += tiltForce * direction / element.mass;
             }
@@ -348,7 +346,8 @@ class CanvasPhysics {
                 element.rotationSpeed = Math.sign(element.rotationSpeed) * this.config.maxRotationSpeed;
             }
             
-            const maxSpeed = (20 / Math.sqrt(element.mass)) / this.config.animationSpeed;
+            // УВЕЛИЧИЛИ максимальную скорость для более динамичного движения
+            const maxSpeed = (35 / Math.sqrt(element.mass)) / this.config.animationSpeed; // Было 20
             const currentSpeed = Math.sqrt(element.vx * element.vx + element.vy * element.vy);
             if (currentSpeed > maxSpeed) {
                 element.vx = (element.vx / currentSpeed) * maxSpeed;
@@ -444,9 +443,8 @@ class CanvasPhysics {
                     element2.vx += impulse2 * (dx / distance);
                     element2.vy += impulse2 * (dy / distance);
                     
-                    // ТОЛЬКО МИНИМАЛЬНЫЙ наклон от сильных столкновений
                     if (bounceForce > 0.1) {
-                        const tiltForce = bounceForce * this.config.rotationIntensity * 0.1;
+                        const tiltForce = bounceForce * this.config.rotationIntensity * 0.3;
                         element1.rotationSpeed += tiltForce * (Math.random() - 0.5) / element1.mass;
                         element2.rotationSpeed += tiltForce * (Math.random() - 0.5) / element2.mass;
                         
@@ -470,7 +468,7 @@ class CanvasPhysics {
     }
 
     private activateNearbyElements(centerElement: PhysicsElement) {
-        const activationRadius = centerElement.collisionRadius * 3;
+        const activationRadius = centerElement.collisionRadius * 5; // Увеличили с 3 до 5
         
         for (const element of this.elements) {
             if (element === centerElement) continue;
@@ -481,15 +479,13 @@ class CanvasPhysics {
             
             if (distance < activationRadius) {
                 element.isResting = false;
-                element.restingTime = Math.max(0, element.restingTime - 60);
+                element.restingTime = Math.max(0, element.restingTime - 90); // Увеличили с 60 до 90
                 
                 if (distance < activationRadius * 0.7) {
-                    const force = ((activationRadius - distance) / activationRadius * 3) / this.config.animationSpeed;
+                    const force = ((activationRadius - distance) / activationRadius * 8) / this.config.animationSpeed; // Увеличили с 3 до 8
                     
                     element.vx += (dx / distance) * force;
                     element.vy += (dy / distance) * force;
-                    
-                    // НЕ добавляем наклон от активации соседних элементов
                 }
             }
         }
@@ -763,25 +759,25 @@ class CanvasPhysics {
 // Инициализация
 const canvasPhysics = new CanvasPhysics('scene');
 
-// Настройки без агрессивного вращения
+// Настройки для максимально сильного расталкивания
 canvasPhysics.updateConfig({
-    gravity: 0.2,              
-    fallSpeed: 0.5,            
-    friction: 0.985,            
-    bounce: 0.15,               
-    mouseForce: 80,           
-    mouseRadius: 180,
-    mouseVelocityMultiplier: 12, 
-    elementCount: 300,
+    gravity: 0.16,              
+    fallSpeed: 0.4,            
+    friction: 0.94,            
+    bounce: 0.3,               
+    mouseForce: 2500,          
+    mouseRadius: 150,          
+    mouseVelocityMultiplier: 25, 
+    elementCount: 250,
     elementSize: 32,
-    elementPadding: 10,         
-    restThreshold: 0.015,       
-    restTimeThreshold: 45,      
-    separationForce: 100000,      
-    rotationDamping: 0.8,       // Очень быстрое затухание
-    maxRotationSpeed: 0.05,     // Очень медленный наклон
-    rotationIntensity: 0.01,    // Очень слабый эффект
-    animationSpeed: 34.0
+    elementPadding: 8,         
+    restThreshold: 0.01,       
+    restTimeThreshold: 30,     
+    separationForce: 150000,   
+    rotationDamping: 0.95,     
+    maxRotationSpeed: 0.3,     
+    rotationIntensity: 0.8,    
+    animationSpeed: 30.0       
 });
 
 // Настройка распределения цветов

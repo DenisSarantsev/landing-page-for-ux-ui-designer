@@ -1,4 +1,5 @@
 @use "../variables.scss" as *;
+@use "../functions.scss" as *;
 
 .socials-widget {
 	position: relative;
@@ -11,6 +12,9 @@
 	gap: 20px;
 	transform: scale(0.2);
 	z-index: 1000;
+	@media (max-width: $mobile-bp){
+		top: -50px;
+	}
 	&__wrapper {
 		display: flex;
 		flex-direction: column;
@@ -22,11 +26,23 @@
 		backdrop-filter: blur(6px);
 		padding: 25px 28px;
 		border-radius: 360px;
+		@media (max-width: 400px){
+			width: 90vw;
+			padding: px-to-vw(25px, 400px) px-to-vw(30px, 400px);
+		}
 	}
 	&__socials-items {
 		display: grid;
 		grid-template-columns: repeat(3, 80px);
 		gap: 20px;
+		@media (max-width: 400px){
+			display: flex;
+			justify-content: center;
+			gap: px-to-vw(20px, 400px);
+		}
+		@media (max-width: 360px){
+			gap: px-to-vw(5px, 360px);
+		}
 		&>*:nth-child(1)>*:first-child {
 			background: #0044FF;
 			border: 1px solid rgba(43, 46, 58, 0.1);
@@ -39,6 +55,9 @@
 			& img {
 				width: 22px;
 				height: auto;
+				@media (max-width: $small-mobile-bp){
+					width: 18px;
+				}
 			}
 		}
 		&>*:nth-child(3)>*:first-child {
@@ -53,6 +72,9 @@
 		flex-direction: column;
 		align-items: center;
 		gap: 8px;
+		@media (max-width: 400px){
+			width: px-tp-vw(80px, 400px);
+		}
 		&:hover {
 			.socials-widget__socials-item_icon {
 				opacity: 0.9;
@@ -69,6 +91,13 @@
 			& img {
 				width: 24px;
 				height: auto;
+				@media (max-width: $small-mobile-bp){
+					width: 20px;
+				}
+			}
+			@media (max-width: $small-mobile-bp){
+				width: 40px;
+				height: 40px;
 			}
 		}
 		&_text {

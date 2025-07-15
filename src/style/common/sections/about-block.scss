@@ -56,39 +56,42 @@
 		}
 	}
 	&__slider {
-		display: flex;
-		flex-direction: column;
-		align-items: center;
-		width: 100%;
-		position: relative;
-		min-height: 730px;
-		@media (max-width: $first-bp){
-			min-height: px-to-vw(610px, $first-bp);
-		}
-		@media (max-width: $tablet-bp){
-			min-height: px-to-vw(490px, $small-tablet-bp);
-		}
-		@media (max-width: $small-tablet-bp){
-			min-height: px-to-vw(450px, $small-tablet-bp);
-		}
-		&>*:nth-child(1)>*:last-child {
-			background: radial-gradient(120.32% 320.36% at 0% 0%, rgba(43, 138, 255, 0) 0%, rgba(43, 138, 255, 0.5) 100%);
-		}
-		&>*:nth-child(2)>*:last-child {
-			background: radial-gradient(120.32% 320.36% at 0% 0%, rgba(43, 237, 255, 0) 0%, rgba(64, 255, 43, 0.5) 100%);
-		}
-		&>*:nth-child(3)>*:last-child {
-			background: radial-gradient(120.32% 320.36% at 0% 0%, rgba(238, 238, 238, 0) 0%, rgba(182, 178, 167, 0.5) 100%);
-		}
-		&>*:nth-child(4)>*:last-child {
-			background: radial-gradient(120.32% 320.36% at 0% 0%, rgba(43, 135, 255, 0) 0%, rgba(43, 167, 255, 0.5) 100%);
-		}
-		&>*:nth-child(5)>*:last-child {
-			background: radial-gradient(120.32% 320.36% at 0% 0%, rgba(43, 255, 188, 0) 0%, rgba(27, 194, 30, 0.4) 100%);
-		}
-		&>*:nth-child(6)>*:last-child {
-			background: radial-gradient(120.32% 320.36% at 0% 0%, rgba(220, 43, 255, 0) 0%, rgba(255, 126, 225, 0.5) 100%);
-		}
+display: flex;
+  flex-direction: column;
+  align-items: center;
+  width: 100%;
+  position: relative;
+  min-height: 730px;
+  overflow: visible; // Важно для Safari
+  @media (max-width: $first-bp){
+    min-height: px-to-vw(610px, $first-bp);
+  }
+  @media (max-width: $tablet-bp){
+    min-height: px-to-vw(490px, $small-tablet-bp);
+  }
+  @media (max-width: $small-tablet-bp){
+    min-height: px-to-vw(450px, $small-tablet-bp);
+  }
+  
+  // Градиенты для разных слайдов
+  &>*:nth-child(1)>*:last-child {
+    background: radial-gradient(120.32% 320.36% at 0% 0%, rgba(43, 138, 255, 0) 0%, rgba(43, 138, 255, 0.5) 100%);
+  }
+  &>*:nth-child(2)>*:last-child {
+    background: radial-gradient(120.32% 320.36% at 0% 0%, rgba(43, 237, 255, 0) 0%, rgba(64, 255, 43, 0.5) 100%);
+  }
+  &>*:nth-child(3)>*:last-child {
+    background: radial-gradient(120.32% 320.36% at 0% 0%, rgba(238, 238, 238, 0) 0%, rgba(182, 178, 167, 0.5) 100%);
+  }
+  &>*:nth-child(4)>*:last-child {
+    background: radial-gradient(120.32% 320.36% at 0% 0%, rgba(43, 135, 255, 0) 0%, rgba(43, 167, 255, 0.5) 100%);
+  }
+  &>*:nth-child(5)>*:last-child {
+    background: radial-gradient(120.32% 320.36% at 0% 0%, rgba(43, 255, 188, 0) 0%, rgba(27, 194, 30, 0.4) 100%);
+  }
+  &>*:nth-child(6)>*:last-child {
+    background: radial-gradient(120.32% 320.36% at 0% 0%, rgba(220, 43, 255, 0) 0%, rgba(255, 126, 225, 0.5) 100%);
+  }
 		&_one-image {
 
 		}
@@ -119,7 +122,7 @@
 		&_one-image {
 			& img {
 				width: auto;
-				height: auto;
+				height: 100%;
 				padding-bottom: 15px;
 				@media (max-width: $first-bp){
 					width: auto;
@@ -138,7 +141,7 @@
 		&_three-images {
 			& img {
 				width: auto;
-				height: auto;
+				height: 95%;
 				@media (max-width: $first-bp){
 					width: auto;
 					height: 90%;
@@ -176,7 +179,7 @@
 		font-weight: 400;
 		text-align: center;
 		position: absolute;
-		bottom: -30px;
+		bottom: -50px;
 		left: 0;
 		width: 100%;
 		display: inline-block;
@@ -187,13 +190,18 @@
 		}
 	}
 	&__slide-gradient {
-		position: absolute;
-		top: 0px;
-		left: 0px;
-		width: 100%;
-		height: 100%;
-		z-index: -1;
-		filter: blur(127px);
+  position: absolute;
+  // Увеличиваем размер для распространения градиента
+  top: 0px;
+  left: 0px;
+  width: 90%;
+  height: 90%;
+  z-index: -1;
+  filter: blur(127px);
+  
+  // Дополнительная поддержка для Safari
+  -webkit-filter: blur(127px);
+  will-change: filter;
 	}
 }
 

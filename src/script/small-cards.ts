@@ -9,6 +9,7 @@ const buttonsContainer = document.querySelector<HTMLElement>(".advantages__items
 
 
 // Переключаем на нужные карточки
+
 const showCurrentElement = (section: string, cardsCount: number): void => {
 	if (smallCardsContainer) {
 		const currentCards = [...smallCardsContainer.children];
@@ -39,7 +40,8 @@ const showCurrentElement = (section: string, cardsCount: number): void => {
 					const allCards = smallCardsContainer.children;
 					[...allCards].forEach((card, index) => {
 						const centerIndex = (allCards.length - 1) / 2;
-						const finalX = (index - centerIndex) * -33;
+						const gap = calculateCardsGap() ?? -45;
+						const finalX = (index - centerIndex) * (isMobileScreen ? gap : -33);
 						
 						// Устанавливаем начальное состояние
 						gsap.set(card, {
@@ -97,7 +99,6 @@ const showCurrentElement = (section: string, cardsCount: number): void => {
 	}
 }
 
-
 // Первично вызываем функцию и вставляем дефолтные карточки
 if ( !isMobileScreen ) {
 	showCurrentElement("default-set", 10);
@@ -110,10 +111,24 @@ window.addEventListener("resize", () => {
 	} else {
 		showCurrentElement("default-set", 7);
 	}
+
 })
 
+const calculateCardsGap = () => {
+	const windowWidth = window.innerWidth;
+	if ( windowWidth > 450 ) {
+		return -45
+	} else if (  windowWidth <= 450 &&  windowWidth > 400 ) {
+		return -50
+	} else if ( windowWidth <= 400 && windowWidth > 360 ) {
+		return -55
+	} else if ( windowWidth <= 360 ) {
+		return -47
+	}
+}
 
 // Навешиваем прослушиватель на каждую кнопку (для десктопа и мобайла)
+/*
 if ( buttonsContainer )
 [...buttonsContainer?.children].forEach((button) => {
 	// Для десктопа
@@ -135,6 +150,7 @@ if ( buttonsContainer )
 		}
 	})
 })
+*/
 
 // Анимация при наведении на карточки
 smallCardsContainer?.addEventListener("mouseenter", () => {

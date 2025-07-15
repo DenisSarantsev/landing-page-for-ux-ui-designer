@@ -1,5 +1,9 @@
 import type { Workplace, WorkplacesData } from "../types/workplace.type";
 import type { Project, ProjectsData } from "../types/project.type";
+import { animateWordsByWord, showScaleAndOpacityElement } from "./animations";
+
+// Контейнер со скроллом
+const scrollWrapper = document.querySelector<HTMLElement>(".project-modal__content-wrapper");
 
 // ----------- Загрузка воркплейсов
 // Функция загрузки JSON
@@ -41,7 +45,7 @@ export const addActualProjectDataToModalWindow = async (id: number): Promise<voi
 				modalContentWrapper.innerHTML = "";
 				modalContentWrapper.insertAdjacentHTML("beforeend", `
 					<div class="project-modal__titles titles-gap">
-						<h1 class="project-modal__title secondary-title">${project["project-name"]}</h1>
+						<h1 style="opacity: 0;" class="project-modal__title secondary-title">${project["project-name"]}</h1>
 						<div class="project-modal__subtitle subtitle">${project.description}</div>
 					</div>
 					<div class="project-modal__images-wrapper">
@@ -61,7 +65,16 @@ export const addActualProjectDataToModalWindow = async (id: number): Promise<voi
 						</div>
 					</div>
 				`)
-			}
+			};
+			// Скроллим вверх
+			if ( scrollWrapper ) scrollToTop(scrollWrapper);
+			// Анимация появления заголовка в модалке
+			const projectModalTitle = document.querySelector<HTMLElement>(".project-modal__title");
+			const projectModalSubitle = document.querySelector<HTMLElement>(".project-modal__subtitle");
+			const projectImagesWrapper = document.querySelector<HTMLElement>(".project-modal__images-wrapper");
+			if ( projectModalTitle ) animateWordsByWord(projectModalTitle, 0.3);
+			if ( projectModalSubitle ) showScaleAndOpacityElement(projectModalSubitle, 0.2);
+			if ( projectImagesWrapper ) showScaleAndOpacityElement(projectImagesWrapper, 0.3);
 		}
 	}
 }
@@ -82,12 +95,12 @@ export const addActualWorkplaceDataToModalWindow = async (id: number): Promise<v
 						<div class="project-modal__icon">
 							<img src="/img/workplace/${workplace.id}/company-logo.png" alt="company logo">
 						</div>
-						<h1 class="project-modal__title secondary-title">${workplace.post}</h1>
-						<div class="project-modal__company-address">${workplace.company} — ${workplace["company-address"]}</div>
-						<div class="project-modal__period">${workplace.period.from} - ${workplace.period.to}</div>
-						<div class="project-modal__workplace-description">${workplace.description}</div>
+						<h1 style="opacity: 0;" class="project-modal__title secondary-title">${workplace.post}</h1>
+						<div class="project-modal__company-address project-show-animation">${workplace.company} — ${workplace["company-address"]}</div>
+						<div class="project-modal__period project-show-animation">${workplace.period.from} - ${workplace.period.to}</div>
+						<div class="project-modal__workplace-description project-show-animation">${workplace.description}</div>
 					</div>
-					<div class="project-modal__images-wrapper">
+					<div class="project-modal__images-wrapper project-show-animation">
 						<div class="project-modal__images-wrapper_one">
 							<img src="/img/project/${workplace.id}/1.png" alt="project screenshot">
 						</div>
@@ -104,7 +117,32 @@ export const addActualWorkplaceDataToModalWindow = async (id: number): Promise<v
 						</div>
 					</div>
 				`)
+			};
+			// Скроллим вверх
+			if ( scrollWrapper ) scrollToTop(scrollWrapper);
+			// Анимация появления заголовка в модалке
+			const projectModalTitle = document.querySelector<HTMLElement>(".project-modal__title");
+			const projectShowElements = document.querySelectorAll<HTMLElement>(".project-show-animation");
+			if ( projectModalTitle ) animateWordsByWord(projectModalTitle, 0.2);
+			if ( projectShowElements && projectShowElements.length > 0 ) {
+				for ( let element of projectShowElements ) {
+					showScaleAndOpacityElement(element, 0.3);
+				}
 			}
 		}
 	}
 }
+
+// Прокрутка модалки в самый верх
+export const scrollToTop = (element: HTMLElement, smooth: boolean = true): void => {
+  if (!element) {
+    console.warn('Element is not provided for scrollToTop function');
+    return;
+  }
+
+  element.scrollTo({
+    top: 0,
+    left: 0,
+    behavior: smooth ? 'smooth' : 'instant'
+  });
+};

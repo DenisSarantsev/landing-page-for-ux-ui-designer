@@ -34,13 +34,10 @@
 					font-size: px-to-vw(58px, $tablet-bp);
 				}
 				@media (max-width: $small-tablet-bp){
-					font-size: px-to-vw(40px, $small-tablet-bp);
+					font-size: 48px;
 				}
-				@media (max-width: $mobile-bp){
-					font-size: px-to-vw(30px, $mobile-bp);
-				}
-				@media (max-width: $small-mobile-bp){
-					font-size: 24px;
+				@media (max-width: 393px){
+					font-size: 40px;
 				}
 			}
 			& span {
@@ -73,8 +70,8 @@
 			@media (max-width: $small-tablet-bp){
 				font-size: 18px;
 			}
-			@media (max-width: $small-tablet-bp){
-				font-size: 18px;
+			@media (max-width: $mobile-bp){
+				font-size: 16px;
 			}
 		}
 }

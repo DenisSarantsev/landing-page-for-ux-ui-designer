@@ -8,6 +8,7 @@ const projectModal = document.querySelector<HTMLElement>(".project-modal");
 // Кнопка закрытия модалки
 const modalCloseButton = document.querySelector<HTMLElement>(".modal-close-button");
 
+
 // Функционал закрытия модалки
 modalCloseButton?.addEventListener("click", () => {
 	const projectModalWrapper = projectModal?.firstElementChild;
@@ -27,19 +28,32 @@ modalCloseButton?.addEventListener("click", () => {
 		onComplete: () => {
 			projectModal?.classList.add("modal-hidden");
 		}
-	})
+	});
+	// Элементы модалки
+	const modalTitles = document.querySelector<HTMLElement>(".project-modal__titles");
+	const modalImages = document.querySelector<HTMLElement>(".project-modal__images-wrapper");
+	if ( modalTitles ) modalTitles.innerHTML = "";
+	if ( modalImages ) modalImages.innerHTML = "";
 })
 
-
-// Получаем все карточки воркплейсов на странице (десктоп и мобайл)
-const allWorkplaceCards = document.querySelectorAll<HTMLElement>(".work-history-card")
-if ( allWorkplaceCards && [...allWorkplaceCards].length > 0 ) {
-	[...allWorkplaceCards].forEach((card) => {
-		card.addEventListener("click", (event) => {
-			
+// Ховеры модалки
+modalCloseButton?.addEventListener("mouseenter", () => {
+	if ( modalCloseButton ) {
+		gsap.to(modalCloseButton, {
+			scale: 1.1,
+			duration: 0.2
 		})
-	})
-}
+	}
+});
+modalCloseButton?.addEventListener("mouseleave", () => {
+	if ( modalCloseButton ) {
+		gsap.to(modalCloseButton, {
+			scale: 1,
+			duration: 0.2
+		})
+	}
+})
+
 
 })
 

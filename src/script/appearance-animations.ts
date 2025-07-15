@@ -1,7 +1,7 @@
 // Чек прокрутки
 import { advancedScrollWatcher } from "./scroll-checker";
 // Функции анимаций
-import { animateWordsByWord, animateElementScale, showScaleAndOpacityElement } from "./animations";
+import { animateWordsByWord, animateElementScale, showScaleAndOpacityElement, showScaleAndOpacityElementWithDuration } from "./animations";
 import { changeSlides } from "./about-me-slider";
 // Отслеживаем первое появление блока advantages
 export const isCardsShow = [0]; // 0 - не показивалась, 1 - показивалась
@@ -45,6 +45,7 @@ if ( cardsWrapper instanceof HTMLElement ) {
 
 
 // ---------- Блок с карточками проектов
+/*
 const worksBlock = document.querySelector<HTMLElement>(".works");
 const worksBlockTitle = document.querySelector<HTMLElement>(".works__title");
 const worksBlockSubtitle = document.querySelector<HTMLElement>(".works__subtitle");
@@ -58,13 +59,14 @@ advancedScrollWatcher.watch({
 		}
   }
 });
+*/
 
 
 // ---------- Блок со слайдером
 let sliderWorks: boolean = false;
 const aboutBlock = document.querySelector<HTMLElement>(".about");
-const aboutBlockTitle = document.querySelector<HTMLElement>(".about__title");
-const aboutBlockSubtitle = document.querySelector<HTMLElement>(".about__subtitle");
+//const aboutBlockTitle = document.querySelector<HTMLElement>(".about__title");
+//const aboutBlockSubtitle = document.querySelector<HTMLElement>(".about__subtitle");
 const aboutSlider = document.querySelector<HTMLElement>(".about__slider");
 advancedScrollWatcher.watch({
   selector: '.about',
@@ -74,13 +76,15 @@ advancedScrollWatcher.watch({
 			sliderWorks = true;
 			changeSlides(5);
 		}
+		/*
 		if ( !aboutBlock?.classList.contains("scrolled-title") && data.scrolledPercentage > 10 ) {
 			if ( aboutBlockTitle instanceof HTMLElement ) animateWordsByWord(aboutBlockTitle, 0.1);
 			if ( aboutBlockSubtitle instanceof HTMLElement ) animateWordsByWord(aboutBlockSubtitle, 0.2);
 			if ( aboutBlock instanceof HTMLElement ) aboutBlock.classList.add("scrolled-title");
 		}
-		if ( !aboutBlock?.classList.contains("scrolled-block") && data.scrolledPercentage > 15 ) {
-			if ( aboutSlider instanceof HTMLElement ) showScaleAndOpacityElement(aboutSlider, 0.5);
+			*/
+		if ( !aboutBlock?.classList.contains("scrolled-block") && data.scrolledPercentage > 10 ) {
+			if ( aboutSlider instanceof HTMLElement ) showScaleAndOpacityElementWithDuration(aboutSlider, 0, 0.7);
 			if ( aboutBlock instanceof HTMLElement ) aboutBlock.classList.add("scrolled-block");
 		}
 	}
@@ -89,7 +93,7 @@ advancedScrollWatcher.watch({
 
 // ---------- Блок c маленькими карточками
 const advantageBlock = document.querySelector<HTMLElement>(".advantages");
-const advantageTitle = document.querySelector<HTMLElement>(".advantages__title");
+////const advantageTitle = document.querySelector<HTMLElement>(".advantages__title");
 const advantagesCardsWrapper = document.querySelector<HTMLElement>(".advantages__cards");
 const itemsCardsWrapper = document.querySelector<HTMLElement>(".advantages__items");
 advancedScrollWatcher.watch({
@@ -97,6 +101,7 @@ advancedScrollWatcher.watch({
   onScroll: (element, data) => {
 	if ( data.scrolledPercentage > 15 && !advantageBlock?.classList.contains("scrolled") ) {
 		if ( advantageBlock instanceof HTMLElement ) advantageBlock.classList.add("scrolled");
+		/*
 		if ( advantageTitle instanceof HTMLElement ) { 
 			const advantageBlockTitleChildrens = advantageTitle.children;
 			if ( advantageBlockTitleChildrens && [...advantageBlockTitleChildrens].length > 0 ) {
@@ -108,24 +113,25 @@ advancedScrollWatcher.watch({
 				})
 			}
 		};
+		*/
 		}
-		if ( data.scrolledPercentage > 20 && !advantagesCardsWrapper?.classList.contains("cards-scrolled") ) {
+		if ( data.scrolledPercentage > 15 && !advantagesCardsWrapper?.classList.contains("cards-scrolled") ) {
 			isCardsShow[0] = 1;
 			advantagesCardsWrapper?.classList.add("cards-scrolled");
 			const cards = advantagesCardsWrapper?.children;
 			if ( cards && [...cards].length > 0 ) {
 				[...cards].forEach((card, index) => {
-					const delay = 0.1 + ((index + 1)/30);
+					const delay = 0.1 + ((index + 1)/35);
 					if ( card instanceof HTMLElement ) showScaleAndOpacityElement(card, delay);
 				});
 			}
 		}
-		if ( data.scrolledPercentage > 25 && !itemsCardsWrapper?.classList.contains("items-scrolled") ) {
+		if ( data.scrolledPercentage > 20 && !itemsCardsWrapper?.classList.contains("items-scrolled") ) {
 			itemsCardsWrapper?.classList.add("items-scrolled");
 			const items = itemsCardsWrapper?.children;
 			if ( items && [...items].length > 0 ) {
 				[...items].forEach((item, index) => {
-					const delay = 0.1 + ((index + 1)/10);
+					const delay = 0.1 + ((index + 1)/12);
 					if ( item instanceof HTMLElement ) showScaleAndOpacityElement(item, delay);
 				});
 			}
@@ -136,17 +142,19 @@ advancedScrollWatcher.watch({
 
 
 // ---------- Блок cо слайдером
-const sliderBlockTitle = document.querySelector<HTMLElement>(".history__title");
+//const sliderBlockTitle = document.querySelector<HTMLElement>(".history__title");
 const sliderMobile = document.querySelector<HTMLElement>(".swiper");
 
 advancedScrollWatcher.watch({
   selector: '.history',
   onScroll: (element, data) => {
 		// Показываем заголовок
+		/*
 		if ( !sliderBlockTitle?.classList.contains("scrolled-title") && data.scrolledPercentage > 10 ) {
 			if ( sliderBlockTitle instanceof HTMLElement ) animateWordsByWord(sliderBlockTitle, 0.1);
 			if ( sliderBlockTitle instanceof HTMLElement ) sliderBlockTitle.classList.add("scrolled-title");
 		}
+			*/
 		// Показываем слайдер на мобилке
 		if ( !sliderMobile?.classList.contains("scrolled-block") && data.scrolledPercentage > 15 ) {
 			if ( sliderMobile instanceof HTMLElement ) showScaleAndOpacityElement(sliderMobile, 0.5);
@@ -158,13 +166,14 @@ advancedScrollWatcher.watch({
 
 
 // ---------- Блок c текстом
-const textBlockTitle = document.querySelector<HTMLElement>(".product-thinking__left");
-const textBlockSubtitles = document.querySelector<HTMLElement>(".product-thinking__right");
+//const textBlockTitle = document.querySelector<HTMLElement>(".product-thinking__left");
+//const textBlockSubtitles = document.querySelector<HTMLElement>(".product-thinking__right");
 
 advancedScrollWatcher.watch({
   selector: '.product-thinking',
   onScroll: (element, data) => {
 		// Показываем заголовок
+		/*
 		if ( !textBlockTitle?.classList.contains("scrolled-title") && data.scrolledPercentage > 10 ) {
 			if ( textBlockTitle instanceof HTMLElement ) textBlockTitle.classList.add("scrolled-title");
 			const mainTitles = textBlockTitle?.children;
@@ -181,6 +190,7 @@ advancedScrollWatcher.watch({
 			const lastSubtitle = textBlockSubtitles?.lastElementChild;
 			if ( lastSubtitle instanceof HTMLElement ) showScaleAndOpacityElement(lastSubtitle, 1);
 		}
+			*/
 	}
 });
 
@@ -196,7 +206,7 @@ advancedScrollWatcher.watch({
   selector: '.footer',
   onScroll: (element, data) => {
 		// Показываем заголовок
-		if ( !footerBlock?.classList.contains("scrolled-title") && data.scrolledPercentage > 40 ) {
+		if ( !footerBlock?.classList.contains("scrolled-title") && data.scrolledPercentage > 20 ) {
 			if ( footerBlock instanceof HTMLElement ) footerBlock.classList.add("scrolled-title");
 			if ( topFooterSubtitle instanceof HTMLElement ) animateWordsByWord(topFooterSubtitle, 0.5);
 			const topTitle = footerTitleWrapper?.firstElementChild;

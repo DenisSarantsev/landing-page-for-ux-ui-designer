@@ -29,7 +29,7 @@
 	align-items: center;
 	justify-content: space-between;
 	opacity: 0;
-	animation: opacityHeader 3.5s ease 0.5s forwards;
+	animation: opacityHeader 2.5s ease 0.1s forwards;
 		&__left-block {
 			min-width: 154px;
 			@media (max-width: $tablet-bp){
@@ -182,7 +182,7 @@
 	justify-content: center;
 	flex-grow: 1;
 	gap: 40px;
-	padding-bottom: 60px;
+	padding-bottom: 60px !important;
 	@media (max-height: $first-height-bp){
 		gap: px-to-vh(40px, $first-height-bp);
 	}
@@ -274,7 +274,7 @@
 		}
 		&__socials-button-outer {
 			height: 76px;
-			margin-top: -4.01vh;
+			// margin-top: -4.01vh;
 			padding: 0px 0px;
 			width: 100%;
 			display: flex;

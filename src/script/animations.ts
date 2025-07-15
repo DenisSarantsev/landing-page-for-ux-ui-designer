@@ -22,18 +22,37 @@ export const animateElementScale = (element: HTMLElement, delay: number, startY:
 	// Сначала анимируем появление
 	gsap.fromTo(element, {
 			opacity: 0,
-			scale: 0.3,
-			x: -100,
+			scale: 0.8,
+			x: -60,
 			transformOrigin: "center center",
 	},{
 			opacity: 1,
-			duration: 0.9,
+			duration: 0.8,
 			delay: delay,
 			scale: 1,
-			ease: "elastic.out(1.5, 0.5)",
+			ease: "elastic.out(1.2, 0.5)",
 			x: 0,
 			transformOrigin: "center center",
 	});
+}
+
+	// Анимация поялвения элемента с увеличением
+	export const animateElementSettingsScale = (element: HTMLElement, delay: number, startY: number, startX: number, startScale: number) => {
+		// Сначала анимируем появление
+		gsap.fromTo(element, {
+				opacity: 0,
+				scale: startScale,
+				x: -60,
+				transformOrigin: "center center",
+		},{
+				opacity: 1,
+				duration: 0.8,
+				delay: delay,
+				scale: 1,
+				ease: "elastic.out(1.2, 0.5)",
+				x: 0,
+				transformOrigin: "center center",
+		});
 
 	// Долгое покачивание (запускается параллельно)
 	gsap.fromTo(element, {
@@ -56,7 +75,19 @@ export const showScaleAndOpacityElement = (element: HTMLElement, delay: number) 
 		y: 40
 	}, {
 		opacity: 1,
-		duration: 0.7,
+		duration: 0.4,
+		y: 0,
+		delay: delay
+	})
+}
+
+export const showScaleAndOpacityElementWithDuration = (element: HTMLElement, delay: number, duration: number) => {
+	gsap.fromTo(element, {
+		opacity: 0,
+		y: 40
+	}, {
+		opacity: 1,
+		duration: duration,
 		y: 0,
 		delay: delay
 	})

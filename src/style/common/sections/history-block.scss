@@ -17,6 +17,9 @@
 			@media (max-width: $tablet-bp){
 				gap: 50px;
 			}
+			&:hover {
+				cursor: pointer;
+			}
 		}
 		&__title {
 		}

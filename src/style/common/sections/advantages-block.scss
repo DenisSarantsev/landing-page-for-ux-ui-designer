@@ -70,6 +70,7 @@
 			width: 100%;
 			display: flex;
 			flex-direction: column;
+			align-items: center;
 			background-color: transparent;
 			position: relative;
 			padding-bottom: 10px;
@@ -109,18 +110,21 @@
 				opacity: 0;
 				transition: all 0.2s ease 0s;
 			}
-			@media (min-width: $tablet-bp){
-				&:hover {
-					&>*:last-child {
-						opacity: 1;
-						transition: all 0.2s ease 0s;
-					}
-					&>*:nth-child(2) {
-						opacity: 0;
-						transition: all 0.2s ease 0s;
-					}
-				}
+			&:hover {
+				cursor: default;
 			}
+			// @media (min-width: $tablet-bp){
+			// 	&:hover {
+			// 		&>*:last-child {
+			// 			opacity: 1;
+			// 			transition: all 0.2s ease 0s;
+			// 		}
+			// 		&>*:nth-child(2) {
+			// 			opacity: 0;
+			// 			transition: all 0.2s ease 0s;
+			// 		}
+			// 	}
+			// }
 		}
 }
 
