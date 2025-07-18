@@ -18,3 +18,5 @@ import "./script/swiper"; // Скрипты для работы слайдера
 import "./script/dispersion-effect"; // Эффект рассыпающихся элементов
 import "./script/animations"; // Анимации появления (функции).
 import "./script/appearance-animations"; // Анимации появления применение функций.
+import "./script/margin-top-block"; // Отступ текстового блока в независимо от количества карточек
+

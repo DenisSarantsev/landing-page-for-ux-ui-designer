@@ -6,7 +6,7 @@ interface PhysicsElement {
     width: number;
     height: number;
     color: string;
-    shape: 'blob' | 'triangle' | 'circle' | 'ring';
+		shape: 'blob' | 'triangle' | 'circle' | 'ring' | 'star' | 'square' | 'hexagon' | 'ellipse' | 'rectangle' | 'polygon' | 'diamond';
     padding: number;
     mass: number;
     isResting: boolean;
@@ -15,6 +15,7 @@ interface PhysicsElement {
     visualRadius: number;
     rotation: number;
     rotationSpeed: number;
+    initialY: number;
 }
 
 class CanvasPhysics {
@@ -24,17 +25,20 @@ class CanvasPhysics {
     private mouse = { x: 0, y: 0 };
     private prevMouse = { x: 0, y: 0 };
     private animationId: number | null = null;
+    private isAnimationStarted = false;
+    private scrollListener: (() => void) | null = null;
+    private globalMouseListener: ((e: MouseEvent) => void) | null = null;
     
     private config = {
-        gravity: 0.15,
+        gravity: 0.1,
         friction: 0.94,
         bounce: 0.3,
         mouseForce: 25000,
         mouseRadius: 30,
         mouseVelocityMultiplier: 25,
-        elementCount: 300,
+        elementCount: 200,
         elementSize: 32,
-        elementPadding: 8,
+        elementPadding: 5,
         restThreshold: 0.01,
         restTimeThreshold: 30,
         damping: 0.99,
@@ -42,22 +46,79 @@ class CanvasPhysics {
         rotationDamping: 0.95,
         maxRotationSpeed: 0.3,
         rotationIntensity: 0.8,
-        fallSpeed: 0.4,
-        animationSpeed: 30,
+        fallSpeed: 1,
+        animationSpeed: 40,
+        footerVisibilityThreshold: 60,
+        
+        // АДАПТИВНЫЕ НАСТРОЙКИ
+        adaptiveSettings: {
+            mobile: {
+                maxWidth: 480,
+                elementCount: 80,
+                elementSize: 20,
+                mouseRadius: 80,
+                mouseForce: 1500
+            },
+            tablet: {
+                maxWidth: 768,
+                elementCount: 120,
+                elementSize: 25,
+                mouseRadius: 100,
+                mouseForce: 2000
+            },
+            laptop: {
+                maxWidth: 1024,
+                elementCount: 160,
+                elementSize: 28,
+                mouseRadius: 120,
+                mouseForce: 2200
+            },
+            desktop: {
+                maxWidth: 1440,
+                elementCount: 200,
+                elementSize: 32,
+                mouseRadius: 150,
+                mouseForce: 2500
+            },
+            large: {
+                maxWidth: Infinity,
+                elementCount: 280,
+                elementSize: 36,
+                mouseRadius: 180,
+                mouseForce: 3000
+            }
+        },
+        
         // Настройки масс для разных форм
         massConfig: {
-            blob: { min: 0.6, max: 0.65 },
-            triangle: { min: 0.5, max: 0.55 },
-            circle: { min: 0.4, max: 0.55 },
-            ring: { min: 0.4, max: 0.45 }
+					blob: { min: 0.6, max: 0.65 },
+					triangle: { min: 0.5, max: 0.55 },
+					circle: { min: 0.4, max: 0.55 },
+					ring: { min: 0.4, max: 0.45 },
+					star: { min: 0.45, max: 0.5 },
+					square: { min: 0.55, max: 0.6 },
+					hexagon: { min: 0.5, max: 0.55 },
+					ellipse: { min: 0.4, max: 0.5 },
+					rectangle: { min: 0.6, max: 0.7 },
+					polygon: { min: 0.5, max: 0.6 },
+					diamond: { min: 0.45, max: 0.55 }
         },
+        
         // Распределение форм (в процентах)
         shapeDistribution: {
-            blob: 40,
-            triangle: 25,
-            circle: 20,
-            ring: 15
+					blob: 14,        // Уменьшено 
+					triangle: 11,    // Уменьшено
+					circle: 11,      // Уменьшено
+					ring: 11,        // Уменьшено
+					star: 11,        // Уменьшено
+					square: 7,       // Уменьшено
+					hexagon: 7,      // Уменьшено
+					ellipse: 6,      // Уменьшено
+					rectangle: 6,    // Уменьшено
+					polygon: 6,      // Уменьшено
+					diamond: 10      // Новая фигура
         },
+        
         // Цвета с процентами распределения
         colorDistribution: {
             '#CFFF10': 20,
@@ -70,7 +131,7 @@ class CanvasPhysics {
             '#1EFF5D': 5,
             '#CAD4DE': 5
         } as Record<string, number>,
-        shapes: ['blob', 'triangle', 'circle', 'ring'] as const
+			shapes: ['blob', 'triangle', 'circle', 'ring', 'star', 'square', 'hexagon', 'ellipse', 'rectangle', 'polygon', 'diamond'] as const
     };
 
     constructor(canvasId: string) {
@@ -82,8 +143,83 @@ class CanvasPhysics {
         this.ctx = this.canvas.getContext('2d')!;
         this.setupCanvas();
         this.setupEventListeners();
+        this.setupScrollListener();
+        
+        this.applyAdaptiveSettings();
         this.createElements();
         this.startAnimation();
+    }
+
+    private getAdaptiveSettings() {
+        const screenWidth = window.innerWidth;
+        const settings = this.config.adaptiveSettings;
+        
+        if (screenWidth <= settings.mobile.maxWidth) {
+            return settings.mobile;
+        } else if (screenWidth <= settings.tablet.maxWidth) {
+            return settings.tablet;
+        } else if (screenWidth <= settings.laptop.maxWidth) {
+            return settings.laptop;
+        } else if (screenWidth <= settings.desktop.maxWidth) {
+            return settings.desktop;
+        } else {
+            return settings.large;
+        }
+    }
+
+    private applyAdaptiveSettings() {
+        const adaptiveSettings = this.getAdaptiveSettings();
+        
+        this.config.elementCount = adaptiveSettings.elementCount;
+        this.config.elementSize = adaptiveSettings.elementSize;
+        this.config.mouseRadius = adaptiveSettings.mouseRadius;
+        this.config.mouseForce = adaptiveSettings.mouseForce;
+        
+        console.log(`Adaptive settings applied for ${window.innerWidth}px:`, adaptiveSettings);
+    }
+
+    private setupScrollListener() {
+        this.scrollListener = () => {
+            const footer = document.querySelector('footer');
+            if (!footer || this.isAnimationStarted) return;
+
+            const footerRect = footer.getBoundingClientRect();
+            const windowHeight = window.innerHeight;
+            
+            const visibleHeight = Math.max(0, Math.min(footerRect.height, windowHeight - footerRect.top));
+            const visibilityPercentage = (visibleHeight / footerRect.height) * 100;
+            
+            if (visibilityPercentage >= this.config.footerVisibilityThreshold) {
+                this.startElementsFalling();
+            }
+        };
+
+        window.addEventListener('scroll', this.scrollListener);
+        
+        setTimeout(() => {
+            if (this.scrollListener) {
+                this.scrollListener();
+            }
+        }, 100);
+    }
+
+    private startElementsFalling() {
+        if (this.isAnimationStarted) return;
+        
+        this.isAnimationStarted = true;
+        
+        this.elements.forEach((element, index) => {
+            element.y = element.initialY;
+            element.vx = (Math.random() - 0.5) * 1;
+            element.vy = 0;
+            element.isResting = false;
+            element.restingTime = 0;
+        });
+
+        if (this.scrollListener) {
+            window.removeEventListener('scroll', this.scrollListener);
+            this.scrollListener = null;
+        }
     }
 
     private setupCanvas() {
@@ -91,6 +227,13 @@ class CanvasPhysics {
             const rect = this.canvas.getBoundingClientRect();
             this.canvas.width = rect.width;
             this.canvas.height = rect.height;
+            
+            const oldElementCount = this.config.elementCount;
+            this.applyAdaptiveSettings();
+            
+            if (oldElementCount !== this.config.elementCount) {
+                this.createElements();
+            }
         };
         
         resizeCanvas();
@@ -98,6 +241,32 @@ class CanvasPhysics {
     }
 
     private setupEventListeners() {
+        this.globalMouseListener = (e: MouseEvent) => {
+            const rect = this.canvas.getBoundingClientRect();
+            this.prevMouse.x = this.mouse.x;
+            this.prevMouse.y = this.mouse.y;
+            
+            this.mouse.x = e.clientX - rect.left;
+            this.mouse.y = e.clientY - rect.top;
+        };
+
+        document.addEventListener('mousemove', this.globalMouseListener);
+
+        document.addEventListener('mouseleave', () => {
+            this.mouse.x = -1000;
+            this.mouse.y = -1000;
+            this.prevMouse.x = -1000;
+            this.prevMouse.y = -1000;
+        });
+
+        document.addEventListener('mouseenter', (e) => {
+            const rect = this.canvas.getBoundingClientRect();
+            this.mouse.x = e.clientX - rect.left;
+            this.mouse.y = e.clientY - rect.top;
+            this.prevMouse.x = this.mouse.x;
+            this.prevMouse.y = this.mouse.y;
+        });
+
         this.canvas.addEventListener('mousemove', (e) => {
             const rect = this.canvas.getBoundingClientRect();
             this.prevMouse.x = this.mouse.x;
@@ -146,19 +315,19 @@ class CanvasPhysics {
         return this.shuffleArray(colors);
     }
 
-    private createShapeArray(): ('blob' | 'triangle' | 'circle' | 'ring')[] {
-        const shapes: ('blob' | 'triangle' | 'circle' | 'ring')[] = [];
+    private createShapeArray(): ('blob' | 'triangle' | 'circle' | 'ring' | 'star' | 'square' | 'hexagon' | 'ellipse' | 'rectangle' | 'polygon' | 'diamond')[] {
+        const shapes: ('blob' | 'triangle' | 'circle' | 'ring' | 'star' | 'square' | 'hexagon' | 'ellipse' | 'rectangle' | 'polygon' | 'diamond')[] = [];
         const totalElements = this.config.elementCount;
         
         Object.entries(this.config.shapeDistribution).forEach(([shape, percentage]) => {
             const count = Math.round((percentage / 100) * totalElements);
             for (let i = 0; i < count; i++) {
-                shapes.push(shape as 'blob' | 'triangle' | 'circle' | 'ring');
+                shapes.push(shape as 'blob' | 'triangle' | 'circle' | 'ring' | 'star' | 'square' | 'hexagon' | 'ellipse' | 'rectangle' | 'polygon' | 'diamond');
             }
         });
         
         while (shapes.length < totalElements) {
-            const shapeKeys = Object.keys(this.config.shapeDistribution) as ('blob' | 'triangle' | 'circle' | 'ring')[];
+            const shapeKeys = Object.keys(this.config.shapeDistribution) as ('blob' | 'triangle' | 'circle' | 'ring' | 'star' | 'square' | 'hexagon' | 'ellipse' | 'rectangle' | 'polygon' | 'diamond')[];
             const randomShape = shapeKeys[Math.floor(Math.random() * shapeKeys.length)];
             shapes.push(randomShape);
         }
@@ -193,15 +362,20 @@ class CanvasPhysics {
             const mass = massRange.min + Math.random() * (massRange.max - massRange.min);
             
             const centerX = this.canvas.width / 2;
-            const spreadRadius = 100;
+            const spreadRadius = Math.min(150, this.canvas.width / 8);
             
             const angle = Math.random() * Math.PI * 2;
             const distance = Math.random() * spreadRadius;
             const x = centerX + Math.cos(angle) * distance - this.config.elementSize / 2;
             
+            const baseOffset = Math.min(400, this.canvas.height / 3);
+            const elementOffset = Math.min(25, this.config.elementSize);
+            const initialY = Math.random() * -baseOffset - i * (elementOffset / 4);
+            
             const element: PhysicsElement = {
                 x: Math.max(0, Math.min(x, this.canvas.width - this.config.elementSize)),
-                y: Math.random() * -400 - i * 25,
+                y: initialY,
+                initialY: initialY,
                 vx: (Math.random() - 0.5) * 1,
                 vy: 0,
                 width: this.config.elementSize,
@@ -223,6 +397,10 @@ class CanvasPhysics {
     }
 
     private updatePhysics() {
+        if (!this.isAnimationStarted) {
+            return;
+        }
+
         this.applyMouseForcesToAllElements();
         
         for (let i = 0; i < this.elements.length; i++) {
@@ -320,24 +498,21 @@ class CanvasPhysics {
             const velocityForceX = (dx / distance) * mouseSpeed * (this.config.mouseVelocityMultiplier / this.config.animationSpeed);
             const velocityForceY = (dy / distance) * mouseSpeed * (this.config.mouseVelocityMultiplier / this.config.animationSpeed);
             
-            // УВЕЛИЧИЛИ силу инерции для более сильного эффекта
-            const inertiaForceX = mouseVx * (1.2 / this.config.animationSpeed); // Было 0.4
-            const inertiaForceY = mouseVy * (1.2 / this.config.animationSpeed); // Было 0.4
+            const inertiaForceX = mouseVx * (1.2 / this.config.animationSpeed);
+            const inertiaForceY = mouseVy * (1.2 / this.config.animationSpeed);
             
             const totalForceX = baseForceX + velocityForceX + inertiaForceX;
             const totalForceY = baseForceY + velocityForceY + inertiaForceY;
             
-            // УВЕЛИЧИЛИ множитель близости для более сильного эффекта
-            const proximityMultiplier = distance < this.config.mouseRadius * 0.5 ? 4.0 : 1.5; // Было 2.5 : 1
+            const proximityMultiplier = distance < this.config.mouseRadius * 0.5 ? 4.0 : 1.5;
             const interpolationMultiplier = 1 / Math.max(1, Math.ceil(mouseSpeed / (10 * this.config.animationSpeed)));
             const animationCompensation = 1 / this.config.animationSpeed;
             
             element.vx += totalForceX * proximityMultiplier * interpolationMultiplier * animationCompensation;
             element.vy += totalForceY * proximityMultiplier * interpolationMultiplier * animationCompensation;
             
-            // УСИЛИЛИ эффект вращения
-            if (mouseSpeed > 5) { // Уменьшили порог с 10 до 5
-                const tiltForce = force * this.config.rotationIntensity * 0.8; // Увеличили с 0.2 до 0.8
+            if (mouseSpeed > 5) {
+                const tiltForce = force * this.config.rotationIntensity * 0.8;
                 const direction = (mouseVx * dy - mouseVy * dx) > 0 ? 1 : -1;
                 element.rotationSpeed += tiltForce * direction / element.mass;
             }
@@ -346,8 +521,7 @@ class CanvasPhysics {
                 element.rotationSpeed = Math.sign(element.rotationSpeed) * this.config.maxRotationSpeed;
             }
             
-            // УВЕЛИЧИЛИ максимальную скорость для более динамичного движения
-            const maxSpeed = (35 / Math.sqrt(element.mass)) / this.config.animationSpeed; // Было 20
+            const maxSpeed = (35 / Math.sqrt(element.mass)) / this.config.animationSpeed;
             const currentSpeed = Math.sqrt(element.vx * element.vx + element.vy * element.vy);
             if (currentSpeed > maxSpeed) {
                 element.vx = (element.vx / currentSpeed) * maxSpeed;
@@ -468,7 +642,7 @@ class CanvasPhysics {
     }
 
     private activateNearbyElements(centerElement: PhysicsElement) {
-        const activationRadius = centerElement.collisionRadius * 5; // Увеличили с 3 до 5
+        const activationRadius = centerElement.collisionRadius * 5;
         
         for (const element of this.elements) {
             if (element === centerElement) continue;
@@ -479,10 +653,10 @@ class CanvasPhysics {
             
             if (distance < activationRadius) {
                 element.isResting = false;
-                element.restingTime = Math.max(0, element.restingTime - 90); // Увеличили с 60 до 90
+                element.restingTime = Math.max(0, element.restingTime - 90);
                 
                 if (distance < activationRadius * 0.7) {
-                    const force = ((activationRadius - distance) / activationRadius * 8) / this.config.animationSpeed; // Увеличили с 3 до 8
+                    const force = ((activationRadius - distance) / activationRadius * 8) / this.config.animationSpeed;
                     
                     element.vx += (dx / distance) * force;
                     element.vy += (dy / distance) * force;
@@ -589,23 +763,31 @@ class CanvasPhysics {
         this.ctx.rotate(element.rotation);
         
         this.ctx.fillStyle = element.color;
+        this.ctx.globalAlpha = 1.0;
         
-        const massOpacity = Math.min(1, 0.6 + element.mass * 0.2);
-        if (element.isResting) {
-            this.ctx.globalAlpha = massOpacity * 0.8;
-        } else {
-            this.ctx.globalAlpha = massOpacity;
-        }
-        
-        if (element.shape === 'blob') {
-            this.drawBlob(element.visualRadius);
-        } else if (element.shape === 'triangle') {
-            this.drawTriangle(element.visualRadius);
-        } else if (element.shape === 'circle') {
-            this.drawCircle(element.visualRadius);
-        } else if (element.shape === 'ring') {
-            this.drawRing(element.visualRadius);
-        }
+    if (element.shape === 'blob') {
+        this.drawBlob(element.visualRadius);
+    } else if (element.shape === 'triangle') {
+        this.drawTriangle(element.visualRadius);
+    } else if (element.shape === 'circle') {
+        this.drawCircle(element.visualRadius);
+    } else if (element.shape === 'ring') {
+        this.drawRing(element.visualRadius);
+    } else if (element.shape === 'star') {
+        this.drawStar(element.visualRadius);
+    } else if (element.shape === 'square') {
+        this.drawSquare(element.visualRadius);
+    } else if (element.shape === 'hexagon') {
+        this.drawHexagon(element.visualRadius);
+    } else if (element.shape === 'ellipse') {
+        this.drawEllipse(element.visualRadius);
+    } else if (element.shape === 'rectangle') {
+        this.drawRectangle(element.visualRadius);
+    } else if (element.shape === 'polygon') {
+        this.drawPolygon(element.visualRadius);
+    } else if (element.shape === 'diamond') {
+    this.drawDiamond(element.visualRadius);
+		}
         
         this.ctx.restore();
     }
@@ -614,37 +796,29 @@ class CanvasPhysics {
         const scale = size / 20;
         
         this.ctx.beginPath();
-        
         this.ctx.moveTo(10.1352 * scale - size, 5.20101 * scale - size);
-        
         this.ctx.bezierCurveTo(
             17.1682 * scale - size, -1.09557 * scale - size,
             27.9739 * scale - size, -0.49861 * scale - size,
             34.2705 * scale - size, 6.53435 * scale - size
         );
-        
         this.ctx.bezierCurveTo(
             40.5671 * scale - size, 13.5673 * scale - size,
             39.9701 * scale - size, 24.373 * scale - size,
             32.9371 * scale - size, 30.6696 * scale - size
         );
-        
         this.ctx.lineTo(24.8078 * scale - size, 37.9478 * scale - size);
-        
         this.ctx.bezierCurveTo(
             22.5954 * scale - size, 39.9285 * scale - size,
             19.1962 * scale - size, 39.7407 * scale - size,
             17.2155 * scale - size, 37.5284 * scale - size
         );
-        
         this.ctx.lineTo(1.58642 * scale - size, 20.0714 * scale - size);
-        
         this.ctx.bezierCurveTo(
             -0.394288 * scale - size, 17.8591 * scale - size,
             -0.206501 * scale - size, 14.4599 * scale - size,
             2.00585 * scale - size, 12.4792 * scale - size
         );
-        
         this.ctx.closePath();
         this.ctx.fill();
     }
@@ -653,33 +827,25 @@ class CanvasPhysics {
         const scale = size / 16;
         
         this.ctx.beginPath();
-        
         this.ctx.moveTo(4.59681 * scale - size, 3.14075 * scale - size);
-        
         this.ctx.bezierCurveTo(
             4.95061 * scale - size, 1.36365 * scale - size,
             6.787 * scale - size, 0.303406 * scale - size,
             8.50291 * scale - size, 0.885558 * scale - size
         );
-        
         this.ctx.lineTo(29.112 * scale - size, 7.87754 * scale - size);
-        
         this.ctx.bezierCurveTo(
             31.5545 * scale - size, 8.70622 * scale - size,
             31.8819 * scale - size, 12.0269 * scale - size,
             29.6481 * scale - size, 13.3166 * scale - size
         );
-        
         this.ctx.lineTo(4.78978 * scale - size, 27.6685 * scale - size);
-        
         this.ctx.bezierCurveTo(
             2.55604 * scale - size, 28.9582 * scale - size,
             -0.156095 * scale - size, 27.0144 * scale - size,
             0.347524 * scale - size, 24.4847 * scale - size
         );
-        
         this.ctx.lineTo(4.59681 * scale - size, 3.14075 * scale - size);
-        
         this.ctx.closePath();
         this.ctx.fill();
     }
@@ -702,6 +868,339 @@ class CanvasPhysics {
         this.ctx.fill();
         this.ctx.restore();
     }
+
+    private drawStar(size: number) {
+        const scaleX = (size * 2) / 36;
+        const scaleY = (size * 2) / 40;
+        
+        this.ctx.beginPath();
+        this.ctx.moveTo((26.9221 * scaleX) - size, (39.7182 * scaleY) - size);
+        this.ctx.lineTo((2.3038 * scaleX) - size, (34.2924 * scaleY) - size);
+        this.ctx.bezierCurveTo(
+            (0.846368 * scaleX) - size, (33.9712 * scaleY) - size,
+            (0.296576 * scaleX) - size, (32.1828 * scaleY) - size,
+            (1.32186 * scaleX) - size, (31.0983 * scaleY) - size
+        );
+        this.ctx.lineTo((12.1304 * scaleX) - size, (19.6658 * scaleY) - size);
+        this.ctx.bezierCurveTo(
+            (12.6175 * scaleX) - size, (19.1506 * scaleY) - size,
+            (12.781 * scaleX) - size, (18.4088 * scaleY) - size,
+            (12.5556 * scaleX) - size, (17.7365 * scaleY) - size
+        );
+        this.ctx.lineTo((7.55447 * scaleX) - size, (2.81956 * scaleY) - size);
+        this.ctx.bezierCurveTo(
+            (7.08007 * scaleX) - size, (1.40456 * scaleY) - size,
+            (8.33071 * scaleX) - size, (0.0130201 * scaleY) - size,
+            (9.78813 * scaleX) - size, (0.334236 * scaleY) - size
+        );
+        this.ctx.lineTo((34.4064 * scaleX) - size, (5.76008 * scaleY) - size);
+        this.ctx.bezierCurveTo(
+            (35.8638 * scaleX) - size, (6.08129 * scaleY) - size,
+            (36.4136 * scaleX) - size, (7.86964 * scaleY) - size,
+            (35.3883 * scaleX) - size, (8.95411 * scaleY) - size
+        );
+        this.ctx.lineTo((24.5798 * scaleX) - size, (20.3866 * scaleY) - size);
+        this.ctx.bezierCurveTo(
+            (24.0927 * scaleX) - size, (20.9019 * scaleY) - size,
+            (23.9292 * scaleX) - size, (21.6437 * scaleY) - size,
+            (24.1546 * scaleX) - size, (22.316 * scaleY) - size
+        );
+        this.ctx.lineTo((29.1557 * scaleX) - size, (37.2329 * scaleY) - size);
+        this.ctx.bezierCurveTo(
+            (29.6301 * scaleX) - size, (38.6479 * scaleY) - size,
+            (28.3795 * scaleX) - size, (40.0394 * scaleY) - size,
+            (26.9221 * scaleX) - size, (39.7182 * scaleY) - size
+        );
+        this.ctx.closePath();
+        this.ctx.fill();
+    }
+
+    // НОВЫЕ МЕТОДЫ ДЛЯ РИСОВАНИЯ SQUARE И HEXAGON
+    private drawSquare(size: number) {
+        // Масштабируем координаты из SVG (28x28) к размеру элемента
+        const scaleX = (size * 2) / 28;
+        const scaleY = (size * 2) / 28;
+        
+        this.ctx.beginPath();
+        
+        // Начальная точка (23.0996, 0.299805)
+        this.ctx.moveTo((23.0996 * scaleX) - size, (0.299805 * scaleY) - size);
+        
+        // Кривая к (27.0996, 4.2998)
+        this.ctx.bezierCurveTo(
+            (25.3087 * scaleX) - size, (0.299805 * scaleY) - size,
+            (27.0996 * scaleX) - size, (2.09067 * scaleY) - size,
+            (27.0996 * scaleX) - size, (4.2998 * scaleY) - size
+        );
+        
+        // Линия к (27.0996, 23.2998)
+        this.ctx.lineTo((27.0996 * scaleX) - size, (23.2998 * scaleY) - size);
+        
+        // Кривая к (23.0996, 27.2998)
+        this.ctx.bezierCurveTo(
+            (27.0996 * scaleX) - size, (25.5089 * scaleY) - size,
+            (25.3087 * scaleX) - size, (27.2998 * scaleY) - size,
+            (23.0996 * scaleX) - size, (27.2998 * scaleY) - size
+        );
+        
+        // Линия к (20.5635, 27.2998)
+        this.ctx.lineTo((20.5635 * scaleX) - size, (27.2998 * scaleY) - size);
+        
+        // Кривая к (16.5635, 23.2998)
+        this.ctx.bezierCurveTo(
+            (18.3543 * scaleX) - size, (27.2998 * scaleY) - size,
+            (16.5635 * scaleX) - size, (25.5089 * scaleY) - size,
+            (16.5635 * scaleX) - size, (23.2998 * scaleY) - size
+        );
+        
+        // Линия к (16.5635, 14.8359)
+        this.ctx.lineTo((16.5635 * scaleX) - size, (14.8359 * scaleY) - size);
+        
+        // Кривая к (12.5635, 10.8359)
+        this.ctx.bezierCurveTo(
+            (16.5635 * scaleX) - size, (12.6268 * scaleY) - size,
+            (14.7726 * scaleX) - size, (10.8359 * scaleY) - size,
+            (12.5635 * scaleX) - size, (10.8359 * scaleY) - size
+        );
+        
+        // Линия к (4.09961, 10.8359)
+        this.ctx.lineTo((4.09961 * scaleX) - size, (10.8359 * scaleY) - size);
+        
+        // Кривая к (0.0996094, 6.83594)
+        this.ctx.bezierCurveTo(
+            (1.89047 * scaleX) - size, (10.8359 * scaleY) - size,
+            (0.0996094 * scaleX) - size, (9.04508 * scaleY) - size,
+            (0.0996094 * scaleX) - size, (6.83594 * scaleY) - size
+        );
+        
+        // Линия к (0.0996094, 4.2998)
+        this.ctx.lineTo((0.0996094 * scaleX) - size, (4.2998 * scaleY) - size);
+        
+        // Кривая к (4.09961, 0.299805)
+        this.ctx.bezierCurveTo(
+            (0.0996094 * scaleX) - size, (2.09067 * scaleY) - size,
+            (1.89047 * scaleX) - size, (0.299805 * scaleY) - size,
+            (4.09961 * scaleX) - size, (0.299805 * scaleY) - size
+        );
+        
+        // Линия обратно к начальной точке
+        this.ctx.lineTo((23.0996 * scaleX) - size, (0.299805 * scaleY) - size);
+        
+        this.ctx.closePath();
+        this.ctx.fill();
+    }
+
+    private drawHexagon(size: number) {
+        // Масштабируем координаты из SVG (37x36) к размеру элемента
+        const scaleX = (size * 2) / 37;
+        const scaleY = (size * 2) / 36;
+        
+        this.ctx.beginPath();
+        
+        // Начальная точка (35.2692, 14.9625)
+        this.ctx.moveTo((35.2692 * scaleX) - size, (14.9625 * scaleY) - size);
+        
+        // Кривая к (35.5616, 18.5359)
+        this.ctx.bezierCurveTo(
+            (36.146 * scaleX) - size, (15.958 * scaleY) - size,
+            (36.2649 * scaleX) - size, (17.4111 * scaleY) - size,
+            (35.5616 * scaleX) - size, (18.5359 * scaleY) - size
+        );
+        
+        // Линия к (30.7519, 26.2275)
+        this.ctx.lineTo((30.7519 * scaleX) - size, (26.2275 * scaleY) - size);
+        
+        // Линия к (25.6792, 33.9794)
+        this.ctx.lineTo((25.6792 * scaleX) - size, (33.9794 * scaleY) - size);
+        
+        // Кривая к (22.5458, 35.2712)
+        this.ctx.bezierCurveTo(
+            (25.0013 * scaleX) - size, (35.0153 * scaleY) - size,
+            (23.7568 * scaleX) - size, (35.5284 * scaleY) - size,
+            (22.5458 * scaleX) - size, (35.2712 * scaleY) - size
+        );
+        
+        // Линия к (13.1956, 33.2859)
+        this.ctx.lineTo((13.1956 * scaleX) - size, (33.2859 * scaleY) - size);
+        
+        // Линия к (3.99941, 31.1442)
+        this.ctx.lineTo((3.99941 * scaleX) - size, (31.1442 * scaleY) - size);
+        
+        // Кривая к (1.69266, 28.4988)
+        this.ctx.bezierCurveTo(
+            (2.74109 * scaleX) - size, (30.8511 * scaleY) - size,
+            (1.81173 * scaleX) - size, (29.7853 * scaleY) - size,
+            (1.69266 * scaleX) - size, (28.4988 * scaleY) - size
+        );
+        
+        // Линия к (0.86676, 19.5755)
+        this.ctx.lineTo((0.86676 * scaleX) - size, (19.5755 * scaleY) - size);
+        
+        // Линия к (0.231412, 10.6365)
+        this.ctx.lineTo((0.231412 * scaleX) - size, (10.6365 * scaleY) - size);
+        
+        // Кривая к (2.07757, 7.65147)
+        this.ctx.bezierCurveTo(
+            (0.139813 * scaleX) - size, (9.34777 * scaleY) - size,
+            (0.883605 * scaleX) - size, (8.14514 * scaleY) - size,
+            (2.07757 * scaleX) - size, (7.65147 * scaleY) - size
+        );
+        
+        // Линия к (10.8034, 4.04359)
+        this.ctx.lineTo((10.8034 * scaleX) - size, (4.04359 * scaleY) - size);
+        
+        // Линия к (19.7066, 0.565015)
+        this.ctx.lineTo((19.7066 * scaleX) - size, (0.565015 * scaleY) - size);
+        
+        // Кривая к (23.0083, 1.33046)
+        this.ctx.bezierCurveTo(
+            (20.8597 * scaleX) - size, (0.114496 * scaleY) - size,
+            (22.1711 * scaleX) - size, (0.418524 * scaleY) - size,
+            (23.0083 * scaleX) - size, (1.33046 * scaleY) - size
+        );
+        
+        // Линия к (29.2735, 8.15479)
+        this.ctx.lineTo((29.2735 * scaleX) - size, (8.15479 * scaleY) - size);
+        
+        // Линия обратно к начальной точке
+        this.ctx.lineTo((35.2692 * scaleX) - size, (14.9625 * scaleY) - size);
+        
+        this.ctx.closePath();
+        this.ctx.fill();
+    }
+
+		// Метод для рисования ellipse
+		private drawEllipse(size: number) {
+				const scaleX = (size * 2) / 38;
+				const scaleY = (size * 2) / 25;
+				
+				this.ctx.save();
+				this.ctx.translate(0, 0);
+				this.ctx.rotate(22.3416 * Math.PI / 180); // поворот из SVG
+				this.ctx.scale(scaleX, scaleY);
+				
+				this.ctx.beginPath();
+				this.ctx.ellipse(0, 0, 19.6314, 9.9, 0, 0, Math.PI * 2);
+				this.ctx.fill();
+				
+				this.ctx.restore();
+		}
+
+		// Метод для рисования rectangle
+		private drawRectangle(size: number) {
+				const scaleX = (size * 2) / 33;
+				const scaleY = (size * 2) / 41;
+				
+				this.ctx.save();
+				this.ctx.translate(0, 0);
+				this.ctx.rotate(-57.1373 * Math.PI / 180); // поворот из SVG
+				
+				this.ctx.beginPath();
+				this.ctx.roundRect(
+						(-41.4 / 2) * scaleX, 
+						(-14.4 / 2) * scaleY, 
+						41.4 * scaleX, 
+						14.4 * scaleY, 
+						4 * Math.min(scaleX, scaleY)
+				);
+				this.ctx.fill();
+				
+				this.ctx.restore();
+		}
+
+		// Метод для рисования polygon (стрелка)
+		private drawPolygon(size: number) {
+				const scaleX = (size * 2) / 32;
+				const scaleY = (size * 2) / 30;
+				
+				// Вычисляем правильный центр стрелки
+				// Центр по X: примерно в середине между минимальной и максимальной X координатами
+				// Центр по Y: примерно в середине между минимальной и максимальной Y координатами
+				const centerX = 19; // (0.239001 + 37.5665) / 2 ≈ 19
+				const centerY = 14.7; // (-0.0551034 + 29.6951) / 2 ≈ 14.7
+				
+				this.ctx.beginPath();
+				
+				// Переводим SVG path в Canvas API с правильным центрированием
+				this.ctx.moveTo(((26.9573 - centerX) * scaleX), ((5.89926 - centerY) * scaleY));
+				this.ctx.bezierCurveTo(
+						((27.6755 - centerX) * scaleX), ((4.65538 - centerY) * scaleY),
+						((29.5128 - centerX) * scaleX), ((4.79286 - centerY) * scaleY),
+						((30.0381 - centerX) * scaleX), ((6.12968 - centerY) * scaleY)
+				);
+				this.ctx.lineTo(((37.1636 - centerX) * scaleX), ((24.2624 - centerY) * scaleY));
+				this.ctx.bezierCurveTo(
+						((37.5665 - centerX) * scaleX), ((25.2877 - centerY) * scaleY),
+						((36.9117 - centerX) * scaleX), ((26.4219 - centerY) * scaleY),
+						((35.8223 - centerX) * scaleX), ((26.5856 - centerY) * scaleY)
+				);
+				this.ctx.lineTo(((16.5556 - centerX) * scaleX), ((29.4819 - centerY) * scaleY));
+				this.ctx.bezierCurveTo(
+						((15.1355 - centerX) * scaleX), ((29.6951 - centerY) * scaleY),
+						((14.0981 - centerX) * scaleX), ((28.1721 - centerY) * scaleY),
+						((14.8162 - centerX) * scaleX), ((26.9283 - centerY) * scaleY)
+				);
+				this.ctx.lineTo(((16.7273 - centerX) * scaleX), ((23.6181 - centerY) * scaleY));
+				this.ctx.lineTo(((1.88989 - centerX) * scaleX), ((15.0517 - centerY) * scaleY));
+				this.ctx.bezierCurveTo(
+						((0.659916 - centerX) * scaleX), ((14.3413 - centerY) * scaleY),
+						((0.239001 - centerX) * scaleX), ((12.7685 - centerY) * scaleY),
+						((0.949218 - centerX) * scaleX), ((11.5384 - centerY) * scaleY)
+				);
+				this.ctx.lineTo(((6.68896 - centerX) * scaleX), ((1.59687 - centerY) * scaleY));
+				this.ctx.bezierCurveTo(
+						((7.3992 - centerX) * scaleX), ((0.366801 - centerY) * scaleY),
+						((8.97172 - centerX) * scaleX), ((-0.0551034 - centerY) * scaleY),
+						((10.2019 - centerX) * scaleX), ((0.654871 - centerY) * scaleY)
+				);
+				this.ctx.lineTo(((25.0393 - centerX) * scaleX), ((9.22128 - centerY) * scaleY));
+				this.ctx.lineTo(((26.9573 - centerX) * scaleX), ((5.89926 - centerY) * scaleY));
+				
+				this.ctx.closePath();
+				this.ctx.fill();
+		}
+
+		// Метод для рисования diamond
+		private drawDiamond(size: number) {
+				const scaleX = (size * 2) / 36;
+				const scaleY = (size * 2) / 37;
+				
+				// Вычисляем центр фигуры
+				const centerX = 18; // (0 + 36) / 2
+				const centerY = 18.5; // (0 + 37) / 2
+				
+				this.ctx.beginPath();
+				
+				// Переводим SVG path в Canvas API с центрированием
+				this.ctx.moveTo(((35.4224 - centerX) * scaleX), ((13.7385 - centerY) * scaleY));
+				this.ctx.bezierCurveTo(
+						((36.2714 - centerX) * scaleX), ((15.2071 - centerY) * scaleY),
+						((36.1018 - centerX) * scaleX), ((17.0515 - centerY) * scaleY),
+						((34.9991 - centerX) * scaleX), ((18.3406 - centerY) * scaleY)
+				);
+				this.ctx.lineTo(((20.6041 - centerX) * scaleX), ((35.1693 - centerY) * scaleY));
+				this.ctx.bezierCurveTo(
+						((19.1943 - centerX) * scaleX), ((36.8175 - centerY) * scaleY),
+						((16.7278 - centerX) * scaleX), ((37.0418 - centerY) * scaleY),
+						((15.0437 - centerX) * scaleX), ((35.6751 - centerY) * scaleY)
+				);
+				this.ctx.lineTo(((1.9041 - centerX) * scaleX), ((25.0108 - centerY) * scaleY));
+				this.ctx.bezierCurveTo(
+						((-0.0607217 - centerX) * scaleX), ((23.4161 - centerY) * scaleY),
+						((-0.0696371 - centerX) * scaleX), ((20.4206 - centerY) * scaleY),
+						((1.88566 - centerX) * scaleX), ((18.8142 - centerY) * scaleY)
+				);
+				this.ctx.lineTo(((22.97 - centerX) * scaleX), ((1.49259 - centerY) * scaleY));
+				this.ctx.bezierCurveTo(
+						((24.8779 - centerX) * scaleX), ((-0.0748266 - centerY) * scaleY),
+						((27.7363 - centerX) * scaleX), ((0.443658 - centerY) * scaleY),
+						((28.9721 - centerX) * scaleX), ((2.58131 - centerY) * scaleY)
+				);
+				this.ctx.lineTo(((35.4224 - centerX) * scaleX), ((13.7385 - centerY) * scaleY));
+				
+				this.ctx.closePath();
+				this.ctx.fill();
+		}
 
     private render() {
         this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
@@ -735,7 +1234,7 @@ class CanvasPhysics {
         this.createElements();
     }
 
-    public updateShapeDistribution(newDistribution: Record<'blob' | 'triangle' | 'circle' | 'ring', number>) {
+    public updateShapeDistribution(newDistribution: Record<'blob' | 'triangle' | 'circle' | 'ring' | 'star' | 'square' | 'hexagon' | 'ellipse' | 'rectangle' | 'polygon' | 'diamond', number>) {
         const totalPercentage = Object.values(newDistribution).reduce((sum, percent) => sum + percent, 0);
         if (Math.abs(totalPercentage - 100) > 0.1) {
             console.warn(`Сумма процентов должна быть 100%, текущая: ${totalPercentage}%`);
@@ -745,42 +1244,67 @@ class CanvasPhysics {
         this.createElements();
     }
 
-    public reset() {
+    public updateAdaptiveSettings() {
+        this.applyAdaptiveSettings();
         this.createElements();
+    }
+
+    public getCurrentSettings() {
+        return {
+            screenWidth: window.innerWidth,
+            adaptiveSettings: this.getAdaptiveSettings(),
+            currentConfig: {
+                elementCount: this.config.elementCount,
+                elementSize: this.config.elementSize,
+                mouseRadius: this.config.mouseRadius,
+                mouseForce: this.config.mouseForce
+            }
+        };
+    }
+
+    public reset() {
+        this.isAnimationStarted = false;
+        this.createElements();
+        this.setupScrollListener();
     }
 
     public destroy() {
         if (this.animationId) {
             cancelAnimationFrame(this.animationId);
         }
+        if (this.scrollListener) {
+            window.removeEventListener('scroll', this.scrollListener);
+        }
+        if (this.globalMouseListener) {
+            document.removeEventListener('mousemove', this.globalMouseListener);
+        }
+    }
+
+    public forceStart() {
+        this.startElementsFalling();
     }
 }
 
 // Инициализация
 const canvasPhysics = new CanvasPhysics('scene');
 
-// Настройки для максимально сильного расталкивания
 canvasPhysics.updateConfig({
-    gravity: 0.16,              
-    fallSpeed: 0.4,            
+    gravity: 0.1,              
+    fallSpeed: 1,            
     friction: 0.94,            
     bounce: 0.3,               
-    mouseForce: 2500,          
-    mouseRadius: 150,          
     mouseVelocityMultiplier: 25, 
-    elementCount: 250,
-    elementSize: 32,
-    elementPadding: 8,         
+    elementPadding: 5,         
     restThreshold: 0.01,       
     restTimeThreshold: 30,     
     separationForce: 150000,   
     rotationDamping: 0.95,     
     maxRotationSpeed: 0.3,     
     rotationIntensity: 0.8,    
-    animationSpeed: 30.0       
+    animationSpeed: 40,
+    footerVisibilityThreshold: 60      
 });
 
-// Настройка распределения цветов
 canvasPhysics.updateColorDistribution({
     '#CFFF10': 8,
     '#D6E4EC': 17,
@@ -793,12 +1317,21 @@ canvasPhysics.updateColorDistribution({
     '#CAD4DE': 25
 });
 
-// Настройка распределения форм
+// Обновленное распределение форм с новыми фигурами
 canvasPhysics.updateShapeDistribution({
-    blob: 35,
-    triangle: 25,
-    circle: 25,
-    ring: 15
+    blob: 14,
+    triangle: 11,
+    circle: 11,
+    ring: 11,
+    star: 11,
+    square: 7,
+    hexagon: 7,
+    ellipse: 6,
+    rectangle: 6,
+    polygon: 6,
+    diamond: 10      // Новая фигура
 });
+
+console.log('Current adaptive settings:', canvasPhysics.getCurrentSettings());
 
 (window as any).canvasPhysics = canvasPhysics;

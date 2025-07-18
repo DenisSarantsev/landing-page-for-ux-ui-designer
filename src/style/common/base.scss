@@ -1,5 +1,6 @@
 @use "./variables.scss" as *;
 @use "./fonts.scss" as *;
+@use "./functions.scss" as *;
 
 
 
@@ -33,6 +34,15 @@ main {
 	flex-direction: column;
 	align-items: center;
 	width: 100%;
+	&>*:not(:first-child) {
+		margin-top: 248px;
+		@media (max-width: $second-bp){
+			margin-top: px-to-vw(248px, $second-bp);
+		}
+		@media (max-width: $tablet-bp){
+			margin-top: px-to-vw(248px, $tablet-bp);
+		}
+	}
 }
 
 section {

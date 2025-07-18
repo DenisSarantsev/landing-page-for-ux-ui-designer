@@ -1,5 +1,6 @@
 // Чек прокрутки
 import { advancedScrollWatcher } from "./scroll-checker";
+import gsap from "gsap";
 // Функции анимаций
 import { animateWordsByWord, animateElementScale, showScaleAndOpacityElement, showScaleAndOpacityElementWithDuration } from "./animations";
 import { changeSlides } from "./about-me-slider";
@@ -201,6 +202,7 @@ const footerBlock = document.querySelector<HTMLElement>(".footer");
 const topFooterSubtitle = document.querySelector<HTMLElement>(".footer__subtitle");
 const footerTitleWrapper = document.querySelector<HTMLElement>(".footer__title");
 const footerContacts = document.querySelector<HTMLElement>(".footer__contacts");
+const socialsWidget = document.querySelector<HTMLElement>(".start-block__socials-button-outer");
 
 advancedScrollWatcher.watch({
   selector: '.footer',
@@ -217,6 +219,19 @@ advancedScrollWatcher.watch({
 			const bottomContact = footerContacts?.lastElementChild;
 			if ( topContact instanceof HTMLElement ) animateWordsByWord(topContact, 0.8);
 			if ( bottomContact instanceof HTMLElement ) animateWordsByWord(bottomContact, 0.9);
+		};
+
+		// Скрываем виджет
+		if ( data.scrolledPercentage > 20 ) {
+			if ( socialsWidget ) {
+				socialsWidget.classList.add("widget-opacity");
+				socialsWidget.classList.remove("widget-visible");
+			}
+		} else {
+			if ( socialsWidget ) {
+				socialsWidget.classList.remove("widget-opacity");
+				socialsWidget.classList.add("widget-visible");
+			}
 		}
 	}
 });

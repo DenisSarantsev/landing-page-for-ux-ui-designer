@@ -2,13 +2,6 @@
 @use "../functions.scss" as *;
 
 .history {
-	margin-top: 180px;
-	@media (max-width: $first-bp){
-		margin-top: px-to-vw(180px, $first-bp);
-	}
-	@media (max-width: $small-tablet-bp){
-		margin-top: px-to-vw(248px, $tablet-bp);
-	}
 		&__wrapper {
 			position: relative;
 			display: flex;

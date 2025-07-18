@@ -93,7 +93,7 @@ const checkScroll = () => {
                     const currentScale = gsap.getProperty(card, "scale") as number;
                     
                     // Логируем для отладки
-                    console.log(`Card ${index}: visible=${isVisible}, scale=${currentScale.toFixed(2)}, top=${rect.top.toFixed(0)}, bottom=${rect.bottom.toFixed(0)}, windowHeight=${windowHeight}`);
+                    //console.log(`Card ${index}: visible=${isVisible}, scale=${currentScale.toFixed(2)}, top=${rect.top.toFixed(0)}, bottom=${rect.bottom.toFixed(0)}, windowHeight=${windowHeight}`);
                     
                     if (isVisible && currentScale < 0.99) {
                         // Карточка видима и маленькая - увеличиваем

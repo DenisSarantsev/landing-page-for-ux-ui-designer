@@ -28,10 +28,9 @@
 	}
 		&__wrapper {
 			height: calc( 100dvh - 40px );
-			overflow-y: scroll;
 			background-color: #FFFFFF;
 			border-radius: 80px;
-
+			overflow: hidden;
 			// Скрываем скроллбар для всех браузеров
 			scrollbar-width: none; /* Firefox */
 			-ms-overflow-style: none; /* Internet Explorer 10+ */
@@ -69,7 +68,7 @@
 				padding: 80px 24px px-to-vw(170px, $first-bp) 24px;
 			}
 			@media (max-width: $small-tablet-bp){
-				padding: 80px 12px 12px 12px;
+				padding: 80px 12px 50px 12px;
 			}
 		}
 		&__close-button {

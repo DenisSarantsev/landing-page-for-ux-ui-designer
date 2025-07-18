@@ -2,10 +2,7 @@
 @use "../functions.scss" as *;
 
 .about {
-	margin-top: 248px;
-	@media (max-width: $first-bp){
-		margin-top: px-to-vw(248px, $first-bp);
-	}
+	padding-bottom: 50px;
 	&__wrapper {
 		display: flex;
 		flex-direction: column;

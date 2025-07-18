@@ -13,7 +13,7 @@ const addCardsInMobileSlider = async () => {
     const swiperWorkplaces = await loadWorkplaces();
     // Вставляем слайды в контейнер
     if ( swiperWorkplaces && swiperWorkplaces.length > 0 )
-    swiperWorkplaces.forEach((slide) => {
+    swiperWorkplaces.reverse().forEach((slide) => {
         slidesWrapper?.insertAdjacentHTML("beforeend", `
             <div class="swiper-slide">
                 <div data-workplace-swiper-slide-id=${slide.id} class="work-history-card">
@@ -81,24 +81,24 @@ const addCardsInMobileSlider = async () => {
 
 // Функция для расчета slidesPerView на основе ширины экрана
 const calculateSlidesPerView = (containerWidth: number, slideWidth: number, spaceBetween: number): number => {
-    // Рассчитываем сколько полных слайдов помещается
-    const fullSlidesCount = Math.floor(containerWidth / (slideWidth + spaceBetween));
-    
-    // Рассчитываем оставшееся место
-    const remainingSpace = containerWidth - (fullSlidesCount * (slideWidth + spaceBetween));
-    
-    // Рассчитываем какую часть следующего слайда можно показать
-    const partialSlideRatio = remainingSpace / slideWidth;
-    
-    // Возвращаем количество полных слайдов + часть следующего
-    return fullSlidesCount + Math.min(partialSlideRatio, 0.8); // Максимум 80% от следующего слайда
+	const fullSlidesCount = Math.floor(containerWidth / (slideWidth + spaceBetween));
+	const remainingSpace = containerWidth - (fullSlidesCount * (slideWidth + spaceBetween));
+	const partialSlideRatio = remainingSpace / slideWidth;
+
+	// Убираем жесткое ограничение, но оставляем разумный максимум
+	const result = fullSlidesCount + Math.min(partialSlideRatio, 0.95);
+	
+	console.log(`Container: ${containerWidth}, Full: ${fullSlidesCount}, Partial: ${partialSlideRatio.toFixed(2)}, Result: ${result.toFixed(2)}`);
+	
+	return result;
 };
 
 // Функция для получения отступа в зависимости от ширины экрана
 const getSpaceBetween = (screenWidth: number): number => {
-    if (screenWidth < 560) return 15;
-    if (screenWidth < 640) return 15; // Теперь и в промежутке 560-640 тоже 15px
-    return 15;
+	if (screenWidth < 400) return 10;
+	if (screenWidth < 560) return 15;
+	if (screenWidth < 640) return 15; // Теперь и в промежутке 560-640 тоже 15px
+	return 15;
 };
 
 const initSwiper = async () => {
@@ -123,9 +123,9 @@ const initSwiper = async () => {
                         centeredSlides: true,
                     },
                     360: {
-                        slidesPerView: 1,
-                        spaceBetween: 0,
-                        centeredSlides: true,
+                        slidesPerView: calculateSlidesPerView(360, slideWidth, getSpaceBetween(360)),
+                        spaceBetween: getSpaceBetween(360),
+                        centeredSlides: false,
                     },
                     400: {
                         slidesPerView: calculateSlidesPerView(400, slideWidth, getSpaceBetween(400)),
@@ -172,7 +172,7 @@ const initSwiper = async () => {
                         const newSlidesPerView = calculateSlidesPerView(containerWidth, slideWidth, currentSpaceBetween);
                         
                         // Определяем нужно ли центрирование
-                        const shouldCenter = containerWidth < 400;
+                        const shouldCenter = containerWidth < 360;
                         
                         this.params.slidesPerView = shouldCenter ? 1 : newSlidesPerView;
                         this.params.spaceBetween = shouldCenter ? 0 : currentSpaceBetween;

@@ -24,7 +24,7 @@ const addDesktopWorkCards = async () => {
     const desktopWorkCardsWrapper = document.querySelector<HTMLElement>(".history__cards");
     if (desktopWorkCardsWrapper) {
         const jsonCards = await loadWorkplaces();
-        jsonCards.reverse().forEach((card) => {
+        jsonCards.forEach((card) => {
             desktopWorkCardsWrapper.insertAdjacentHTML("beforeend", `
                 <div data-card-id=${card.id} class="history__card work-history-card desktop-workplace-card">
                     <div class="work-history-card__wrapper">

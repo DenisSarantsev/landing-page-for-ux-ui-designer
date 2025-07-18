@@ -8,9 +8,84 @@
     <title>Danil Ivashchenko - User Experience & Interface Designer</title>
 		<meta name="description" content="Danil Ivashchenko - experienced UX/UI Designer from Irvine, California. Creating visually captivating designs and interactive experiences that engage audiences and exceed expectations.">
 		<meta >
+		<style>
+			@font-face {
+				font-family: 'Outfit';
+				src: url('/fonts/77fb6637911ebc8dafcfe5019b57546f.woff2') format('woff2');
+				font-weight: 300;
+				font-style: normal;
+				font-display: block; /* Блокируем показ до загрузки */
+			}
+			.preloader {
+					position: fixed;
+					top: 0;
+					left: 0;
+					width: 100%;
+					height: 100%;
+					background: #1c1c1c;
+					display: flex;
+					align-items: center;
+					justify-content: center;
+					z-index: 99999999;
+					opacity: 1;
+					visibility: visible;
+					transition: opacity 0.5s ease, visibility 0.5s ease;
+			}
+			
+			.preloader.hidden {
+					opacity: 0;
+					visibility: hidden;
+			}
+			
+			.preloader__wrapper {
+					text-align: center;
+			}
+			
+			.preloader__content {
+				display: flex;
+				justify-content: center;
+				align-items: center;
+				gap: 12px;
+			}
+
+			.preloader__dot {
+				width: 5px;
+				height: 5px;
+				border-radius: 50%;
+				background-color: #FFFFFF;
+			}
+
+			.preloader__text {
+				font-size: 20px;
+				font-weight: 300;
+				color: #ffffff;
+				font-family: "Outfit", Arial, sans-serif;
+				opacity: 1;
+				transition: all 0.3s ease 0s;
+			}
+			
+			/* Скрываем основной контент до загрузки */
+			.main-content {
+					opacity: 0;
+					transition: opacity 0.5s ease;
+			}
+			
+			.main-content.loaded {
+					opacity: 1;
+			}
+    </style>
   </head>
   <body>
-		<div class="start-section max-height body-padding">
+		<!-- Preloader -->
+		<div class="preloader" id="preloader">
+			<div class="preloader__wrapper">
+				<div class="preloader__content">
+					<div class="preloader__dot"></div>
+					<div style="font-family: 'Outfit', Arial, sans-serif; font-weight: 300;" class="preloader__text"></div>
+				</div>
+			</div>
+		</div>
+		<div id="mainContent" class="start-section max-height body-padding main-content">
 			<div class="start-section__wrapper">
 				<header class="start-section__header header">
 					<div class="header__left-block">
@@ -384,6 +459,71 @@
 
 
 		</footer>
+		<!-- Скрипт прелоадера -->
+    <script>
+        (function() {
+            const preloaderContent = document.querySelector(".preloader__text");
+            const preloaderTitles = [
+							"Loading resources...",
+							"Preparing interface...",
+							"Initializing...",
+							"Setting up animations...",
+							"Loading fonts...",
+							"Preparing content...",
+							"Final setup...",
+							"Almost ready..."
+            ];
+            
+            let currentTitle = 0;
+            let preloaderInterval;
+            
+            // Запускаем анимацию текстов
+            function startTextAnimation() {
+                if (preloaderContent) {
+                    preloaderContent.textContent = preloaderTitles[currentTitle];
+                    
+                    preloaderInterval = setInterval(() => {
+                        currentTitle = (currentTitle + 1) % preloaderTitles.length;
+                        preloaderContent.textContent = preloaderTitles[currentTitle];
+                    }, 100);
+                }
+            }
+            
+            // Скрываем прелоадер
+            function hidePreloader() {
+                clearInterval(preloaderInterval);
+                
+                const preloader = document.getElementById('preloader');
+                const mainContent = document.getElementById('mainContent');
+                
+                if (preloader && mainContent) {
+                    preloader.classList.add('hidden');
+                    mainContent.classList.add('loaded');
+                    
+                    // Полностью убираем прелоадер через 0.5 секунды
+                    setTimeout(() => {
+                        preloader.style.display = 'none';
+                    }, 500);
+                }
+            }
+            
+            // Запускаем текстовую анимацию сразу
+            startTextAnimation();
+            
+            // Ждем загрузки DOM дерева
+            document.addEventListener('DOMContentLoaded', () => {
+                // Минимальное время показа прелоадера (500ms)
+                setTimeout(() => {
+                    hidePreloader();
+                }, 500);
+            });
+            
+            // Резервный таймер (максимум 3 секунды)
+            setTimeout(() => {
+                hidePreloader();
+            }, 3000);
+        })();
+    </script>
     <script type="module" src="/src/main.ts"></script>
   </body>
 </html>

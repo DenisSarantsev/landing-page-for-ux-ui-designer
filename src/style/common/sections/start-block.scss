@@ -316,3 +316,13 @@
 		opacity: 1;
 	}
 }
+
+.widget-opacity {
+	opacity: 0;
+	transition: all 0.3s ease 0s;
+}
+
+.widget-visible {
+	opacity: 1;
+	transition: all 0.3s ease 0s;
+}

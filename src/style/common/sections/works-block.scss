@@ -3,10 +3,6 @@
 
 // Блок с карточками работ
 .works {
-	margin-top: 128px;
-	@media (max-width: $first-bp){
-		margin-top: px-to-vw(128px, $first-bp);
-	}
 		&__wrapper {
 			display: flex;
 			flex-direction: column;
