@@ -29,7 +29,7 @@
 	align-items: center;
 	justify-content: space-between;
 	opacity: 0;
-	animation: opacityHeader 2.5s ease 0.1s forwards;
+	animation: opacityHeader 2.5s ease 0.6s forwards;
 		&__left-block {
 			min-width: 154px;
 			@media (max-width: $tablet-bp){

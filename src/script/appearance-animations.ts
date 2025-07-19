@@ -19,8 +19,8 @@ const startBlockBottomTitle = document.querySelector<HTMLElement>('.start-block_
 const cardsWrapper = document.querySelector<HTMLElement>('.start-block__cards');
 // Анимируем верхний заголовок
 if ( startBlockTopTitle instanceof HTMLElement ) { 
-	if ( startBlockTopTitle.firstElementChild instanceof HTMLElement ) animateWordsByWord(startBlockTopTitle.firstElementChild, 0.4);
-	if ( startBlockTopTitle.lastElementChild instanceof HTMLElement ) animateWordsByWord(startBlockTopTitle.lastElementChild, 0.5);
+	if ( startBlockTopTitle.firstElementChild instanceof HTMLElement ) animateWordsByWord(startBlockTopTitle.firstElementChild, 1);
+	if ( startBlockTopTitle.lastElementChild instanceof HTMLElement ) animateWordsByWord(startBlockTopTitle.lastElementChild, 1.1);
 };
 // Анимируем нижний заголовок
 if ( startBlockBottomTitle instanceof HTMLElement ) { 
@@ -28,7 +28,7 @@ if ( startBlockBottomTitle instanceof HTMLElement ) {
 	if ( startBlockBottomTitleChildrens && [...startBlockBottomTitleChildrens].length > 0 ) {
 		[...startBlockBottomTitleChildrens].forEach((item, index) => {
 			if ( item instanceof HTMLElement ) {
-				const delay = 0.6 + ((index + 1)/10);
+				const delay = 1 + ((index + 1)/10);
 				animateWordsByWord(item, delay);
 			}
 		})
@@ -38,9 +38,9 @@ if ( startBlockBottomTitle instanceof HTMLElement ) {
 if ( cardsWrapper instanceof HTMLElement ) {
 	const cards = cardsWrapper.children;
 	if ( cards && [...cards].length > 0 ) {
-		if ( cards[0] instanceof HTMLElement ) animateElementScale(cards[0], 0.8, -60, -50);
-		if ( cards[1] instanceof HTMLElement ) animateElementScale(cards[1], 0.9, -40, 20);
-		if ( cards[2] instanceof HTMLElement ) animateElementScale(cards[2], 1, -20, 40);
+		if ( cards[0] instanceof HTMLElement ) animateElementScale(cards[0], 1.1, -60, -50);
+		if ( cards[1] instanceof HTMLElement ) animateElementScale(cards[1], 1.2, -40, 20);
+		if ( cards[2] instanceof HTMLElement ) animateElementScale(cards[2], 1.3, -20, 40);
 	}
 };
 
