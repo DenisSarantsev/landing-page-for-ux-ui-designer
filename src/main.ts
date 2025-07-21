@@ -19,4 +19,5 @@ import "./script/dispersion-effect"; // Эффект рассыпающихся 
 import "./script/animations"; // Анимации появления (функции).
 import "./script/appearance-animations"; // Анимации появления применение функций.
 import "./script/margin-top-block"; // Отступ текстового блока в независимо от количества карточек
-
+//import "./script/cursor-shader"; // Эффект шлейфа после курсора
+import "./script/splash-cursor"; // Эффект шлейфа после курсора

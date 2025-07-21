@@ -34,7 +34,20 @@
 			
 			.preloader.hidden {
 					opacity: 0;
-					visibility: hidden;
+					/*
+					visibility: hidden; */
+					transition: opacity 0.3s ease 0.3s;
+					animation: hidePreloader 0.5s ease 0s forwards;
+			}
+
+			.preloader__circle-element {
+				position: absolute;
+				bottom: -100px;
+				left: 0px;
+				width: 100%;
+				height: 200px;
+				background: #1c1c1c;
+				border-radius: 0% 0% 50% 50%;
 			}
 			
 			.preloader__wrapper {
@@ -46,6 +59,9 @@
 				justify-content: center;
 				align-items: center;
 				gap: 12px;
+				@media (max-width: 768px){
+					gap: 8px;
+				}
 			}
 
 			.preloader__dot {
@@ -62,22 +78,35 @@
 				font-family: "Outfit", Arial, sans-serif;
 				opacity: 1;
 				transition: all 0.3s ease 0s;
+				@media (max-width: 768px){
+					font-size: 16px;
+				}
 			}
 			
 			/* Скрываем основной контент до загрузки */
 			.main-content {
 					opacity: 0;
-					transition: opacity 0.5s ease;
+					transition: opacity 0.3s ease;
 			}
 			
 			.main-content.loaded {
 					opacity: 1;
 			}
+
+			@keyframes hidePreloader {
+				0% {
+					transform: translateX(0px);
+				}
+				100% {
+					transform: translateY(-1000px);
+				}
+			}
     </style>
-    <script type="module" crossorigin src="/assets/index-Btj5RLQd.js"></script>
-    <link rel="stylesheet" crossorigin href="/assets/index-yea3XlOd.css">
+    <script type="module" crossorigin src="/assets/index-3ufn8WZ0.js"></script>
+    <link rel="stylesheet" crossorigin href="/assets/index-CLrEjxgy.css">
   </head>
   <body>
+		<canvas id="canvas"></canvas>
 		<!-- Preloader -->
 		<div class="preloader" id="preloader">
 			<div class="preloader__wrapper">
@@ -86,6 +115,7 @@
 					<div style="font-family: 'Outfit', Arial, sans-serif; font-weight: 300;" class="preloader__text"></div>
 				</div>
 			</div>
+			<div class="preloader__circle-element"></div>
 		</div>
 		<div id="mainContent" class="start-section max-height body-padding main-content">
 			<div class="start-section__wrapper">
