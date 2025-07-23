@@ -105,5 +105,5 @@ export const changeSlides = (maxSlides: number) => {
 		} else {
 			newIndex++
 		}
-	}, 5000)
+	}, 4000)
 }

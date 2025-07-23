@@ -28,7 +28,12 @@ const initializeWidgetListeners = () => {
     if (window.innerWidth > 992) {
         // Десктоп: работа по наведению
         widget.addEventListener('mouseenter', widgetOpenListener);
-        widget.addEventListener('mouseleave', widgetCloseListener);
+        widget.addEventListener('mouseleave', () => {
+					widgetCloseListener();
+					setTimeout(() => {
+						widgetCloseListener();
+					}, 100)
+				});
     } else {
         // Мобильные устройства: работа по клику
         widget.addEventListener('click', widgetClickListener);

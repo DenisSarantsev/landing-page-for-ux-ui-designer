@@ -16,6 +16,11 @@ interface PhysicsElement {
     rotation: number;
     rotationSpeed: number;
     initialY: number;
+
+		inertiaVx?: number;
+    inertiaVy?: number;
+    inertiaTime?: number;
+		protectedRadius?: number;
 }
 
 class CanvasPhysics {
@@ -28,27 +33,41 @@ class CanvasPhysics {
     private isAnimationStarted = false;
     private scrollListener: (() => void) | null = null;
     private globalMouseListener: ((e: MouseEvent) => void) | null = null;
+		private dynamicCursorRadius: number = 50;
+		private mouseDirection: { x: number, y: number } = { x: 0, y: 0 };
+		private mouseSpeed: number = 0;
+		private mouseIdleTimeout: number | null = null;
     
     private config = {
         gravity: 0.1,
         friction: 0.94,
-        bounce: 0.3,
+        bounce: 0.1,
         mouseForce: 25000,
         mouseRadius: 30,
         mouseVelocityMultiplier: 25,
-        elementCount: 200,
+        elementCount: 250,
         elementSize: 32,
-        elementPadding: 5,
+        elementPadding: 20,
         restThreshold: 0.01,
         restTimeThreshold: 30,
         damping: 0.99,
-        separationForce: 150000,
+        separationForce: 10,
         rotationDamping: 0.95,
         maxRotationSpeed: 0.3,
         rotationIntensity: 0.8,
         fallSpeed: 1,
         animationSpeed: 40,
         footerVisibilityThreshold: 60,
+
+				cursorEffectRadius: 70,          // радиус действия курсора
+				cursorRepelStrength: 3,        // сила расталкивания
+				cursorAttractStrength: 0.001,  // сила притягивания элементов за курсором
+				cursorBaseForce: 35,           // базовая сила воздействия
+				cursorSpeedMultiplier: 3,      // коэффициент умножения силы от скорости
+				cursorFarEffect: 0.08,           // сила покачивания для дальних элементов
+				cursorFarFalloff: 120,           // скорость затухания силы по расстоянию
+				inertiaMultiplier: 1.4,
+				minElementDistance: 4, // Минимальная дистанция между элементами
         
         // АДАПТИВНЫЕ НАСТРОЙКИ
         adaptiveSettings: {
@@ -75,14 +94,14 @@ class CanvasPhysics {
             },
             desktop: {
                 maxWidth: 1440,
-                elementCount: 200,
+                elementCount: 230,
                 elementSize: 32,
                 mouseRadius: 150,
                 mouseForce: 2500
             },
             large: {
                 maxWidth: Infinity,
-                elementCount: 280,
+                elementCount: 320,
                 elementSize: 36,
                 mouseRadius: 180,
                 mouseForce: 3000
@@ -241,6 +260,50 @@ class CanvasPhysics {
     }
 
     private setupEventListeners() {
+
+			this.canvas.addEventListener('mousemove', (e) => {
+					const rect = this.canvas.getBoundingClientRect();
+					this.prevMouse.x = this.mouse.x;
+					this.prevMouse.y = this.mouse.y;
+					this.mouse.x = e.clientX - rect.left;
+					this.mouse.y = e.clientY - rect.top;
+
+					// Определяем направление движения мыши
+					const dx = this.mouse.x - this.prevMouse.x;
+					const dy = this.mouse.y - this.prevMouse.y;
+					// Сохраняем данные в глобальный метод
+					const length = Math.sqrt(dx * dx + dy * dy);
+					this.mouseDirection.x = length > 0 ? dx / length : 0;
+					this.mouseDirection.y = length > 0 ? dy / length : 0;
+
+					let direction = '';
+					if (Math.abs(dx) > Math.abs(dy) && Math.abs(dx) > 0) {
+							direction = dx > 0 ? 'right' : 'left';
+					} else if (Math.abs(dy) > 0) {
+							direction = dy > 0 ? 'down' : 'up';
+					} else {
+							direction = 'none';
+					}
+
+					// Скорость движения мыши (модуль вектора)
+					const speed = Math.sqrt(dx * dx + dy * dy);
+					this.mouseSpeed = speed; 
+
+					// Сбросить таймер, если мышь двигается
+					if (this.mouseIdleTimeout) {
+						clearTimeout(this.mouseIdleTimeout);
+					}
+					this.mouseIdleTimeout = window.setTimeout(() => {
+						this.mouseSpeed = 0;
+					}, 100); // 0.1 секунда
+
+					// Пропорциональный радиус
+					this.dynamicCursorRadius = speed * 2;
+					console.log(this.dynamicCursorRadius)
+
+					console.log(`Направление движения мыши: ${direction}, скорость: ${speed.toFixed(2)} px`);
+			});
+
         this.globalMouseListener = (e: MouseEvent) => {
             const rect = this.canvas.getBoundingClientRect();
             this.prevMouse.x = this.mouse.x;
@@ -391,6 +454,8 @@ class CanvasPhysics {
                 rotation: Math.random() * 0.2 - 0.1,
                 rotationSpeed: 0
             };
+
+						element.protectedRadius = 5; // например, 10px
             
             this.elements.push(element);
         }
@@ -402,9 +467,24 @@ class CanvasPhysics {
         }
 
         this.applyMouseForcesToAllElements();
+
+				const inertiaDuration = 80; // мс
         
         for (let i = 0; i < this.elements.length; i++) {
             const element = this.elements[i];
+
+						// Применяем инерцию, если она активна
+						if (
+							element.inertiaTime &&
+							Date.now() - element.inertiaTime < inertiaDuration
+						) {
+							element.vx = element.inertiaVx!;
+							element.vy = element.inertiaVy!;
+						}
+						element.x += element.vx * this.config.animationSpeed;
+						element.y += element.vy * this.config.animationSpeed;
+
+						this.checkBoundaryCollisions(element);
             
             if (!element.isResting) {
                 const gravityForce = this.config.gravity * element.mass;
@@ -477,60 +557,82 @@ class CanvasPhysics {
         }
     }
 
-    private applyMouseForceAtPosition(element: PhysicsElement, mouseX: number, mouseY: number, interpolationStep: number) {
-        const dx = this.getElementCenterX(element) - mouseX;
-        const dy = this.getElementCenterY(element) - mouseY;
-        const distance = Math.sqrt(dx * dx + dy * dy);
-        
-        if (distance < this.config.mouseRadius && distance > 0) {
-            element.isResting = false;
-            element.restingTime = 0;
-            
-            const force = (this.config.mouseRadius - distance) / this.config.mouseRadius;
-            
-            const baseForceX = (dx / distance) * force * this.config.mouseForce;
-            const baseForceY = (dy / distance) * force * this.config.mouseForce;
-            
-            const mouseVx = this.mouse.x - this.prevMouse.x;
-            const mouseVy = this.mouse.y - this.prevMouse.y;
-            const mouseSpeed = Math.sqrt(mouseVx * mouseVx + mouseVy * mouseVy);
-            
-            const velocityForceX = (dx / distance) * mouseSpeed * (this.config.mouseVelocityMultiplier / this.config.animationSpeed);
-            const velocityForceY = (dy / distance) * mouseSpeed * (this.config.mouseVelocityMultiplier / this.config.animationSpeed);
-            
-            const inertiaForceX = mouseVx * (1.2 / this.config.animationSpeed);
-            const inertiaForceY = mouseVy * (1.2 / this.config.animationSpeed);
-            
-            const totalForceX = baseForceX + velocityForceX + inertiaForceX;
-            const totalForceY = baseForceY + velocityForceY + inertiaForceY;
-            
-            const proximityMultiplier = distance < this.config.mouseRadius * 0.5 ? 4.0 : 1.5;
-            const interpolationMultiplier = 1 / Math.max(1, Math.ceil(mouseSpeed / (10 * this.config.animationSpeed)));
-            const animationCompensation = 1 / this.config.animationSpeed;
-            
-            element.vx += totalForceX * proximityMultiplier * interpolationMultiplier * animationCompensation;
-            element.vy += totalForceY * proximityMultiplier * interpolationMultiplier * animationCompensation;
-            
-            if (mouseSpeed > 5) {
-                const tiltForce = force * this.config.rotationIntensity * 0.8;
-                const direction = (mouseVx * dy - mouseVy * dx) > 0 ? 1 : -1;
-                element.rotationSpeed += tiltForce * direction / element.mass;
-            }
-            
-            if (Math.abs(element.rotationSpeed) > this.config.maxRotationSpeed) {
-                element.rotationSpeed = Math.sign(element.rotationSpeed) * this.config.maxRotationSpeed;
-            }
-            
-            const maxSpeed = (35 / Math.sqrt(element.mass)) / this.config.animationSpeed;
-            const currentSpeed = Math.sqrt(element.vx * element.vx + element.vy * element.vy);
-            if (currentSpeed > maxSpeed) {
-                element.vx = (element.vx / currentSpeed) * maxSpeed;
-                element.vy = (element.vy / currentSpeed) * maxSpeed;
-            }
-            
-            this.activateNearbyElements(element);
-        }
+private applyMouseForceAtPosition(
+    element: PhysicsElement,
+    mouseX: number,
+    mouseY: number,
+    interpolationStep: number
+) {
+    const dx = this.getElementCenterX(element) - mouseX;
+    const dy = this.getElementCenterY(element) - mouseY;
+    const distance = Math.sqrt(dx * dx + dy * dy);
+
+    // Используем динамический радиус
+    const radius = this.dynamicCursorRadius;
+
+    // Вектор от курсора к элементу
+    const dirToElement = { x: dx / (distance || 1), y: dy / (distance || 1) };
+    // Вектор направления движения мыши
+    const mouseDir = this.mouseDirection;
+
+    // Косинус угла между движением мыши и направлением к элементу
+    const directionDot = dirToElement.x * mouseDir.x + dirToElement.y * mouseDir.y;
+
+    // Сила воздействия по расстоянию
+		const minSpeed = 0;
+		const maxSpeed2 = 60; // подбери под себя
+		const normalizedSpeed = Math.max(minSpeed, Math.min(this.mouseSpeed, maxSpeed2));
+		const speedFactor = normalizedSpeed / maxSpeed2; // от 0 до 1
+
+		// Пропорционально увеличиваем силу
+		let force = 0;
+		if (distance <= radius) {
+				force = ((radius - distance) / radius) * speedFactor;
+		} else if (distance <= radius * 2) {
+				force = 0.5 * (1 - (distance - radius) / radius) * speedFactor;
+		} else {
+				force = 0.1 * (1 - (distance - radius * 2) / (radius * 2)) * speedFactor;
+				force = Math.max(0, force);
+		}
+
+    // --- МЕХАНИКА ОТТАЛКИВАНИЯ И ПРИТЯЖЕНИЯ ---
+    // Если элемент "впереди" движения курсора (directionDot > 0) — отталкиваем в сторону движения
+    // Если "позади" (directionDot < 0) — притягиваем к курсору
+    let forceX = 0;
+    let forceY = 0;
+    if (directionDot > 0) {
+        // Отталкивание: толкаем по направлению движения мыши
+        forceX = mouseDir.x * force * this.config.cursorBaseForce / (element.mass || 1);
+        forceY = mouseDir.y * force * this.config.cursorBaseForce / (element.mass || 1);
+    } else if (directionDot < 0) {
+        // Притяжение: притягиваем к курсору
+        forceX = -dirToElement.x * force * this.config.cursorBaseForce * this.config.cursorAttractStrength / (element.mass || 1);
+        forceY = -dirToElement.y * force * this.config.cursorBaseForce * this.config.cursorAttractStrength / (element.mass || 1);
+			}
+
+    // Применяем силу к скорости
+    if (Math.abs(forceX) > 0.001 || Math.abs(forceY) > 0.001) {
+        element.vx += forceX / this.config.animationSpeed * interpolationStep;
+        element.vy += forceY / this.config.animationSpeed * interpolationStep;
+
+				// Сохраняем инерцию с множителем
+				element.inertiaVx = element.vx * this.config.inertiaMultiplier;
+				element.inertiaVy = element.vy * this.config.inertiaMultiplier;
+				element.inertiaTime = Date.now();
     }
+
+    // Ограничение максимальной скорости для плавности
+    const maxSpeed = (35 / Math.sqrt(element.mass)) / this.config.animationSpeed;
+    const currentSpeed = Math.sqrt(element.vx * element.vx + element.vy * element.vy);
+    if (currentSpeed > maxSpeed) {
+        element.vx = (element.vx / currentSpeed) * maxSpeed;
+        element.vy = (element.vy / currentSpeed) * maxSpeed;
+    }
+
+    // Убираем дребезжание
+    if (Math.abs(element.vx) < 0.01) element.vx = 0;
+    if (Math.abs(element.vy) < 0.01) element.vy = 0;
+}
 
     private separateAllElements(): boolean {
         let hasOverlaps = false;
@@ -551,9 +653,22 @@ class CanvasPhysics {
         const dy = this.getElementCenterY(element1) - this.getElementCenterY(element2);
         const distance = Math.sqrt(dx * dx + dy * dy);
         
-        const minDistance = element1.collisionRadius + element2.collisionRadius + 2;
+				// Минимальное расстояние между элементами
+				const minDistance = (element1.collisionRadius + (element1.protectedRadius || 0)) +
+														(element2.collisionRadius + (element2.protectedRadius || 0)) +
+														(this.config.minElementDistance || 0);
         
         if (distance < minDistance) {
+
+						// ---- Гасим столкновенич
+						const damping = 0.1; // коэффициент гашения, подбери под себя (0.5...0.8)
+						const avgVx = (element1.vx + element2.vx) / 2;
+						const avgVy = (element1.vy + element2.vy) / 2;
+						element1.vx = avgVx + (element1.vx - avgVx) * damping;
+						element1.vy = avgVy + (element1.vy - avgVy) * damping;
+						element2.vx = avgVx + (element2.vx - avgVx) * damping;
+						element2.vy = avgVy + (element2.vy - avgVy) * damping;
+
             if (distance < 0.1) {
                 const angle = Math.random() * Math.PI * 2;
                 const separationDistance = minDistance * 0.6;
@@ -677,17 +792,19 @@ class CanvasPhysics {
         const centerX = this.getElementCenterX(element);
         const centerY = this.getElementCenterY(element);
         
-        if (centerX < element.collisionRadius) {
-            element.x = element.collisionRadius - element.width / 2;
-        } else if (centerX > this.canvas.width - element.collisionRadius) {
-            element.x = this.canvas.width - element.collisionRadius - element.width / 2;
-        }
-        
-        if (centerY < element.collisionRadius) {
-            element.y = element.collisionRadius - element.height / 2;
-        } else if (centerY > this.canvas.height - element.collisionRadius) {
-            element.y = this.canvas.height - element.collisionRadius - element.height / 2;
-        }
+    // Ограничиваем по X
+    if (centerX < element.collisionRadius) {
+        element.x = element.collisionRadius - element.width / 2;
+    } else if (centerX > this.canvas.width - element.collisionRadius) {
+        element.x = this.canvas.width - element.collisionRadius - element.width / 2;
+    }
+
+    // Ограничиваем по Y
+    if (centerY < element.collisionRadius) {
+        element.y = element.collisionRadius - element.height / 2;
+    } else if (centerY > this.canvas.height - element.collisionRadius) {
+        element.y = this.canvas.height - element.collisionRadius - element.height / 2;
+    }
     }
 
     private updateRestState(element: PhysicsElement) {

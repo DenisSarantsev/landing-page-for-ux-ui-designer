@@ -80,8 +80,8 @@ function initFluidEffect(oldConfig: SplashCursorProps) {
 	canvas.style.height = '100vh';
 	canvas.style.pointerEvents = 'none'; // элементы под canvas кликабельны
 	canvas.style.zIndex = '-1';        // canvas поверх всего
-	canvas.style.background = 'transparent';
-	canvas.style.backgroundColor = 'transparent';
+	canvas.style.background = 'rgba(0,0,0,0)';
+	canvas.style.backgroundColor = 'rgba(0,0,0,0)';
 	canvas.style.display = 'block';
 
 	let config = {
@@ -113,49 +113,50 @@ function initFluidEffect(oldConfig: SplashCursorProps) {
 	}
 
 	function getWebGLContext(canvas: HTMLCanvasElement) {
-		const params = {
-			alpha: true,
-			depth: false,
-			stencil: false,
-			antialias: false,
-			preserveDrawingBuffer: false,
-		};
+    const params = {
+        alpha: true,
+        depth: false,
+        stencil: false,
+        antialias: false,
+        preserveDrawingBuffer: false,
+    };
 
-		let gl = canvas.getContext(
-			"webgl2",
-			params
-		) as WebGL2RenderingContext | null;
-
-		if (!gl) {
-			gl = (canvas.getContext("webgl", params) ||
-				canvas.getContext(
-					"experimental-webgl",
-					params
-				)) as WebGL2RenderingContext | null;
-		}
-
-		if (!gl) {
-			throw new Error("Unable to initialize WebGL.");
-		}
+    let gl = canvas.getContext("webgl", params) as WebGLRenderingContext | null;
+    if (!gl) {
+        gl = canvas.getContext("experimental-webgl", params) as WebGLRenderingContext | null;
+    }
+    if (!gl) {
+        gl = canvas.getContext("webgl2", params) as WebGL2RenderingContext | null;
+    }
+    if (!gl) {
+        alert("WebGL не поддерживается в этом браузере!");
+        throw new Error("Unable to initialize WebGL.");
+    }
 
 		const isWebGL2 = "drawBuffers" in gl;
 
 		let supportLinearFiltering = false;
 		let halfFloat = null;
 
-		if (isWebGL2) {
-			(gl as WebGL2RenderingContext).getExtension("EXT_color_buffer_float");
-			supportLinearFiltering = !!(gl as WebGL2RenderingContext).getExtension(
-				"OES_texture_float_linear"
-			);
-		} else {
-			halfFloat = gl.getExtension("OES_texture_half_float");
-			supportLinearFiltering = !!gl.getExtension(
-				"OES_texture_half_float_linear"
-			);
-		}
+    if (isWebGL2) {
+        const extColorBufferFloat = (gl as WebGL2RenderingContext).getExtension("EXT_color_buffer_float");
+        const extTextureFloatLinear = (gl as WebGL2RenderingContext).getExtension("OES_texture_float_linear");
+        console.log("EXT_color_buffer_float:", !!extColorBufferFloat);
+        console.log("OES_texture_float_linear:", !!extTextureFloatLinear);
+        supportLinearFiltering = !!extTextureFloatLinear;
+    } else {
+        halfFloat = gl.getExtension("OES_texture_half_float");
+        const extHalfFloatLinear = gl.getExtension("OES_texture_half_float_linear");
+        console.log("OES_texture_half_float:", !!halfFloat);
+        console.log("OES_texture_half_float_linear:", !!extHalfFloatLinear);
+        supportLinearFiltering = !!extHalfFloatLinear;
+    }
 
 		gl.clearColor(0, 0, 0, 1);
+
+		// Проверка float текстур
+    const floatTex = gl.getExtension("OES_texture_float");
+    console.log("OES_texture_float:", !!floatTex);
 
 		const halfFloatTexType = isWebGL2
 			? (gl as WebGL2RenderingContext).HALF_FLOAT
@@ -506,7 +507,7 @@ function initFluidEffect(oldConfig: SplashCursorProps) {
 				p.x *= aspectRatio;
 				vec3 splat = exp(-dot(p, p) / radius) * color;
 				vec3 base = texture2D(uTarget, vUv).xyz;
-				gl_FragColor = vec4(base + splat, 1.0);
+				gl_FragColor = vec4(base + splat, 1);
 		}
 	`
 	);
@@ -1368,6 +1369,7 @@ function initFluidEffect(oldConfig: SplashCursorProps) {
 		return delta;
 	}
 
+	/*
 	function generateColor(): ColorRGB {
 		const c = HSVtoRGB(Math.random(), 1.0, 1.0);
 		c.r *= 0.15;
@@ -1375,6 +1377,96 @@ function initFluidEffect(oldConfig: SplashCursorProps) {
 		c.b *= 0.15;
 		return c;
 	}
+		*/
+
+		// "#eaf3fe",
+    // "#e3eefe",
+    // "#dee1fa",
+    // "#fcf1e8"
+    // "#f1fdfd",
+    // "#f1fdfd",
+
+    // "#d6edfd",
+
+    // "#d9e8fa",
+
+    // "#e5ddee",
+
+    // "#f8fbf9",
+    // "#eff0fa"
+
+
+	const colorSequence: ColorRGB[] = [
+    { r: 122 / 255, g: 182 / 255, b: 255 / 255 },
+    { r: 145 / 255, g: 190 / 255, b: 255 / 255 },
+		{ r: 243 / 255, g: 244 / 255, b: 254 / 255 },
+    { r: 141 / 255, g: 153 / 255, b: 252 / 255 },
+    { r: 201 / 255, g: 255 / 255, b: 155 / 255 },
+		{ r: 243 / 255, g: 244 / 255, b: 254 / 255 },
+    { r: 194 / 255, g: 252 / 255, b: 252 / 255 },
+    { r: 173 / 255, g: 222 / 255, b: 255 / 255 },
+		{ r: 243 / 255, g: 244 / 255, b: 254 / 255 },
+    { r: 180 / 255, g: 212 / 255, b: 250 / 255 },
+    { r: 222 / 255, g: 197 / 255, b: 250 / 255 },
+		{ r: 243 / 255, g: 244 / 255, b: 254 / 255 },
+    { r: 207 / 255, g: 211 / 255, b: 250 / 255 },
+    { r: 243 / 255, g: 244 / 255, b: 254 / 255 },
+	];
+
+	let colorIndex = 0;
+
+	function generateColor(): ColorRGB {
+    const color = colorSequence[colorIndex];
+    colorIndex = (colorIndex + 1) % colorSequence.length;
+    // Сделать цвета менее яркими
+    return {
+        r: color.r * 0.2,
+        g: color.g * 0.2,
+        b: color.b * 0.2
+    };
+	}
+
+
+/*
+function hexToRgb(hex: string): ColorRGB {
+    hex = hex.replace('#', '');
+    if (hex.length === 3) {
+        hex = hex.split('').map(x => x + x).join('');
+    }
+    const num = parseInt(hex, 16);
+    return {
+        r: ((num >> 16) & 255) / 255,
+        g: ((num >> 8) & 255) / 255,
+        b: (num & 255) / 255,
+    };
+}
+
+const colorHexSequence = [
+    "#eaf3fe",
+    "#e3eefe",
+    "#dee1fa",
+    "#eadce7",
+    "#fcf1e8",
+    "#fbfdf8",
+    "#f1fdfd",
+    "#f1fdfd",
+    "#d6edfd",
+    "#d9e8fa",
+    "#e5ddee",
+    "#f8fbf9",
+    "#eff0fa"
+];
+
+const colorSequence: ColorRGB[] = colorHexSequence.map(hexToRgb);
+
+let colorIndex = 0;
+
+function generateColor(): ColorRGB {
+    const color = colorSequence[colorIndex];
+    colorIndex = (colorIndex + 1) % colorSequence.length;
+    return { ...color };
+}
+		*/
 
 	function HSVtoRGB(h: number, s: number, v: number): ColorRGB {
 		let r = 0,

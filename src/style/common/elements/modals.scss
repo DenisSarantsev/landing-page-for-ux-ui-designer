@@ -86,16 +86,16 @@
 				padding-bottom: px-to-vw(30px, $tablet-bp);
 			}
 			& img {
-				border-radius: 50%;
+				//border-radius: 50%;
 				width: 71px;
-				height: 71px;
+				height: auto;
 				@media (max-width: $tablet-bp){
 					width: px-to-vw(71px, $tablet-bp);
-					height: px-to-vw(71px, $tablet-bp);
+					height: auto;
 				}
 				@media (max-width: 690px){
 					width: 47px;
-					height: 47px;
+					height: auto;
 				}
 			}
 		}

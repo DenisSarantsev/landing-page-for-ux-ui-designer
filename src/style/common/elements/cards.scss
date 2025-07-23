@@ -215,10 +215,10 @@
 			border-bottom: 1px solid $light-grey;
 			&_image {
 				width: 46px;
-				height: 46px;
+				height: auto;
 				@media (max-width: $small-tablet-bp){
 					width: 36px;
-					height: 36px;
+					height: auto;
 				}
 			}
 			&_data {

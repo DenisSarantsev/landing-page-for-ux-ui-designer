@@ -29,6 +29,7 @@
 	font-family: $accent-font;
 	text-transform: uppercase;
 	text-align: center;
+	color: $neutral-dark;
 	@media (max-width: $first-bp){
 		font-size: px-to-vw(77px, $first-bp);
 	}
@@ -49,7 +50,7 @@
 	line-height: 162.5%;
 	color: $neutral-grey;
 	letter-spacing: 0.5%;
-	font-weight: 500;
+	font-weight: 300;
 	text-align: center;
 	@media (max-width: $first-bp){
 		font-size: 16px;

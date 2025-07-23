@@ -30,58 +30,59 @@
 					opacity: 1;
 					visibility: visible;
 					transition: opacity 0.5s ease, visibility 0.5s ease;
-			}
-			
-			.preloader.hidden {
+				}
+				
+				.preloader.hidden {
 					opacity: 0;
 					/*
 					visibility: hidden; */
 					transition: opacity 0.3s ease 0.3s;
 					animation: hidePreloader 0.5s ease 0s forwards;
-			}
+				}
 
-			.preloader__circle-element {
-				position: absolute;
-				bottom: -100px;
-				left: 0px;
-				width: 100%;
-				height: 200px;
-				background: #1c1c1c;
-				border-radius: 0% 0% 50% 50%;
-			}
-			
-			.preloader__wrapper {
+				.preloader__circle-element {
+					position: absolute;
+					bottom: -100px;
+					left: 0px;
+					width: 100%;
+					height: 200px;
+					background: #1c1c1c;
+					border-radius: 0% 0% 50% 50%;
+				}
+				
+				.preloader__wrapper {
 					text-align: center;
-			}
-			
-			.preloader__content {
-				display: flex;
-				justify-content: center;
-				align-items: center;
-				gap: 12px;
-				@media (max-width: 768px){
-					gap: 8px;
 				}
-			}
+				
+				.preloader__content {
+					display: flex;
+					justify-content: center;
+					align-items: center;
+					gap: 12px;
+					@media (max-width: 768px){
+					gap: 12px;
+					}
+				}
 
-			.preloader__dot {
-				width: 5px;
-				height: 5px;
-				border-radius: 50%;
-				background-color: #FFFFFF;
-			}
+				.preloader__dot {
+					width: 8px;
+					height: 8px;
+					border-radius: 50%;
+					background-color: #FFFFFF;
+				}
 
-			.preloader__text {
-				font-size: 20px;
-				font-weight: 300;
-				color: #ffffff;
-				font-family: "Outfit", Arial, sans-serif;
-				opacity: 1;
-				transition: all 0.3s ease 0s;
-				@media (max-width: 768px){
+				.preloader__text {
+					font-size: 32px;
+					font-weight: 300;
+					color: #ffffff;
+					font-family: "Outfit", Arial, sans-serif;
+					opacity: 1;
+					transition: all 0.3s ease 0s;
+					@media (max-width: 768px){
 					font-size: 16px;
+					}
 				}
-			}
+
 			
 			/* Скрываем основной контент до загрузки */
 			.main-content {
@@ -102,8 +103,8 @@
 				}
 			}
     </style>
-    <script type="module" crossorigin src="/assets/index-3ufn8WZ0.js"></script>
-    <link rel="stylesheet" crossorigin href="/assets/index-CLrEjxgy.css">
+    <script type="module" crossorigin src="/assets/index-CcewF9jx.js"></script>
+    <link rel="stylesheet" crossorigin href="/assets/index-Bksmh1gl.css">
   </head>
   <body>
 		<canvas id="canvas"></canvas>
@@ -223,7 +224,7 @@
 				<div class="works__wrapper block-gap">
 					<div class="works__titles titles-gap">
 						<h2 class="works__title secondary-title">Featured work</h2>
-						<div class="works__subtitle subtitle">A SELECTION OF OUR MOST PASSIONATELY CRAFTED WORKS WITH FORWARD-THINKING CLIENTS AND FRIENDS OVER THE YEARS.</div>
+						<div class="works__subtitle subtitle">A SELECTION OF OUR MOST PASSIONATELY CRAFTED WORKS WITH <br> FORWARD-THINKING CLIENTS AND FRIENDS OVER THE YEARS.</div>
 					</div>
 					<div class="works__cards"></div>
 					<div class="works__button">
@@ -496,14 +497,15 @@
         (function() {
             const preloaderContent = document.querySelector(".preloader__text");
             const preloaderTitles = [
-							"Loading resources...",
-							"Preparing interface...",
-							"Initializing...",
-							"Setting up animations...",
-							"Loading fonts...",
-							"Preparing content...",
-							"Final setup...",
-							"Almost ready..."
+							"Hello",
+							"Bonjour",
+							"नमस्ते",
+							"Ciao",
+							"Olá",
+							"Hola",
+							"Guten tag",
+							"你好",
+              "Привет"
             ];
             
             let currentTitle = 0;
@@ -517,7 +519,7 @@
                     preloaderInterval = setInterval(() => {
                         currentTitle = (currentTitle + 1) % preloaderTitles.length;
                         preloaderContent.textContent = preloaderTitles[currentTitle];
-                    }, 100);
+                    }, 110);
                 }
             }
             
@@ -535,7 +537,7 @@
                     // Полностью убираем прелоадер через 0.5 секунды
                     setTimeout(() => {
                         preloader.style.display = 'none';
-                    }, 500);
+                    }, 950);
                 }
             }
             
@@ -547,7 +549,7 @@
                 // Минимальное время показа прелоадера (500ms)
                 setTimeout(() => {
                     hidePreloader();
-                }, 500);
+                }, 950);
             });
             
             // Резервный таймер (максимум 3 секунды)
