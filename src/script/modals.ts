@@ -1,6 +1,7 @@
 import gsap from "gsap"
 import type { Project, ProjectsData } from "../types/project.type";
 import { loadProjects } from "./common";
+import { unlockBodyScroll } from "./common";
 
 document.addEventListener("DOMContentLoaded", () => {
 // Получаем модалку
@@ -12,6 +13,7 @@ const modalCloseButton = document.querySelector<HTMLElement>(".modal-close-butto
 // Функционал закрытия модалки
 modalCloseButton?.addEventListener("click", () => {
 	const projectModalWrapper = projectModal?.firstElementChild;
+	unlockBodyScroll();
 	if ( projectModalWrapper )
 	gsap.fromTo(projectModalWrapper, {
 		opacity: 1,

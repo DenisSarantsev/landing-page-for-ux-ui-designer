@@ -80,25 +80,16 @@ const addCardsInMobileSlider = async () => {
 };
 
 // Функция для расчета slidesPerView на основе ширины экрана
-const calculateSlidesPerView = (containerWidth: number, slideWidth: number, spaceBetween: number): number => {
-	const fullSlidesCount = Math.floor(containerWidth / (slideWidth + spaceBetween));
-	const remainingSpace = containerWidth - (fullSlidesCount * (slideWidth + spaceBetween));
-	const partialSlideRatio = remainingSpace / slideWidth;
-
-	// Убираем жесткое ограничение, но оставляем разумный максимум
-	const result = fullSlidesCount + Math.min(partialSlideRatio, 0.95);
-	
-	console.log(`Container: ${containerWidth}, Full: ${fullSlidesCount}, Partial: ${partialSlideRatio.toFixed(2)}, Result: ${result.toFixed(2)}`);
-	
-	return result;
+const calculateSlidesPerView = (containerWidth: number, slideWidth: number): number => {
+    const spaceBetween = 20; // фиксированное расстояние между карточками
+    // Количество слайдов = (ширина контейнера + spaceBetween) / (ширина слайда + spaceBetween)
+    const slides = (containerWidth + spaceBetween) / (slideWidth + spaceBetween);
+    return slides;
 };
 
 // Функция для получения отступа в зависимости от ширины экрана
 const getSpaceBetween = (screenWidth: number): number => {
-	if (screenWidth < 400) return 10;
-	if (screenWidth < 560) return 15;
-	if (screenWidth < 640) return 15; // Теперь и в промежутке 560-640 тоже 15px
-	return 15;
+	return 20;
 };
 
 const initSwiper = async () => {
@@ -109,7 +100,7 @@ const initSwiper = async () => {
         // Небольшая задержка для рендеринга
         setTimeout(() => {
             // Предполагаемая ширина одного слайда (нужно подставить реальную)
-            const slideWidth = 300; // Замените на реальную ширину вашего слайда
+            const slideWidth = 290; // Замените на реальную ширину вашего слайда
             
             const swiper = new Swiper('.swiper', {
                 slidesPerView: 'auto',
@@ -123,42 +114,42 @@ const initSwiper = async () => {
                         centeredSlides: true,
                     },
                     360: {
-                        slidesPerView: calculateSlidesPerView(360, slideWidth, getSpaceBetween(360)),
+                        slidesPerView: calculateSlidesPerView(360, slideWidth),
                         spaceBetween: getSpaceBetween(360),
                         centeredSlides: false,
                     },
                     400: {
-                        slidesPerView: calculateSlidesPerView(400, slideWidth, getSpaceBetween(400)),
+                        slidesPerView: calculateSlidesPerView(400, slideWidth),
                         spaceBetween: getSpaceBetween(400),
                         centeredSlides: false,
                     },
                     450: {
-                        slidesPerView: calculateSlidesPerView(450, slideWidth, getSpaceBetween(450)),
+                        slidesPerView: calculateSlidesPerView(450, slideWidth),
                         spaceBetween: getSpaceBetween(450),
                         centeredSlides: false,
                     },
                     500: {
-                        slidesPerView: calculateSlidesPerView(500, slideWidth, getSpaceBetween(500)),
+                        slidesPerView: calculateSlidesPerView(500, slideWidth),
                         spaceBetween: getSpaceBetween(500),
                         centeredSlides: false,
                     },
                     550: {
-                        slidesPerView: calculateSlidesPerView(550, slideWidth, getSpaceBetween(550)),
+                        slidesPerView: calculateSlidesPerView(550, slideWidth),
                         spaceBetween: getSpaceBetween(550),
                         centeredSlides: false,
                     },
                     600: {
-                        slidesPerView: calculateSlidesPerView(600, slideWidth, getSpaceBetween(600)),
+                        slidesPerView: calculateSlidesPerView(600, slideWidth),
                         spaceBetween: getSpaceBetween(600),
                         centeredSlides: false,
                     },
                     640: {
-                        slidesPerView: calculateSlidesPerView(640, slideWidth, getSpaceBetween(640)),
+                        slidesPerView: calculateSlidesPerView(640, slideWidth),
                         spaceBetween: getSpaceBetween(640),
                         centeredSlides: false,
                     },
                     670: {
-                        slidesPerView: calculateSlidesPerView(670, slideWidth, getSpaceBetween(670)),
+                        slidesPerView: calculateSlidesPerView(670, slideWidth),
                         spaceBetween: getSpaceBetween(670),
                         centeredSlides: false,
                     },
@@ -169,7 +160,7 @@ const initSwiper = async () => {
                     resize: function() {
                         const containerWidth = this.el.offsetWidth;
                         const currentSpaceBetween = getSpaceBetween(containerWidth);
-                        const newSlidesPerView = calculateSlidesPerView(containerWidth, slideWidth, currentSpaceBetween);
+                        const newSlidesPerView = calculateSlidesPerView(containerWidth, slideWidth);
                         
                         // Определяем нужно ли центрирование
                         const shouldCenter = containerWidth < 360;

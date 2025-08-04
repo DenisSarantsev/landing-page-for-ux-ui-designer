@@ -3,57 +3,68 @@
 		{
 			"id": 1,
 			"project-name": "Project name 1",
-			"description": "Modern online store with responsive design"
+			"description": "Modern online store with responsive design",
+			"structure": "1,1,1,2,1"
 		},
 		{
 			"id": 2,
 			"project-name": "Project name 2",
-			"description": "Modern online store with responsive design"
+			"description": "Modern online store with responsive design",
+			"structure": "2,2,1,2"
 		},
 		{
 			"id": 3,
 			"project-name": "Project name 3",
-			"description": "Modern online store with responsive design"
+			"description": "Modern online store with responsive design",
+			"structure": "1,2,1,2"
 		},
 		{
 			"id": 4,
 			"project-name": "Project name 4",
-			"description": "Modern online store with responsive design"
+			"description": "Modern online store with responsive design",
+			"structure": "1,2,1,2"
 		},
 		{
 			"id": 5,
 			"project-name": "Project name 5",
-			"description": "Modern online store with responsive design"
+			"description": "Modern online store with responsive design",
+			"structure": "1,2,1,2"
 		},
 		{
 			"id": 6,
 			"project-name": "Project name 6",
-			"description": "Modern online store with responsive design"
+			"description": "Modern online store with responsive design",
+			"structure": "1,2,1,2"
 		},
 		{
 			"id": 7,
 			"project-name": "Project name 7",
-			"description": "Modern online store with responsive design"
+			"description": "Modern online store with responsive design",
+			"structure": "1,2,1,2"
 		},
 		{
 			"id": 8,
 			"project-name": "Project name 8",
-			"description": "Modern online store with responsive design"
+			"description": "Modern online store with responsive design",
+			"structure": "1,2,1,2"
 		},
 		{
 			"id": 9,
 			"project-name": "Project name 9",
-			"description": "Modern online store with responsive design"
+			"description": "Modern online store with responsive design",
+			"structure": "1,2,1,2"
 		},
 		{
 			"id": 10,
 			"project-name": "Project name 10",
-			"description": "Modern online store with responsive design"
+			"description": "Modern online store with responsive design",
+			"structure": "1,2,1,2"
 		},
 		{
 			"id": 11,
 			"project-name": "Project name 11",
-			"description": "Modern online store with responsive design"
+			"description": "Modern online store with responsive design",
+			"structure": "1,2,1,2"
 		},
 		{
 			"id": 12,
@@ -63,17 +74,20 @@
 		{
 			"id": 13,
 			"project-name": "Project name 13",
-			"description": "Modern online store with responsive design"
+			"description": "Modern online store with responsive design",
+			"structure": "1,2,1,2"
 		},
 		{
 			"id": 14,
 			"project-name": "Project name 14",
-			"description": "Modern online store with responsive design"
+			"description": "Modern online store with responsive design",
+			"structure": "1,2,1,2"
 		},
 		{
 			"id": 15,
 			"project-name": "Project name 15",
-			"description": "Modern online store with responsive design"
+			"description": "Modern online store with responsive design",
+			"structure": "1,2,1,2"
 		}
 	]
 }

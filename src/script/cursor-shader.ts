@@ -1,19 +1,21 @@
 'use strict';
 
 const canvas = document.getElementById('canvas');
-canvas.width = canvas.clientWidth;
-canvas.height = canvas.clientHeight;
+if (canvas) {
+	canvas.width = canvas.clientWidth;
+	canvas.height = canvas.clientHeight;
 
-canvas.style.position = 'fixed';
-canvas.style.top = '0';
-canvas.style.left = '0';
-canvas.style.width = '100vw';
-canvas.style.height = '100vh';
-canvas.style.pointerEvents = 'none'; // элементы под canvas кликабельны
-canvas.style.zIndex = '-1';        // canvas поверх всего
-canvas.style.background = 'transparent';
-canvas.style.backgroundColor = 'transparent';
-canvas.style.display = 'block';
+	canvas.style.position = 'fixed';
+	canvas.style.top = '0';
+	canvas.style.left = '0';
+	canvas.style.width = '100vw';
+	canvas.style.height = '100vh';
+	canvas.style.pointerEvents = 'none'; // элементы под canvas кликабельны
+	canvas.style.zIndex = '-1';        // canvas поверх всего
+	canvas.style.background = 'transparent';
+	canvas.style.backgroundColor = 'transparent';
+	canvas.style.display = 'block';
+}
 
 // var ctx = canvas.getContext("2d");
 // ctx.fillStyle = "transparent";

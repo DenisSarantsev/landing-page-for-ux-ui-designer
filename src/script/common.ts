@@ -34,6 +34,7 @@ export const loadProjects = async (): Promise<Project[]> => {
 
 // Функция для вставки данных проекта в модальное окно
 export const addActualProjectDataToModalWindow = async (id: number): Promise<void> => {
+	blockBodyScroll()
 	// Получаем модалку
 	const projectModal = document.querySelector<HTMLElement>(".project-modal");
 	const projects: Project[] = await loadProjects();
@@ -48,24 +49,33 @@ export const addActualProjectDataToModalWindow = async (id: number): Promise<voi
 						<h1 style="opacity: 0;" class="project-modal__title secondary-title">${project["project-name"]}</h1>
 						<div class="project-modal__subtitle subtitle">${project.description}</div>
 					</div>
-					<div class="project-modal__images-wrapper">
-						<div class="project-modal__images-wrapper_one">
-							<img src="/img/project/${project.id}/1.png" alt="project screenshot">
-						</div>
-						<div class="project-modal__images-wrapper_two">
-							<img src="/img/project/${project.id}/2.png" alt="project screenshot">
-							<img src="/img/project/${project.id}/3.png" alt="project screenshot">
-						</div>
-						<div class="project-modal__images-wrapper_three">
-							<img src="/img/project/${project.id}/4.png" alt="project screenshot">
-						</div>
-						<div class="project-modal__images-wrapper_four">
-							<img src="/img/project/${project.id}/5.png" alt="project screenshot">
-							<img src="/img/project/${project.id}/6.png" alt="project screenshot">
-						</div>
-					</div>
+					<div class="project-modal__images-wrapper"></div>
 				`)
 			};
+			// Формируем структуру картинок
+			const projectStructure = project?.structure.split(",");
+			let imageCounter: number = 1;
+			const imagesWrapper = document.querySelector(".project-modal__images-wrapper");
+			if ( imagesWrapper ) {
+				for ( let i = 0; i < projectStructure.length; i++ ) {
+					if ( projectStructure[i] === "1" ) {
+						imagesWrapper.insertAdjacentHTML("beforeend", `
+							<div class="project-modal__images-wrapper_one">
+								<img src="/img/project/${project.id}/${imageCounter}.png" alt="project screenshot">
+							</div>
+						`);
+						imageCounter += 1;
+					} else {
+						imagesWrapper.insertAdjacentHTML("beforeend", `
+							<div class="project-modal__images-wrapper_two">
+								<img src="/img/project/${project.id}/${imageCounter}.png" alt="project screenshot">
+								<img src="/img/project/${project.id}/${imageCounter + 1}.png" alt="project screenshot">
+							</div>
+						`);
+						imageCounter += 2;
+					}
+				}
+			}
 			// Скроллим вверх
 			if ( scrollWrapper ) scrollToTop(scrollWrapper);
 			// Анимация появления заголовка в модалке
@@ -81,6 +91,7 @@ export const addActualProjectDataToModalWindow = async (id: number): Promise<voi
 
 // Функция для вставки данных проекта в модальное окно
 export const addActualWorkplaceDataToModalWindow = async (id: number): Promise<void> => {
+	blockBodyScroll()
 	// Получаем модалку
 	const projectModal = document.querySelector<HTMLElement>(".project-modal");
 	const workplaces: Workplace[] = await loadWorkplaces();
@@ -100,24 +111,33 @@ export const addActualWorkplaceDataToModalWindow = async (id: number): Promise<v
 						<div class="project-modal__period project-show-animation">${workplace.period.from} - ${workplace.period.to}</div>
 						<div class="project-modal__workplace-description project-show-animation">${workplace.description}</div>
 					</div>
-					<div class="project-modal__images-wrapper project-show-animation">
-						<div class="project-modal__images-wrapper_one">
-							<img src="/img/project/${workplace.id}/1.png" alt="project screenshot">
-						</div>
-						<div class="project-modal__images-wrapper_two">
-							<img src="/img/project/${workplace.id}/2.png" alt="project screenshot">
-							<img src="/img/project/${workplace.id}/3.png" alt="project screenshot">
-						</div>
-						<div class="project-modal__images-wrapper_three">
-							<img src="/img/project/${workplace.id}/4.png" alt="project screenshot">
-						</div>
-						<div class="project-modal__images-wrapper_four">
-							<img src="/img/project/${workplace.id}/5.png" alt="project screenshot">
-							<img src="/img/project/${workplace.id}/6.png" alt="project screenshot">
-						</div>
-					</div>
+					<div class="project-modal__images-wrapper project-show-animation"></div>
 				`)
 			};
+			// Формируем структуру каринок
+			const workplaceStructure = workplace?.structure.split(",");
+			let imageCounter: number = 1;
+			const imagesWrapper = document.querySelector(".project-modal__images-wrapper");
+			if ( imagesWrapper ) {
+				for ( let i = 0; i < workplaceStructure.length; i++ ) {
+					if ( workplaceStructure[i] === "1" ) {
+						imagesWrapper.insertAdjacentHTML("beforeend", `
+							<div class="project-modal__images-wrapper_one">
+								<img src="/img/project/${workplace.id}/${imageCounter}.png" alt="project screenshot">
+							</div>
+						`);
+						imageCounter += 1;
+					} else {
+						imagesWrapper.insertAdjacentHTML("beforeend", `
+							<div class="project-modal__images-wrapper_two">
+								<img src="/img/project/${workplace.id}/${imageCounter}.png" alt="project screenshot">
+								<img src="/img/project/${workplace.id}/${imageCounter + 1}.png" alt="project screenshot">
+							</div>
+						`);
+						imageCounter += 2;
+					}
+				}
+			}
 			// Скроллим вверх
 			if ( scrollWrapper ) scrollToTop(scrollWrapper);
 			// Анимация появления заголовка в модалке
@@ -145,4 +165,19 @@ export const scrollToTop = (element: HTMLElement, smooth: boolean = true): void 
     left: 0,
     behavior: smooth ? 'smooth' : 'instant'
   });
+};
+
+
+// Блокируем и включаем скролл
+export const blockBodyScroll = () => {
+	const bodyElement = document.querySelector<HTMLElement>("body");
+	if (bodyElement) {
+		bodyElement.style.overflowY = "hidden";
+	}
+};
+export const unlockBodyScroll = () => {
+	const bodyElement = document.querySelector<HTMLElement>("body");
+	if (bodyElement) {
+		bodyElement.style.overflowY = "";
+	}
 };

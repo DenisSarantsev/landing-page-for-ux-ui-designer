@@ -4,6 +4,7 @@ import gsap from "gsap";
 // Функции анимаций
 import { animateWordsByWord, animateElementScale, showScaleAndOpacityElement, showScaleAndOpacityElementWithDuration } from "./animations";
 import { changeSlides } from "./about-me-slider";
+import { unlockBodyScroll, blockBodyScroll } from "./common";
 // Отслеживаем первое появление блока advantages
 export const isCardsShow = [0]; // 0 - не показивалась, 1 - показивалась
 
@@ -17,32 +18,95 @@ document.body.classList.add("loaded");
 const startBlockTopTitle = document.querySelector<HTMLElement>('.start-block__main-title');
 const startBlockBottomTitle = document.querySelector<HTMLElement>('.start-block__second-title');
 const cardsWrapper = document.querySelector<HTMLElement>('.start-block__cards');
-// Анимируем верхний заголовок
-if ( startBlockTopTitle instanceof HTMLElement ) { 
-	if ( startBlockTopTitle.firstElementChild instanceof HTMLElement ) animateWordsByWord(startBlockTopTitle.firstElementChild, 1);
-	if ( startBlockTopTitle.lastElementChild instanceof HTMLElement ) animateWordsByWord(startBlockTopTitle.lastElementChild, 1.1);
-};
-// Анимируем нижний заголовок
-if ( startBlockBottomTitle instanceof HTMLElement ) { 
-	const startBlockBottomTitleChildrens = startBlockBottomTitle.children;
-	if ( startBlockBottomTitleChildrens && [...startBlockBottomTitleChildrens].length > 0 ) {
-		[...startBlockBottomTitleChildrens].forEach((item, index) => {
-			if ( item instanceof HTMLElement ) {
-				const delay = 1 + ((index + 1)/10);
-				animateWordsByWord(item, delay);
+
+// Скрываем прелоадер
+function hidePreloader() {
+		//clearInterval(preloaderInterval);
+		window.scrollTo(0, 0);
+		unlockBodyScroll();
+		const preloader = document.getElementById('preloader');
+		const mainContent = document.getElementById('mainContent');
+		
+		if (preloader && mainContent) {
+				preloader.classList.add('hidden');
+				mainContent.classList.add('loaded');
+				
+				// Полностью убираем прелоадер
+				setTimeout(() => {
+						preloader.style.display = 'none';
+				}, 500);
+		}
+}
+
+// Минимальное время показа прелоадера (500ms)
+setTimeout(() => {
+	const images = document.querySelectorAll('.check-loading-image');
+	let loadedCount = 0;
+
+
+
+	images.forEach(img => {
+			if (img instanceof HTMLImageElement) {
+					if (img.complete && img.naturalHeight !== 0) {
+							loadedCount++;
+					} else {
+							img.addEventListener('load', () => {
+									loadedCount++;
+									if (loadedCount === images.length) {
+											hidePreloader();
+											animateStartBlockElements();
+									}
+							});
+							img.addEventListener('error', () => {
+									loadedCount++;
+									if (loadedCount === images.length) {
+											hidePreloader();
+											animateStartBlockElements();
+									}
+							});
+					}
+			} else {
+					// Если это не <img>, считаем как загруженное
+					loadedCount++;
 			}
-		})
+	});
+
+	// Если все были загружены заранее
+	if (loadedCount === images.length) {
+		hidePreloader();
+		animateStartBlockElements()
 	}
-};
-// Анимируем появление карточек
-if ( cardsWrapper instanceof HTMLElement ) {
-	const cards = cardsWrapper.children;
-	if ( cards && [...cards].length > 0 ) {
-		if ( cards[0] instanceof HTMLElement ) animateElementScale(cards[0], 1.1, -60, -50);
-		if ( cards[1] instanceof HTMLElement ) animateElementScale(cards[1], 1.2, -40, 20);
-		if ( cards[2] instanceof HTMLElement ) animateElementScale(cards[2], 1.3, -20, 40);
-	}
-};
+}, 950);
+
+
+const animateStartBlockElements = () => {
+	// Анимируем верхний заголовок
+	if ( startBlockTopTitle instanceof HTMLElement ) { 
+		if ( startBlockTopTitle.firstElementChild instanceof HTMLElement ) animateWordsByWord(startBlockTopTitle.firstElementChild, 0.5);
+		if ( startBlockTopTitle.lastElementChild instanceof HTMLElement ) animateWordsByWord(startBlockTopTitle.lastElementChild, 0.6);
+	};
+	// Анимируем нижний заголовок
+	if ( startBlockBottomTitle instanceof HTMLElement ) { 
+		const startBlockBottomTitleChildrens = startBlockBottomTitle.children;
+		if ( startBlockBottomTitleChildrens && [...startBlockBottomTitleChildrens].length > 0 ) {
+			[...startBlockBottomTitleChildrens].forEach((item, index) => {
+				if ( item instanceof HTMLElement ) {
+					const delay = 0.5 + ((index + 1)/10);
+					animateWordsByWord(item, delay);
+				}
+			})
+		}
+	};
+	// Анимируем появление карточек
+	if ( cardsWrapper instanceof HTMLElement ) {
+		const cards = cardsWrapper.children;
+		if ( cards && [...cards].length > 0 ) {
+			if ( cards[0] instanceof HTMLElement ) animateElementScale(cards[0], 0.5, -60, -50);
+			if ( cards[1] instanceof HTMLElement ) animateElementScale(cards[1], 0.6, -40, 20);
+			if ( cards[2] instanceof HTMLElement ) animateElementScale(cards[2], 0.7, -20, 40);
+		}
+	};
+}
 
 
 // ---------- Блок с карточками проектов

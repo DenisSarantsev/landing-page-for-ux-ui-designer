@@ -610,8 +610,8 @@ const computeOpacity = (x: number): number => {
 
 document.addEventListener("DOMContentLoaded", () => {
     addDesktopWorkCards()
-        .then(() => initializeDraggable())
-        .then(() => addCards())
-        .then(() => addDragEventsToBlock())
-        .then(() => moveCardsByScroll())
+		.then(() => initializeDraggable())
+		.then(() => addCards())
+		.then(() => addDragEventsToBlock())
+		.then(() => moveCardsByScroll())
 })

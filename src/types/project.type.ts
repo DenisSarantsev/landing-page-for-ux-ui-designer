@@ -1,7 +1,8 @@
 export interface Project {
 	"id": number,
 	"project-name": string,
-	"description": string
+	"description": string,
+	"structure": string
 }
 export interface ProjectsData {
   projects: Project[];

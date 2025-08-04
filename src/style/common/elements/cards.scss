@@ -39,6 +39,7 @@
 	flex-direction: column;
 	align-items: center;
 	gap: 32px;
+	will-change: transform;
 	@media (max-width: $first-bp){
 		gap: 2.22vw;
 	}
@@ -50,6 +51,7 @@
 		}
 	}
 	&__card {
+		will-change: transform;
 		height: 280px;
 		max-width: 400px;
 		width: 100%;
@@ -58,21 +60,23 @@
 		border-radius: 50px;
 		position: relative;
 		overflow: hidden;
+		background-color: transparent;
 		@media (max-width: $second-bp){
 			height: px-to-vw(280px, $second-bp);
 			max-width: px-to-vw(400px, $second-bp);
 			border-radius: px-to-vw(50px, $second-bp);
 		}
 		@media (max-width: $small-tablet-bp){
-			height: px-to-vw(260px, $small-tablet-bp);
+			height: 31vw;
 			max-width: 100%;
 			border-radius: px-to-vw(40px, $small-tablet-bp);
 		}
 		@media (max-width: $mobile-bp){
-			height: px-to-vw(266px, $mobile-bp);
 			border-radius: px-to-vw(40px, $mobile-bp);
+			height: auto;
 		}
 		& img {
+			will-change: transform;
 			object-fit: cover;
 			width: 100%;
 			height: 100%;
@@ -152,6 +156,14 @@
 	-webkit-user-select: none;
 	-moz-user-select: none;
 	-ms-user-select: none;
+	-webkit-user-drag: none;
+	user-drag: none;
+	//pointer-events: none;
+	img, svg {
+		-webkit-user-drag: none;
+		user-drag: none;
+		pointer-events: none;
+	}
 	&:hover {
 		cursor: grab;
 	}
@@ -161,9 +173,9 @@
 	&.dragging * {
 		pointer-events: none !important;
 	}
-	@media (max-width: $small-tablet-bp){
-		max-width: px-to-vw(360px, $small-tablet-bp);
-		border-radius: px-to-vw(40px, $small-tablet-bp);
+	@media (max-width: $tablet-bp){
+		max-width: px-to-vw(360px, $tablet-bp);
+		border-radius: px-to-vw(40px, $tablet-bp);
 		max-width: 290px;
 		min-width: 290px;
 	}
@@ -175,7 +187,7 @@
 			@media (max-width: $tablet-bp){
 				padding: px-to-vw(32px, $tablet-bp);
 			}
-			@media (max-width: $small-tablet-bp){
+			@media (max-width: $tablet-bp){
 				padding: 24px;
 				gap: 28px;
 			}
@@ -191,10 +203,10 @@
 			color: $neutral-dark;
 			font-weight: 400;
 			line-height: 126.6%;
-			@media (max-width: $small-tablet-bp){
-				font-size: px-to-vw(30px, $small-tablet-bp);
+			@media (max-width: $tablet-bp){
+				font-size: px-to-vw(30px, $tablet-bp);
 			}
-			@media (max-width: $small-tablet-bp){
+			@media (max-width: $tablet-bp){
 				font-size: 22px;
 			}
 		}
@@ -202,7 +214,7 @@
 			font-size: 18px;
 			letter-spacing: -0.2%;
 			color: $neutral-grey;
-			@media (max-width: $small-tablet-bp){
+			@media (max-width: $tablet-bp){
 				font-size: 16px;
 			}
 		}
@@ -216,7 +228,7 @@
 			&_image {
 				width: 46px;
 				height: auto;
-				@media (max-width: $small-tablet-bp){
+				@media (max-width: $tablet-bp){
 					width: 36px;
 					height: auto;
 				}
@@ -231,7 +243,7 @@
 				line-height: 133%;
 				letter-spacing: -0.2%;
 				color: $neutral-dark;
-				@media (max-width: $small-tablet-bp){
+				@media (max-width: $tablet-bp){
 					font-size: 16px;
 				}
 			}
@@ -240,7 +252,7 @@
 				line-height: 125%;
 				letter-spacing: -0.2%;
 				color: $neutral-grey;
-				@media (max-width: $small-tablet-bp){
+				@media (max-width: $tablet-bp){
 					font-size: 14px;
 				}
 			}
@@ -253,7 +265,7 @@
 				font-size: 16px;
 				color: $neutral-grey;
 				line-height: 125%;
-				@media (max-width: $small-tablet-bp){
+				@media (max-width: $tablet-bp){
 					font-size: 14px;
 				}
 			}
@@ -261,7 +273,7 @@
 				font-size: 18px;
 				color: $neutral-dark;
 				line-height: 127%;
-				@media (max-width: $small-tablet-bp){
+				@media (max-width: $tablet-bp){
 					font-size: 16px;
 				}
 			}

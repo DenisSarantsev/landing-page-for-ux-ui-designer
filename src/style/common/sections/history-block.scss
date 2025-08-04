@@ -136,9 +136,6 @@
 	justify-content: center;
 	width: 360px;
 	@media (max-width: $tablet-bp){
-		padding: px-to-vw(50px, $tablet-bp) 0px;
-	}
-	@media (max-width: $small-tablet-bp){
 		padding: 40px 0px;
 		width: px-to-vw(360px, $small-tablet-bp);
 	}
@@ -156,6 +153,7 @@
 	position: absolute;
 	top: 0px;
 	width: 100%;
+	user-select: none;
 	@media (max-width: $tablet-bp){
 		display: none
 	}

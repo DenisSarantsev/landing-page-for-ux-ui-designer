@@ -11,5 +11,6 @@ export interface Workplace {
 			from: string,
 			to: string
 		},
-		description: string
+		description: string,
+		structure: string
 }

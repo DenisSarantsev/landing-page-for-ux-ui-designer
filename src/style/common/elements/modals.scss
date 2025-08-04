@@ -160,24 +160,6 @@
 					height: auto;
 				}
 			}
-			&_three {
-				& img {
-					width: 100%;
-					height: auto;
-				}
-			}
-			&_four {
-				display: grid;
-				grid-template-columns: 1fr 1fr;
-				gap: 24px;
-				@media (max-width: $small-tablet-bp){
-					gap: 12px;
-				}
-				& img {
-					width: 100%;
-					height: auto;
-				}
-			}
 		}
 }
 

@@ -21,3 +21,4 @@ import "./script/appearance-animations"; // Анимации появления 
 import "./script/margin-top-block"; // Отступ текстового блока в независимо от количества карточек
 //import "./script/cursor-shader"; // Эффект шлейфа после курсора
 import "./script/splash-cursor"; // Эффект шлейфа после курсора
+import "./script/start-block-height"; // Расчет высоты. первого блока

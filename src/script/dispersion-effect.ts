@@ -40,9 +40,9 @@ class CanvasPhysics {
     
     private config = {
         gravity: 0.1,
-        friction: 0.94,
-        bounce: 0.1,
-        mouseForce: 25000,
+        friction: 0.15,
+        bounce: 0.008,
+        mouseForce: 10000,
         mouseRadius: 30,
         mouseVelocityMultiplier: 25,
         elementCount: 250,
@@ -51,57 +51,58 @@ class CanvasPhysics {
         restThreshold: 0.01,
         restTimeThreshold: 30,
         damping: 0.99,
-        separationForce: 10,
+        separationForce: 6,
         rotationDamping: 0.95,
         maxRotationSpeed: 0.3,
         rotationIntensity: 0.8,
-        fallSpeed: 1,
-        animationSpeed: 40,
+        fallSpeed: 0.5,
+        animationSpeed: 7,
         footerVisibilityThreshold: 60,
+				collisionDamping: 0.2, // сильное демпфирование
 
-				cursorEffectRadius: 70,          // радиус действия курсора
+				cursorEffectRadius: 20,          // радиус действия курсора
 				cursorRepelStrength: 3,        // сила расталкивания
 				cursorAttractStrength: 0.001,  // сила притягивания элементов за курсором
-				cursorBaseForce: 35,           // базовая сила воздействия
-				cursorSpeedMultiplier: 3,      // коэффициент умножения силы от скорости
-				cursorFarEffect: 0.08,           // сила покачивания для дальних элементов
+				cursorBaseForce: 25,           // базовая сила воздействия
+				cursorSpeedMultiplier: 2,      // коэффициент умножения силы от скорости
+				cursorFarEffect: 0.01,           // сила покачивания для дальних элементов
 				cursorFarFalloff: 120,           // скорость затухания силы по расстоянию
-				inertiaMultiplier: 1.4,
+				inertiaMultiplier: 1.6,
 				minElementDistance: 4, // Минимальная дистанция между элементами
         
         // АДАПТИВНЫЕ НАСТРОЙКИ
         adaptiveSettings: {
             mobile: {
                 maxWidth: 480,
-                elementCount: 80,
+                elementCount: 70,
                 elementSize: 20,
                 mouseRadius: 80,
                 mouseForce: 1500
             },
             tablet: {
                 maxWidth: 768,
-                elementCount: 120,
+                elementCount: 90,
                 elementSize: 25,
                 mouseRadius: 100,
                 mouseForce: 2000
             },
             laptop: {
                 maxWidth: 1024,
-                elementCount: 160,
+                elementCount: 130,
                 elementSize: 28,
                 mouseRadius: 120,
                 mouseForce: 2200
             },
             desktop: {
                 maxWidth: 1440,
-                elementCount: 230,
+                elementCount: 170,
                 elementSize: 32,
                 mouseRadius: 150,
                 mouseForce: 2500
             },
             large: {
                 maxWidth: Infinity,
-                elementCount: 320,
+                elementCount: 220,
                 elementSize: 36,
                 mouseRadius: 180,
                 mouseForce: 3000
@@ -461,82 +462,112 @@ class CanvasPhysics {
         }
     }
 
-    private updatePhysics() {
-        if (!this.isAnimationStarted) {
-            return;
-        }
-
-        this.applyMouseForcesToAllElements();
-
-				const inertiaDuration = 80; // мс
-        
-        for (let i = 0; i < this.elements.length; i++) {
-            const element = this.elements[i];
-
-						// Применяем инерцию, если она активна
-						if (
-							element.inertiaTime &&
-							Date.now() - element.inertiaTime < inertiaDuration
-						) {
-							element.vx = element.inertiaVx!;
-							element.vy = element.inertiaVy!;
-						}
-						element.x += element.vx * this.config.animationSpeed;
-						element.y += element.vy * this.config.animationSpeed;
-
-						this.checkBoundaryCollisions(element);
-            
-            if (!element.isResting) {
-                const gravityForce = this.config.gravity * element.mass;
-                
-                element.vy += gravityForce;
-                
-                const massEffect = 1 / element.mass;
-                element.vx *= this.config.friction * (1 - massEffect * 0.1);
-                element.vy *= this.config.friction * (1 - massEffect * 0.1);
-                element.vx *= this.config.damping;
-                element.vy *= this.config.damping;
-            } else {
-                element.vx *= 0.85;
-                element.vy *= 0.85;
-                
-                if (Math.abs(element.vx) < 0.01) element.vx = 0;
-                if (Math.abs(element.vy) < 0.01) element.vy = 0;
-            }
-            
-            element.rotationSpeed *= this.config.rotationDamping;
-            
-            if (Math.abs(element.rotationSpeed) < 0.002) {
-                element.rotationSpeed = 0;
-            }
-            
-            if (element.rotationSpeed !== 0) {
-                element.rotation += element.rotationSpeed;
-            }
-            
-            if (Math.abs(element.rotationSpeed) > this.config.maxRotationSpeed) {
-                element.rotationSpeed = Math.sign(element.rotationSpeed) * this.config.maxRotationSpeed;
-            }
-            
-            element.x += element.vx * this.config.animationSpeed;
-            element.y += element.vy * this.config.animationSpeed;
-            
-            this.checkBoundaryCollisions(element);
-        }
-        
-        let maxIterations = 15;
-        let iteration = 0;
-        let hasOverlaps = true;
-        
-        while (hasOverlaps && iteration < maxIterations) {
-            hasOverlaps = this.separateAllElements();
-            iteration++;
-        }
-        
-        for (let i = 0; i < this.elements.length; i++) {
-            this.updateRestState(this.elements[i]);
-        }
+private updatePhysics() {
+    if (!this.isAnimationStarted) {
+        return;
     }
+
+    this.applyMouseForcesToAllElements();
+
+    const inertiaDuration = 100; // мс
+
+    for (let i = 0; i < this.elements.length; i++) {
+        const element = this.elements[i];
+
+        // Применяем инерцию, если она активна
+        if (element.inertiaTime) {
+            const elapsed = Date.now() - element.inertiaTime;
+            if (elapsed < inertiaDuration) {
+                // Коэффициент затухания от 1 до 0
+                const fade = 1 - (elapsed / inertiaDuration);
+                element.vx = (element.inertiaVx || 0) * fade;
+                element.vy = (element.inertiaVy || 0) * fade;
+            } else {
+                // После затухания — обычная физика
+                element.inertiaVx = 0;
+                element.inertiaVy = 0;
+                element.inertiaTime = undefined;
+            }
+        }
+
+        element.x += element.vx * this.config.animationSpeed;
+        element.y += element.vy * this.config.animationSpeed;
+
+        this.checkBoundaryCollisions(element);
+
+        if (!element.isResting) {
+            const gravityForce = this.config.gravity * element.mass;
+
+            element.vy += gravityForce;
+
+            const massEffect = 1 / element.mass;
+            element.vx *= this.config.friction * (1 - massEffect * 0.1);
+            element.vy *= this.config.friction * (1 - massEffect * 0.1);
+            element.vx *= this.config.damping;
+            element.vy *= this.config.damping;
+        } else {
+            element.vx *= 0.85;
+            element.vy *= 0.85;
+
+            if (Math.abs(element.vx) < 0.01) element.vx = 0;
+            if (Math.abs(element.vy) < 0.01) element.vy = 0;
+        }
+
+        element.rotationSpeed *= this.config.rotationDamping;
+
+        if (Math.abs(element.rotationSpeed) < 0.002) {
+            element.rotationSpeed = 0;
+        }
+
+        if (element.rotationSpeed !== 0) {
+            element.rotation += element.rotationSpeed;
+        }
+
+        if (Math.abs(element.rotationSpeed) > this.config.maxRotationSpeed) {
+            element.rotationSpeed = Math.sign(element.rotationSpeed) * this.config.maxRotationSpeed;
+        }
+
+        element.x += element.vx * this.config.animationSpeed;
+        element.y += element.vy * this.config.animationSpeed;
+
+        this.checkBoundaryCollisions(element);
+
+        // Замедляем элементы у нижнего края
+				const bottomEdge = this.canvas.height - element.collisionRadius - 10;
+				const centerY = this.getElementCenterY(element);
+				if (centerY > bottomEdge) {
+						element.vx = 0;
+						element.vy = 0;
+						const maxOffset = 10;
+						const minY = this.canvas.height - element.height - maxOffset;
+						element.y = Math.max(minY, Math.min(element.y, this.canvas.height - element.height));
+				}
+
+				const maxSpeed = 0.8; // подбери под себя для плавности
+				const speed = Math.sqrt(element.vx * element.vx + element.vy * element.vy);
+				if (speed > maxSpeed) {
+						const factor = maxSpeed / speed;
+						element.vx *= factor;
+						element.vy *= factor;
+				}
+
+    }
+
+		
+
+    let maxIterations = 15;
+    let iteration = 0;
+    let hasOverlaps = true;
+
+    while (hasOverlaps && iteration < maxIterations) {
+        hasOverlaps = this.separateAllElements();
+        iteration++;
+    }
+
+    for (let i = 0; i < this.elements.length; i++) {
+        this.updateRestState(this.elements[i]);
+    }
+}
 
     private applyMouseForcesToAllElements() {
         const mouseDistance = Math.sqrt(
@@ -648,113 +679,146 @@ private applyMouseForceAtPosition(
         return hasOverlaps;
     }
 
-    private separateElements(element1: PhysicsElement, element2: PhysicsElement): boolean {
-        const dx = this.getElementCenterX(element1) - this.getElementCenterX(element2);
-        const dy = this.getElementCenterY(element1) - this.getElementCenterY(element2);
-        const distance = Math.sqrt(dx * dx + dy * dy);
-        
-				// Минимальное расстояние между элементами
-				const minDistance = (element1.collisionRadius + (element1.protectedRadius || 0)) +
-														(element2.collisionRadius + (element2.protectedRadius || 0)) +
-														(this.config.minElementDistance || 0);
-        
-        if (distance < minDistance) {
+private separateElements(element1: PhysicsElement, element2: PhysicsElement): boolean {
+    const dx = this.getElementCenterX(element1) - this.getElementCenterX(element2);
+    const dy = this.getElementCenterY(element1) - this.getElementCenterY(element2);
+    const distance = Math.sqrt(dx * dx + dy * dy);
 
-						// ---- Гасим столкновенич
-						const damping = 0.1; // коэффициент гашения, подбери под себя (0.5...0.8)
-						const avgVx = (element1.vx + element2.vx) / 2;
-						const avgVy = (element1.vy + element2.vy) / 2;
-						element1.vx = avgVx + (element1.vx - avgVx) * damping;
-						element1.vy = avgVy + (element1.vy - avgVy) * damping;
-						element2.vx = avgVx + (element2.vx - avgVx) * damping;
-						element2.vy = avgVy + (element2.vy - avgVy) * damping;
+    // Минимальное расстояние между элементами
+    const minDistance = (element1.collisionRadius + (element1.protectedRadius || 0)) +
+                        (element2.collisionRadius + (element2.protectedRadius || 0)) +
+                        (this.config.minElementDistance || 0);
 
-            if (distance < 0.1) {
-                const angle = Math.random() * Math.PI * 2;
-                const separationDistance = minDistance * 0.6;
-                
-                const totalMass = element1.mass + element2.mass;
-                const massRatio1 = element2.mass / totalMass;
-                const massRatio2 = element1.mass / totalMass;
-                
-                element1.x += Math.cos(angle) * separationDistance * massRatio1;
-                element1.y += Math.sin(angle) * separationDistance * massRatio1;
-                element2.x -= Math.cos(angle) * separationDistance * massRatio2;
-                element2.y -= Math.sin(angle) * separationDistance * massRatio2;
-            } else {
-                const overlap = minDistance - distance;
-                const totalMass = element1.mass + element2.mass;
-                const massRatio1 = element2.mass / totalMass;
-                const massRatio2 = element1.mass / totalMass;
-                
-                const separationX = (dx / distance) * overlap * 0.6;
-                const separationY = (dy / distance) * overlap * 0.6;
-                
-                element1.x += separationX * massRatio1;
-                element1.y += separationY * massRatio1;
-                element2.x -= separationX * massRatio2;
-                element2.y -= separationY * massRatio2;
-                
-                if (element1.isResting || element2.isResting) {
-                    const additionalForce = overlap * 0.2;
-                    const pushX = (dx / distance) * additionalForce;
-                    const pushY = (dy / distance) * additionalForce;
-                    
-                    element1.vx += pushX * massRatio1;
-                    element1.vy += pushY * massRatio1;
-                    element2.vx -= pushX * massRatio2;
-                    element2.vy -= pushY * massRatio2;
-                    
-                    element1.isResting = false;
-                    element2.isResting = false;
-                    element1.restingTime = 0;
-                    element2.restingTime = 0;
-                }
-            }
-            
-            this.constrainElementPosition(element1);
-            this.constrainElementPosition(element2);
-            
-            if (distance > 0.1) {
-                const relativeVx = element1.vx - element2.vx;
-                const relativeVy = element1.vy - element2.vy;
-                const normalDotProduct = relativeVx * (dx / distance) + relativeVy * (dy / distance);
-                
-                if (normalDotProduct > 0) {
-                    const totalMass = element1.mass + element2.mass;
-                    const bounceForce = normalDotProduct * this.config.bounce;
-                    
-                    const impulse1 = bounceForce * (2 * element2.mass / totalMass);
-                    const impulse2 = bounceForce * (2 * element1.mass / totalMass);
-                    
-                    element1.vx -= impulse1 * (dx / distance);
-                    element1.vy -= impulse1 * (dy / distance);
-                    element2.vx += impulse2 * (dx / distance);
-                    element2.vy += impulse2 * (dy / distance);
-                    
-                    if (bounceForce > 0.1) {
-                        const tiltForce = bounceForce * this.config.rotationIntensity * 0.3;
-                        element1.rotationSpeed += tiltForce * (Math.random() - 0.5) / element1.mass;
-                        element2.rotationSpeed += tiltForce * (Math.random() - 0.5) / element2.mass;
-                        
-                        element1.rotationSpeed = Math.max(-this.config.maxRotationSpeed, 
-                                                          Math.min(this.config.maxRotationSpeed, element1.rotationSpeed));
-                        element2.rotationSpeed = Math.max(-this.config.maxRotationSpeed, 
-                                                          Math.min(this.config.maxRotationSpeed, element2.rotationSpeed));
-                    }
-                }
-            }
-            
-            element1.isResting = false;
-            element2.isResting = false;
-            element1.restingTime = Math.max(0, element1.restingTime - 30);
-            element2.restingTime = Math.max(0, element2.restingTime - 30);
-            
-            return true;
+    if (distance < minDistance) {
+        // Волновое демпфирование
+        const damping = 0.8;
+        const avgVx = (element1.vx + element2.vx) / 2;
+        const avgVy = (element1.vy + element2.vy) / 2;
+        element1.vx = avgVx + (element1.vx - avgVx) * damping;
+        element1.vy = avgVy + (element1.vy - avgVy) * damping;
+        element2.vx = avgVx + (element2.vx - avgVx) * damping;
+        element2.vy = avgVy + (element2.vy - avgVy) * damping;
+
+        // Усиливаем разделение у стенки
+        let separationMultiplier = 1;
+        const edgeBoost = 1.1;
+
+        // --- Новый блок: если вокруг много элементов, уменьшаем separationMultiplier ---
+        let crowdCount = 0;
+        for (const other of this.elements) {
+            if (other === element1 || other === element2) continue;
+            const d1 = Math.sqrt(
+                Math.pow(this.getElementCenterX(element1) - this.getElementCenterX(other), 2) +
+                Math.pow(this.getElementCenterY(element1) - this.getElementCenterY(other), 2)
+            );
+            const d2 = Math.sqrt(
+                Math.pow(this.getElementCenterX(element2) - this.getElementCenterX(other), 2) +
+                Math.pow(this.getElementCenterY(element2) - this.getElementCenterY(other), 2)
+            );
+            if (d1 < minDistance * 1.2 || d2 < minDistance * 1.2) crowdCount++;
         }
-        
-        return false;
+        if (crowdCount > 4) separationMultiplier *= 0.7; // толпа — меньше толкаемся
+
+        // Усиливаем у края
+        const centerX1 = this.getElementCenterX(element1);
+        const centerY1 = this.getElementCenterY(element1);
+        const centerX2 = this.getElementCenterX(element2);
+        const centerY2 = this.getElementCenterY(element2);
+
+        if (
+            centerX1 < element1.collisionRadius + 2 ||
+            centerX1 > this.canvas.width - element1.collisionRadius - 2 ||
+            centerY1 < element1.collisionRadius + 2 ||
+            centerY1 > this.canvas.height - element1.collisionRadius - 2 ||
+            centerX2 < element2.collisionRadius + 2 ||
+            centerX2 > this.canvas.width - element2.collisionRadius - 2 ||
+            centerY2 < element2.collisionRadius + 2 ||
+            centerY2 > this.canvas.height - element2.collisionRadius - 2
+        ) {
+            separationMultiplier *= edgeBoost;
+        }
+
+        // Ограничиваем максимальный overlap для плавности
+        const maxOverlap = minDistance * 0.7;
+        const overlap = Math.min(minDistance - distance, maxOverlap);
+
+        // Передача импульса (волна)
+        const totalMass = element1.mass + element2.mass;
+        const massRatio1 = element2.mass / totalMass;
+        const massRatio2 = element1.mass / totalMass;
+        const separationX = (dx / (distance || 1)) * overlap * 0.6 * separationMultiplier;
+        const separationY = (dy / (distance || 1)) * overlap * 0.6 * separationMultiplier;
+        element1.x += separationX * massRatio1;
+        element1.y += separationY * massRatio1;
+        element2.x -= separationX * massRatio2;
+        element2.y -= separationY * massRatio2;
+
+        // Не сбрасывай restingTime, если скорость мала
+        if (Math.abs(element1.vx) > 0.02 || Math.abs(element1.vy) > 0.02) {
+            element1.restingTime = 0;
+            element1.isResting = false;
+        }
+        if (Math.abs(element2.vx) > 0.02 || Math.abs(element2.vy) > 0.02) {
+            element2.restingTime = 0;
+            element2.isResting = false;
+        }
+
+        this.constrainElementPosition(element1);
+        this.constrainElementPosition(element2);
+
+        // --- Дополнительная обработка для очень сильного перекрытия ---
+        if (distance < 0.1) {
+            const angle = Math.random() * Math.PI * 2;
+            const separationDistance = minDistance * 0.6;
+
+            element1.x += Math.cos(angle) * separationDistance * massRatio1;
+            element1.y += Math.sin(angle) * separationDistance * massRatio1;
+            element2.x -= Math.cos(angle) * separationDistance * massRatio2;
+            element2.y -= Math.sin(angle) * separationDistance * massRatio2;
+        }
+
+        this.constrainElementPosition(element1);
+        this.constrainElementPosition(element2);
+
+        // --- Отскок (bounce) ---
+        if (distance > 0.1) {
+            const relativeVx = element1.vx - element2.vx;
+            const relativeVy = element1.vy - element2.vy;
+            const normalDotProduct = relativeVx * (dx / distance) + relativeVy * (dy / distance);
+
+            if (normalDotProduct > 0) {
+                const bounceForce = normalDotProduct * this.config.bounce;
+                const impulse1 = bounceForce * (2 * element2.mass / totalMass);
+                const impulse2 = bounceForce * (2 * element1.mass / totalMass);
+
+                element1.vx -= impulse1 * (dx / distance);
+                element1.vy -= impulse1 * (dy / distance);
+                element2.vx += impulse2 * (dx / distance);
+                element2.vy += impulse2 * (dy / distance);
+
+                if (bounceForce > 0.1) {
+                    const tiltForce = bounceForce * this.config.rotationIntensity * 0.3;
+                    element1.rotationSpeed += tiltForce * (Math.random() - 0.5) / element1.mass;
+                    element2.rotationSpeed += tiltForce * (Math.random() - 0.5) / element2.mass;
+
+                    element1.rotationSpeed = Math.max(-this.config.maxRotationSpeed, 
+                                             Math.min(this.config.maxRotationSpeed, element1.rotationSpeed));
+                    element2.rotationSpeed = Math.max(-this.config.maxRotationSpeed, 
+                                             Math.min(this.config.maxRotationSpeed, element2.rotationSpeed));
+                }
+            }
+        }
+
+        element1.isResting = false;
+        element2.isResting = false;
+        element1.restingTime = Math.max(0, element1.restingTime - 30);
+        element2.restingTime = Math.max(0, element2.restingTime - 30);
+
+        return true;
     }
+
+    return false;
+}
 
     private activateNearbyElements(centerElement: PhysicsElement) {
         const activationRadius = centerElement.collisionRadius * 5;
@@ -791,20 +855,27 @@ private applyMouseForceAtPosition(
     private constrainElementPosition(element: PhysicsElement) {
         const centerX = this.getElementCenterX(element);
         const centerY = this.getElementCenterY(element);
-        
-    // Ограничиваем по X
-    if (centerX < element.collisionRadius) {
-        element.x = element.collisionRadius - element.width / 2;
-    } else if (centerX > this.canvas.width - element.collisionRadius) {
-        element.x = this.canvas.width - element.collisionRadius - element.width / 2;
-    }
 
-    // Ограничиваем по Y
-    if (centerY < element.collisionRadius) {
-        element.y = element.collisionRadius - element.height / 2;
-    } else if (centerY > this.canvas.height - element.collisionRadius) {
-        element.y = this.canvas.height - element.collisionRadius - element.height / 2;
-    }
+				const bottomEdge = this.canvas.height - element.collisionRadius - 10;
+				if (centerY > bottomEdge) {
+						const maxOffset = 10;
+						element.y = Math.max(this.canvas.height - element.height - maxOffset, Math.min(element.y, this.canvas.height - element.height));
+						return;
+				}
+        
+				// Ограничиваем по X
+				if (centerX < element.collisionRadius) {
+						element.x = element.collisionRadius - element.width / 2;
+				} else if (centerX > this.canvas.width - element.collisionRadius) {
+						element.x = this.canvas.width - element.collisionRadius - element.width / 2;
+				}
+
+				// Ограничиваем по Y
+				if (centerY < element.collisionRadius) {
+						element.y = element.collisionRadius - element.height / 2;
+				} else if (centerY > this.canvas.height - element.collisionRadius) {
+						element.y = this.canvas.height - element.collisionRadius - element.height / 2;
+				}
     }
 
     private updateRestState(element: PhysicsElement) {
