@@ -138,6 +138,7 @@ advancedScrollWatcher.watch({
   onScroll: (element, data) => {
 		// Запускаем слайдер
 		if ( data.scrolledPercentage > 25 && !sliderWorks ) {
+			console.log("ABOUT")
 			sliderWorks = true;
 			changeSlides(5);
 		}

@@ -6,6 +6,7 @@
 	width: 100%;
 	max-width: $layout-width;
 	max-height: var(--real-vh);
+	position: relative;
 		&__wrapper {
 			//background-color: red;
 		}

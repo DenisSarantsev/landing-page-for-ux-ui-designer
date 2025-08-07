@@ -99,6 +99,8 @@ private calculateScrollData(element: Element): ScrollData {
   const distanceFromTop = rect.top;
   const distanceFromBottom = windowHeight - rect.bottom;
 
+	console.log(distanceFromTop)
+
   // Видимая часть элемента
   const visibleTop = Math.max(0, -distanceFromTop);
   const visibleBottom = Math.max(0, distanceFromBottom);
@@ -139,9 +141,9 @@ private calculateScrollData(element: Element): ScrollData {
   }
 }
 
+
 // Создаём экземпляр расширенного наблюдателя
 export const advancedScrollWatcher = new AdvancedScrollWatcher();
-
 
 
 
