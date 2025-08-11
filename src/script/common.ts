@@ -34,7 +34,7 @@ export const loadProjects = async (): Promise<Project[]> => {
 
 // Функция для вставки данных проекта в модальное окно
 export const addActualProjectDataToModalWindow = async (id: number): Promise<void> => {
-	blockBodyScroll()
+	//blockBodyScroll()
 	// Получаем модалку
 	const projectModal = document.querySelector<HTMLElement>(".project-modal");
 	const projects: Project[] = await loadProjects();
@@ -91,7 +91,7 @@ export const addActualProjectDataToModalWindow = async (id: number): Promise<voi
 
 // Функция для вставки данных проекта в модальное окно
 export const addActualWorkplaceDataToModalWindow = async (id: number): Promise<void> => {
-	blockBodyScroll()
+	//blockBodyScroll()
 	// Получаем модалку
 	const projectModal = document.querySelector<HTMLElement>(".project-modal");
 	const workplaces: Workplace[] = await loadWorkplaces();

@@ -351,14 +351,6 @@ export const updateSettings = (newSettings: Partial<typeof settings>) => {
 
 // Функция для вывода текущих настроек задержек
 export const getDelaySettings = () => {
-  console.log('🚀 Настройки задержек возврата карточек:');
-  console.log(`• Быстрое движение (скорость > ${settings.slowSpeedThreshold}): ${settings.fastSpeedReturnDelay}ms`);
-  console.log(`• Медленное движение (скорость ${settings.verySlowSpeedThreshold}-${settings.slowSpeedThreshold}): ${settings.slowSpeedReturnDelay}ms`);
-  console.log(`• Очень медленное движение (скорость < ${settings.verySlowSpeedThreshold}): ${settings.verySlowSpeedReturnDelay}ms`);
-  console.log('📊 Длительности анимаций:');
-  console.log(`• Быстрое движение: ${settings.pushDuration}s`);
-  console.log(`• Медленное движение: ${settings.slowMoveDuration}s`);
-  console.log(`• Очень медленное движение: ${settings.verySlowMoveDuration}s`);
   return {
     fastSpeedReturnDelay: settings.fastSpeedReturnDelay,
     slowSpeedReturnDelay: settings.slowSpeedReturnDelay,

@@ -194,8 +194,6 @@ class CanvasPhysics {
         this.config.elementSize = adaptiveSettings.elementSize;
         this.config.mouseRadius = adaptiveSettings.mouseRadius;
         this.config.mouseForce = adaptiveSettings.mouseForce;
-        
-        console.log(`Adaptive settings applied for ${window.innerWidth}px:`, adaptiveSettings);
     }
 
     private setupScrollListener() {
