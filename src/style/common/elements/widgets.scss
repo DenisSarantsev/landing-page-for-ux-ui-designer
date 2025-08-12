@@ -105,6 +105,10 @@
 			letter-spacing: -0.2%;
 			line-height: 114%;
 			color: $neutral-dark;
+			font-weight: 300;
+			@media (max-width: $small-tablet-bp){
+				font-weight: 400;
+			}
 		}
 	}
 	&__socials-subtitle {

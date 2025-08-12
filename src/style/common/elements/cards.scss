@@ -88,6 +88,7 @@
 		text-align: center;
 		color: $neutral-dark;
 		opacity: 0;
+		font-weight: 400;
 		@media (max-width: $second-bp){
 			font-size: px-to-vw(18px, $second-bp);
 		}
