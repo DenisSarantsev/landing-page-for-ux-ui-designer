@@ -133,12 +133,13 @@ const aboutBlock = document.querySelector<HTMLElement>(".about");
 //const aboutBlockTitle = document.querySelector<HTMLElement>(".about__title");
 //const aboutBlockSubtitle = document.querySelector<HTMLElement>(".about__subtitle");
 const aboutSlider = document.querySelector<HTMLElement>(".about__slider");
+// Подпись самого первого слайда
+const firstSlideText = document.querySelector<HTMLElement>(".about__text");
 advancedScrollWatcher.watch({
   selector: '.about',
   onScroll: (element, data) => {
 		// Запускаем слайдер
 		if ( data.scrolledPercentage > 25 && !sliderWorks ) {
-			console.log("ABOUT")
 			sliderWorks = true;
 			changeSlides(5);
 		}

@@ -106,4 +106,6 @@ export const changeSlides = (maxSlides: number) => {
 			newIndex++
 		}
 	}, 4000)
-}
+};
+
+

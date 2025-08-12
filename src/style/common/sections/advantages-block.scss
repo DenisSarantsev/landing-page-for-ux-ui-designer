@@ -21,6 +21,29 @@
 		}
 		&__title {
 		}
+		&__title-wrapper {
+			&>*:nth-child(1) {
+				@media (max-width: 760px){
+					display: none;
+				}
+			}
+			&>*:nth-child(2) {
+				@media (min-width: 761px){
+					display: none;
+				}
+				@media (max-width: 520px){
+					display: none;
+				}
+			}
+			&>*:nth-child(3) {
+				@media (min-width: 521px){
+					display: none;
+				}
+				@media (max-width: 398px){
+					font-size: 42px;
+				}
+			}
+		}
 		&__cards {
 			display: flex;
 			justify-content: center;
@@ -80,27 +103,6 @@
 				bottom: 0px;
 				left: 0px;
 			}
-			&_title {
-				font-weight: 300;
-				padding: 20px 0px;
-				font-size: 24px;
-				color: $neutral-dark;
-				letter-spacing: -1%;
-				@media (max-width: $first-bp){
-					font-size: px-to-vw(24px, $first-bp);
-				}
-				@media (max-width: $tablet-bp){
-					font-size: 16px;
-					padding: px-to-vw(20px, $first-bp) 0px;
-				}
-				@media (max-width: $small-tablet-bp){
-					padding: 10px 0px;
-					font-size: 14px;
-				}
-				@media (max-width: $mobile-bp){
-					padding: 12px 0px;
-				}
-			}
 			&>*:last-child {
 				opacity: 0;
 				transition: all 0.2s ease 0s;
@@ -124,10 +126,14 @@
 }
 
 .advantage {
-		&__item {
-			&_title {
+	&__item {
+		&_title {
+			@media (max-width: $small-tablet-bp){
+				font-size: 16px;
+				font-weight: 400;
 			}
 		}
+	}
 }
 
 // Анимация появления карточек
