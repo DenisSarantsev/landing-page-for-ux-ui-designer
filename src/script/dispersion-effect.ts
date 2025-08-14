@@ -21,6 +21,9 @@ interface PhysicsElement {
     inertiaVy?: number;
     inertiaTime?: number;
 		protectedRadius?: number;
+    // Плавное отображаемое положение центра (для мягкого снапа к half‑pixel)
+    drawX?: number;
+    drawY?: number;
 }
 
 class CanvasPhysics {
@@ -37,6 +40,7 @@ class CanvasPhysics {
 		private mouseDirection: { x: number, y: number } = { x: 0, y: 0 };
 		private mouseSpeed: number = 0;
 		private mouseIdleTimeout: number | null = null;
+		private pixelRatio = window.devicePixelRatio || 1;
     
     private config = {
         gravity: 0.1,
@@ -69,43 +73,59 @@ class CanvasPhysics {
 				cursorFarFalloff: 120,           // скорость затухания силы по расстоянию
 				inertiaMultiplier: 1.6,
 				minElementDistance: 4, // Минимальная дистанция между элементами
+        defaultMinElementDistance: 4, // базовое значение для сброса вне мобилки
+                protectedRadius: 5, // базовый защищённый радиус (добавочный буфер)
+                defaultProtectedRadius: 5,
+                collisionScale: 1, // множитель для расчетного collisionRadius ( <1 позволит ближе )
+                defaultCollisionScale: 1,
         
         // АДАПТИВНЫЕ НАСТРОЙКИ
         adaptiveSettings: {
             mobile: {
                 maxWidth: 480,
-                elementCount: 70,
-                elementSize: 20,
+                elementCount: 80,
+                elementSize: 35, // +50% к прежним 28
                 mouseRadius: 80,
-                mouseForce: 1500
+                mouseForce: 1500,
+                elementPadding: 20,
+                minElementDistance: 1, // еще меньше
+                protectedRadius: 2, // убираем дополнительный буфер
+                collisionScale: 0.95 // уменьшаем физический радиус для плотности (визуально почти соприкасаются)
             },
             tablet: {
                 maxWidth: 768,
-                elementCount: 90,
-                elementSize: 25,
+                elementCount: 100,
+                elementSize: 35,
                 mouseRadius: 100,
-                mouseForce: 2000
+                mouseForce: 2000,
+								elementPadding: 0,
+								minElementDistance: 1, // еще меньше
+                protectedRadius: 2, // убираем дополнительный буфер
+                collisionScale: 0.95 
             },
             laptop: {
                 maxWidth: 1024,
                 elementCount: 130,
-                elementSize: 28,
+                elementSize: 35,
                 mouseRadius: 120,
-                mouseForce: 2200
+                mouseForce: 2200,
+								protectedRadius: 2,
             },
             desktop: {
                 maxWidth: 1440,
                 elementCount: 170,
-                elementSize: 32,
+                elementSize: 38,
                 mouseRadius: 150,
-                mouseForce: 2500
+                mouseForce: 2500,
+								protectedRadius: 2,
             },
             large: {
                 maxWidth: Infinity,
                 elementCount: 220,
-                elementSize: 36,
+                elementSize: 40,
                 mouseRadius: 180,
-                mouseForce: 3000
+                mouseForce: 3000,
+								protectedRadius: 2,
             }
         },
         
@@ -194,6 +214,12 @@ class CanvasPhysics {
         this.config.elementSize = adaptiveSettings.elementSize;
         this.config.mouseRadius = adaptiveSettings.mouseRadius;
         this.config.mouseForce = adaptiveSettings.mouseForce;
+        // Применяем уменьшенную дистанцию и отступы только для мобилки
+    const a: any = adaptiveSettings;
+    this.config.minElementDistance = a.minElementDistance !== undefined ? a.minElementDistance : this.config.defaultMinElementDistance;
+    if (a.elementPadding !== undefined) this.config.elementPadding = a.elementPadding;
+    this.config.protectedRadius = a.protectedRadius !== undefined ? a.protectedRadius : this.config.defaultProtectedRadius;
+    this.config.collisionScale = a.collisionScale !== undefined ? a.collisionScale : this.config.defaultCollisionScale;
     }
 
     private setupScrollListener() {
@@ -226,12 +252,15 @@ class CanvasPhysics {
         
         this.isAnimationStarted = true;
         
-        this.elements.forEach((element, index) => {
+        this.elements.forEach((element) => {
             element.y = element.initialY;
             element.vx = (Math.random() - 0.5) * 1;
             element.vy = 0;
             element.isResting = false;
             element.restingTime = 0;
+            // Синхронизируем сглаженные координаты
+            element.drawX = element.x + element.width / 2;
+            element.drawY = element.y + element.height / 2;
         });
 
         if (this.scrollListener) {
@@ -243,19 +272,31 @@ class CanvasPhysics {
     private setupCanvas() {
         const resizeCanvas = () => {
             const rect = this.canvas.getBoundingClientRect();
-            this.canvas.width = rect.width;
-            this.canvas.height = rect.height;
-            
+
+            // 1. HiDPI буфер
+            this.pixelRatio = window.devicePixelRatio || 1;
+            const w = Math.round(rect.width);
+            const h = Math.round(rect.height);
+            this.canvas.width  = w * this.pixelRatio;
+            this.canvas.height = h * this.pixelRatio;
+            this.canvas.style.width  = w + 'px';
+            this.canvas.style.height = h + 'px';
+
+            // 2. Сброс + масштаб
+            this.ctx.setTransform(1, 0, 0, 1, 0, 0);
+            this.ctx.scale(this.pixelRatio, this.pixelRatio);
+            this.ctx.imageSmoothingEnabled = true;
+
             const oldElementCount = this.config.elementCount;
             this.applyAdaptiveSettings();
-            
-            if (oldElementCount !== this.config.elementCount) {
+
+            if (oldElementCount !== this.config.elementCount || this.elements.length === 0) {
                 this.createElements();
             }
         };
-        
+
         resizeCanvas();
-        window.addEventListener('resize', resizeCanvas);
+        window.addEventListener('resize', resizeCanvas, { passive: true });
     }
 
     private setupEventListeners() {
@@ -448,55 +489,53 @@ class CanvasPhysics {
                 mass: mass,
                 isResting: false,
                 restingTime: 0,
-                collisionRadius: baseRadius + this.config.elementPadding,
+                collisionRadius: (baseRadius + this.config.elementPadding) * (this.config.collisionScale || 1),
                 visualRadius: baseRadius,
                 rotation: Math.random() * 0.2 - 0.1,
                 rotationSpeed: 0
             };
 
-						element.protectedRadius = 5; // например, 10px
+            element.protectedRadius = this.config.protectedRadius ?? 5;
+            // Инициализируем сглаженные координаты центров
+            element.drawX = element.x + element.width / 2;
+            element.drawY = element.y + element.height / 2;
             
             this.elements.push(element);
         }
     }
 
 private updatePhysics() {
-    if (!this.isAnimationStarted) {
-        return;
-    }
+    if (!this.isAnimationStarted) return;
 
     this.applyMouseForcesToAllElements();
-
-    const inertiaDuration = 100; // мс
+    const inertiaDuration = 100;
 
     for (let i = 0; i < this.elements.length; i++) {
         const element = this.elements[i];
 
-        // Применяем инерцию, если она активна
+        // Инерция
         if (element.inertiaTime) {
             const elapsed = Date.now() - element.inertiaTime;
             if (elapsed < inertiaDuration) {
-                // Коэффициент затухания от 1 до 0
                 const fade = 1 - (elapsed / inertiaDuration);
                 element.vx = (element.inertiaVx || 0) * fade;
                 element.vy = (element.inertiaVy || 0) * fade;
             } else {
-                // После затухания — обычная физика
                 element.inertiaVx = 0;
                 element.inertiaVy = 0;
                 element.inertiaTime = undefined;
             }
         }
 
+        // (Было ДВА раза обновление позиции — оставляем один)
         element.x += element.vx * this.config.animationSpeed;
         element.y += element.vy * this.config.animationSpeed;
 
         this.checkBoundaryCollisions(element);
 
         if (!element.isResting) {
-            const gravityForce = this.config.gravity * element.mass;
-
-            element.vy += gravityForce;
+            const g = this.config.gravity * element.mass;
+            element.vy += g;
 
             const massEffect = 1 / element.mass;
             element.vx *= this.config.friction * (1 - massEffect * 0.1);
@@ -506,61 +545,41 @@ private updatePhysics() {
         } else {
             element.vx *= 0.85;
             element.vy *= 0.85;
-
             if (Math.abs(element.vx) < 0.01) element.vx = 0;
             if (Math.abs(element.vy) < 0.01) element.vy = 0;
         }
 
         element.rotationSpeed *= this.config.rotationDamping;
-
-        if (Math.abs(element.rotationSpeed) < 0.002) {
-            element.rotationSpeed = 0;
-        }
-
-        if (element.rotationSpeed !== 0) {
+        if (Math.abs(element.rotationSpeed) < 0.002) element.rotationSpeed = 0;
+        if (element.rotationSpeed) {
             element.rotation += element.rotationSpeed;
+            if (Math.abs(element.rotationSpeed) > this.config.maxRotationSpeed) {
+                element.rotationSpeed = Math.sign(element.rotationSpeed) * this.config.maxRotationSpeed;
+            }
         }
 
-        if (Math.abs(element.rotationSpeed) > this.config.maxRotationSpeed) {
-            element.rotationSpeed = Math.sign(element.rotationSpeed) * this.config.maxRotationSpeed;
+        // Замедление внизу
+        const logicalHeight = this.canvas.height / this.pixelRatio;
+        const bottomEdge = logicalHeight - element.collisionRadius - 10;
+        const centerY = this.getElementCenterY(element);
+        if (centerY > bottomEdge) {
+            element.vx = 0;
+            element.vy = 0;
+            element.y = Math.min(element.y, logicalHeight - element.height - 10);
         }
 
-        element.x += element.vx * this.config.animationSpeed;
-        element.y += element.vy * this.config.animationSpeed;
-
-        this.checkBoundaryCollisions(element);
-
-        // Замедляем элементы у нижнего края
-				const bottomEdge = this.canvas.height - element.collisionRadius - 10;
-				const centerY = this.getElementCenterY(element);
-				if (centerY > bottomEdge) {
-						element.vx = 0;
-						element.vy = 0;
-						const maxOffset = 10;
-						const minY = this.canvas.height - element.height - maxOffset;
-						element.y = Math.max(minY, Math.min(element.y, this.canvas.height - element.height));
-				}
-
-				const maxSpeed = 0.8; // подбери под себя для плавности
-				const speed = Math.sqrt(element.vx * element.vx + element.vy * element.vy);
-				if (speed > maxSpeed) {
-						const factor = maxSpeed / speed;
-						element.vx *= factor;
-						element.vy *= factor;
-				}
-
+        // Ограничение скорости
+        const maxSpeed = 0.8;
+        const speed = Math.hypot(element.vx, element.vy);
+        if (speed > maxSpeed) {
+            const f = maxSpeed / speed;
+            element.vx *= f;
+            element.vy *= f;
+        }
     }
 
-		
-
-    let maxIterations = 15;
     let iteration = 0;
-    let hasOverlaps = true;
-
-    while (hasOverlaps && iteration < maxIterations) {
-        hasOverlaps = this.separateAllElements();
-        iteration++;
-    }
+    while (this.separateAllElements() && iteration++ < 12) {}
 
     for (let i = 0; i < this.elements.length; i++) {
         this.updateRestState(this.elements[i]);
@@ -818,29 +837,6 @@ private separateElements(element1: PhysicsElement, element2: PhysicsElement): bo
     return false;
 }
 
-    private activateNearbyElements(centerElement: PhysicsElement) {
-        const activationRadius = centerElement.collisionRadius * 5;
-        
-        for (const element of this.elements) {
-            if (element === centerElement) continue;
-            
-            const dx = this.getElementCenterX(element) - this.getElementCenterX(centerElement);
-            const dy = this.getElementCenterY(element) - this.getElementCenterY(centerElement);
-            const distance = Math.sqrt(dx * dx + dy * dy);
-            
-            if (distance < activationRadius) {
-                element.isResting = false;
-                element.restingTime = Math.max(0, element.restingTime - 90);
-                
-                if (distance < activationRadius * 0.7) {
-                    const force = ((activationRadius - distance) / activationRadius * 8) / this.config.animationSpeed;
-                    
-                    element.vx += (dx / distance) * force;
-                    element.vy += (dy / distance) * force;
-                }
-            }
-        }
-    }
 
     private getElementCenterX(element: PhysicsElement): number {
         return element.x + element.width / 2;
@@ -941,11 +937,52 @@ private separateElements(element1: PhysicsElement, element2: PhysicsElement): bo
 
     private drawElement(element: PhysicsElement) {
         this.ctx.save();
-        
-        const centerX = this.getElementCenterX(element);
-        const centerY = this.getElementCenterY(element);
-        
-        this.ctx.translate(centerX, centerY);
+        // --- Новый алгоритм half‑pixel: снап ТОЛЬКО при близости, без «ползунка» ---
+        const rawX = this.getElementCenterX(element);
+        const rawY = this.getElementCenterY(element);
+        const speed = Math.hypot(element.vx, element.vy);
+
+        const snapX = Math.round(rawX) + 0.5;
+        const snapY = Math.round(rawY) + 0.5;
+
+        // Окно в котором разрешаем подтягивание к half‑pixel
+        const snapWindow = 0.22; // чем меньше — тем реже снап, меньше заметность
+        const speedThreshold = 0.5; // снапим только когда уже почти остановились
+
+        // Инициализация сглаженных координат
+        if (element.drawX === undefined) element.drawX = rawX;
+        if (element.drawY === undefined) element.drawY = rawY;
+
+        let targetX = rawX;
+        let targetY = rawY;
+
+        if (speed < speedThreshold) {
+            const dxSnap = snapX - rawX;
+            const dySnap = snapY - rawY;
+            const ax = Math.abs(dxSnap);
+            const ay = Math.abs(dySnap);
+
+            if (ax < snapWindow) {
+                // Чем ближе — тем сильнее тянем (квадратичное усиление ближе к центру)
+                const influence = 1 - ax / snapWindow; // 0..1
+                targetX = rawX + dxSnap * influence * influence;
+            }
+            if (ay < snapWindow) {
+                const influence = 1 - ay / snapWindow;
+                targetY = rawY + dySnap * influence * influence;
+            }
+
+            // Маленький «щёлк» только в самом конце — когда совсем близко (< 0.04)
+            if (ax < 0.04) targetX = snapX;
+            if (ay < 0.04) targetY = snapY;
+        }
+
+        // Базовое сглаживание (фиксированное — без накопления дрейфа к half‑pixel)
+        const lerpFactor = 0.4; // чуть быстрее прежнего среднего
+        element.drawX += (targetX - element.drawX) * lerpFactor;
+        element.drawY += (targetY - element.drawY) * lerpFactor;
+
+        this.ctx.translate(element.drawX, element.drawY);
         this.ctx.rotate(element.rotation);
         
         this.ctx.fillStyle = element.color;
