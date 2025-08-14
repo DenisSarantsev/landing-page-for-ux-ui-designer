@@ -41,6 +41,8 @@ class CanvasPhysics {
 		private mouseSpeed: number = 0;
 		private mouseIdleTimeout: number | null = null;
 		private pixelRatio = window.devicePixelRatio || 1;
+    private get logicalWidth() { return this.canvas.width / this.pixelRatio; }
+    private get logicalHeight() { return this.canvas.height / this.pixelRatio; }
     
     private config = {
         gravity: 0.1,
@@ -84,10 +86,10 @@ class CanvasPhysics {
             mobile: {
                 maxWidth: 480,
                 elementCount: 80,
-                elementSize: 35, // +50% к прежним 28
+                elementSize: 28, // +50% к прежним 28
                 mouseRadius: 80,
                 mouseForce: 1500,
-                elementPadding: 20,
+                elementPadding: 10,
                 minElementDistance: 1, // еще меньше
                 protectedRadius: 2, // убираем дополнительный буфер
                 collisionScale: 0.95 // уменьшаем физический радиус для плотности (визуально почти соприкасаются)
@@ -269,129 +271,74 @@ class CanvasPhysics {
         }
     }
 
-    private setupCanvas() {
-        const resizeCanvas = () => {
-            const rect = this.canvas.getBoundingClientRect();
+		private setupCanvas() {
+    const resizeCanvas = () => {
+        const vv = (window as any).visualViewport;
+        // Ширина без полосы прокрутки
+        const cssW = vv ? vv.width : document.documentElement.clientWidth;
+        const cssH = vv ? vv.height : window.innerHeight;
 
-            // 1. HiDPI буфер
-            this.pixelRatio = window.devicePixelRatio || 1;
-            const w = Math.round(rect.width);
-            const h = Math.round(rect.height);
-            this.canvas.width  = w * this.pixelRatio;
-            this.canvas.height = h * this.pixelRatio;
-            this.canvas.style.width  = w + 'px';
-            this.canvas.style.height = h + 'px';
+        this.pixelRatio = window.devicePixelRatio || 1;
 
-            // 2. Сброс + масштаб
-            this.ctx.setTransform(1, 0, 0, 1, 0, 0);
-            this.ctx.scale(this.pixelRatio, this.pixelRatio);
-            this.ctx.imageSmoothingEnabled = true;
+        this.canvas.width  = Math.round(cssW * this.pixelRatio);
+        this.canvas.height = Math.round(cssH * this.pixelRatio);
 
-            const oldElementCount = this.config.elementCount;
-            this.applyAdaptiveSettings();
+        // CSS размеры (не 100vw — чтобы не захватить скроллбар)
+        this.canvas.style.width  = cssW + 'px';
+        this.canvas.style.height = cssH + 'px';
 
-            if (oldElementCount !== this.config.elementCount || this.elements.length === 0) {
-                this.createElements();
-            }
-        };
+        this.ctx.setTransform(1,0,0,1,0,0);
+        this.ctx.scale(this.pixelRatio, this.pixelRatio);
+        this.ctx.imageSmoothingEnabled = true;
 
-        resizeCanvas();
-        window.addEventListener('resize', resizeCanvas, { passive: true });
+        const prevCount = this.config.elementCount;
+        this.applyAdaptiveSettings();
+        if (prevCount !== this.config.elementCount || this.elements.length === 0) {
+            this.createElements();
+        }
+    };
+
+    resizeCanvas();
+    window.addEventListener('resize', resizeCanvas, { passive: true });
+    window.addEventListener('orientationchange', resizeCanvas, { passive: true });
+    const vv = (window as any).visualViewport;
+    if (vv) {
+        vv.addEventListener('resize', resizeCanvas, { passive: true });
+        vv.addEventListener('scroll', resizeCanvas, { passive: true }); // iOS адресная строка
     }
+}
 
     private setupEventListeners() {
-
-			this.canvas.addEventListener('mousemove', (e) => {
-					const rect = this.canvas.getBoundingClientRect();
-					this.prevMouse.x = this.mouse.x;
-					this.prevMouse.y = this.mouse.y;
-					this.mouse.x = e.clientX - rect.left;
-					this.mouse.y = e.clientY - rect.top;
-
-					// Определяем направление движения мыши
-					const dx = this.mouse.x - this.prevMouse.x;
-					const dy = this.mouse.y - this.prevMouse.y;
-					// Сохраняем данные в глобальный метод
-					const length = Math.sqrt(dx * dx + dy * dy);
-					this.mouseDirection.x = length > 0 ? dx / length : 0;
-					this.mouseDirection.y = length > 0 ? dy / length : 0;
-
-					let direction = '';
-					if (Math.abs(dx) > Math.abs(dy) && Math.abs(dx) > 0) {
-							direction = dx > 0 ? 'right' : 'left';
-					} else if (Math.abs(dy) > 0) {
-							direction = dy > 0 ? 'down' : 'up';
-					} else {
-							direction = 'none';
-					}
-
-					// Скорость движения мыши (модуль вектора)
-					const speed = Math.sqrt(dx * dx + dy * dy);
-					this.mouseSpeed = speed; 
-
-					// Сбросить таймер, если мышь двигается
-					if (this.mouseIdleTimeout) {
-						clearTimeout(this.mouseIdleTimeout);
-					}
-					this.mouseIdleTimeout = window.setTimeout(() => {
-						this.mouseSpeed = 0;
-					}, 100); // 0.1 секунда
-
-					// Пропорциональный радиус
-					this.dynamicCursorRadius = speed * 2;
-					console.log(this.dynamicCursorRadius)
-
-					console.log(`Направление движения мыши: ${direction}, скорость: ${speed.toFixed(2)} px`);
-			});
-
-        this.globalMouseListener = (e: MouseEvent) => {
+        // Единый обработчик движения
+        const updateMouse = (e: MouseEvent) => {
             const rect = this.canvas.getBoundingClientRect();
             this.prevMouse.x = this.mouse.x;
             this.prevMouse.y = this.mouse.y;
-            
             this.mouse.x = e.clientX - rect.left;
             this.mouse.y = e.clientY - rect.top;
+            const dx = this.mouse.x - this.prevMouse.x;
+            const dy = this.mouse.y - this.prevMouse.y;
+            const len = Math.hypot(dx, dy);
+            if (len > 0) {
+                this.mouseDirection.x = dx / len;
+                this.mouseDirection.y = dy / len;
+            }
+            this.mouseSpeed = len;
+            if (this.mouseIdleTimeout) clearTimeout(this.mouseIdleTimeout);
+            this.mouseIdleTimeout = window.setTimeout(() => { this.mouseSpeed = 0; }, 100);
+            this.dynamicCursorRadius = this.mouseSpeed * 2;
         };
 
-        document.addEventListener('mousemove', this.globalMouseListener);
+        this.globalMouseListener = updateMouse;
+        document.addEventListener('mousemove', updateMouse, { passive: true });
 
-        document.addEventListener('mouseleave', () => {
-            this.mouse.x = -1000;
-            this.mouse.y = -1000;
-            this.prevMouse.x = -1000;
-            this.prevMouse.y = -1000;
-        });
-
-        document.addEventListener('mouseenter', (e) => {
-            const rect = this.canvas.getBoundingClientRect();
-            this.mouse.x = e.clientX - rect.left;
-            this.mouse.y = e.clientY - rect.top;
-            this.prevMouse.x = this.mouse.x;
-            this.prevMouse.y = this.mouse.y;
-        });
-
-        this.canvas.addEventListener('mousemove', (e) => {
-            const rect = this.canvas.getBoundingClientRect();
-            this.prevMouse.x = this.mouse.x;
-            this.prevMouse.y = this.mouse.y;
-            this.mouse.x = e.clientX - rect.left;
-            this.mouse.y = e.clientY - rect.top;
-        });
-
-        this.canvas.addEventListener('mouseleave', () => {
-            this.mouse.x = -1000;
-            this.mouse.y = -1000;
-            this.prevMouse.x = -1000;
-            this.prevMouse.y = -1000;
-        });
-
-        this.canvas.addEventListener('mouseenter', (e) => {
-            const rect = this.canvas.getBoundingClientRect();
-            this.mouse.x = e.clientX - rect.left;
-            this.mouse.y = e.clientY - rect.top;
-            this.prevMouse.x = this.mouse.x;
-            this.prevMouse.y = this.mouse.y;
-        });
+        const resetMouse = () => {
+            this.mouse.x = this.mouse.y = -1000;
+            this.prevMouse.x = this.prevMouse.y = -1000;
+            this.mouseSpeed = 0;
+        };
+        document.addEventListener('mouseleave', resetMouse, { passive: true });
+        document.addEventListener('mouseenter', updateMouse, { passive: true });
     }
 
     private createColorArray(): string[] {
@@ -464,8 +411,9 @@ class CanvasPhysics {
             const massRange = this.config.massConfig[shape];
             const mass = massRange.min + Math.random() * (massRange.max - massRange.min);
             
-            const centerX = this.canvas.width / 2;
-            const spreadRadius = Math.min(150, this.canvas.width / 8);
+            const lw = this.logicalWidth;
+            const centerX = lw / 2;
+            const spreadRadius = Math.min(150, lw / 8);
             
             const angle = Math.random() * Math.PI * 2;
             const distance = Math.random() * spreadRadius;
@@ -476,7 +424,7 @@ class CanvasPhysics {
             const initialY = Math.random() * -baseOffset - i * (elementOffset / 4);
             
             const element: PhysicsElement = {
-                x: Math.max(0, Math.min(x, this.canvas.width - this.config.elementSize)),
+                x: Math.max(0, Math.min(x, lw - this.config.elementSize)),
                 y: initialY,
                 initialY: initialY,
                 vx: (Math.random() - 0.5) * 1,
@@ -559,13 +507,12 @@ private updatePhysics() {
         }
 
         // Замедление внизу
-        const logicalHeight = this.canvas.height / this.pixelRatio;
-        const bottomEdge = logicalHeight - element.collisionRadius - 10;
+    const bottomEdge = this.logicalHeight - element.collisionRadius - 10;
         const centerY = this.getElementCenterY(element);
         if (centerY > bottomEdge) {
             element.vx = 0;
             element.vy = 0;
-            element.y = Math.min(element.y, logicalHeight - element.height - 10);
+            element.y = Math.min(element.y, this.logicalHeight - element.height - 10);
         }
 
         // Ограничение скорости
@@ -744,11 +691,11 @@ private separateElements(element1: PhysicsElement, element2: PhysicsElement): bo
 
         if (
             centerX1 < element1.collisionRadius + 2 ||
-            centerX1 > this.canvas.width - element1.collisionRadius - 2 ||
+            centerX1 > this.logicalWidth - element1.collisionRadius - 2 ||
             centerY1 < element1.collisionRadius + 2 ||
             centerY1 > this.canvas.height - element1.collisionRadius - 2 ||
             centerX2 < element2.collisionRadius + 2 ||
-            centerX2 > this.canvas.width - element2.collisionRadius - 2 ||
+            centerX2 > this.logicalWidth - element2.collisionRadius - 2 ||
             centerY2 < element2.collisionRadius + 2 ||
             centerY2 > this.canvas.height - element2.collisionRadius - 2
         ) {
@@ -860,8 +807,8 @@ private separateElements(element1: PhysicsElement, element2: PhysicsElement): bo
 				// Ограничиваем по X
 				if (centerX < element.collisionRadius) {
 						element.x = element.collisionRadius - element.width / 2;
-				} else if (centerX > this.canvas.width - element.collisionRadius) {
-						element.x = this.canvas.width - element.collisionRadius - element.width / 2;
+                } else if (centerX > this.logicalWidth - element.collisionRadius) {
+                        element.x = this.logicalWidth - element.collisionRadius - element.width / 2;
 				}
 
 				// Ограничиваем по Y
@@ -917,8 +864,8 @@ private separateElements(element1: PhysicsElement, element2: PhysicsElement): bo
         if (centerX <= element.collisionRadius) {
             element.x = element.collisionRadius - element.width / 2;
             element.vx = Math.abs(element.vx) * this.config.bounce * (1 / element.mass);
-        } else if (centerX >= this.canvas.width - element.collisionRadius) {
-            element.x = this.canvas.width - element.collisionRadius - element.width / 2;
+        } else if (centerX >= this.logicalWidth - element.collisionRadius) {
+            element.x = this.logicalWidth - element.collisionRadius - element.width / 2;
             element.vx = -Math.abs(element.vx) * this.config.bounce * (1 / element.mass);
         }
         
@@ -1558,3 +1505,20 @@ canvasPhysics.updateShapeDistribution({
 console.log('Current adaptive settings:', canvasPhysics.getCurrentSettings());
 
 (window as any).canvasPhysics = canvasPhysics;
+
+/*
+
+Основные узкие места сейчас:
+
+O(n^2) коллизии + внутри separateElements дополнительный цикл по всем элементам (crowdCount) => фактически O(n^3) в худшем случае.
+Много sqrt (distance) там, где хватит сравнения квадратов.
+Частое изменение fillStyle (каждый элемент).
+Сложные пути фигур строятся заново каждый кадр (можно кэшировать Path2D).
+Высокое animationSpeed=40 увеличивает число пересечений.
+Все элементы обрабатываются каждый кадр, даже когда “лежат”.
+Множественные интерполяционные шаги мыши (steps) — дорого при быстрых движениях.
+Отрисовка продолжается при невидимом footer (нет паузы через IntersectionObserver).
+Нет снижение качества при низком FPS (DPR / count).
+Много лишних Math.hypot / sqrt в нескольких местах подряд.
+
+*/

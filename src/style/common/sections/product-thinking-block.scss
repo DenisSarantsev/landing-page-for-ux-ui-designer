@@ -11,40 +11,75 @@
 			}
 		}
 		&__left {
+			font-weight: bold;
+			font-size: 64px;
+			text-transform: uppercase;
+			font-family: $accent-font;
+			line-height: 120%;
+			letter-spacing: -0.015em;
+			color: $neutral-dark;
+			@media (max-width: $first-bp){
+				font-size: px-to-vw(64px, $first-bp);
+			}
+			@media (max-width: $tablet-bp){
+				font-size: px-to-vw(58px, $tablet-bp);
+			}
+			@media (max-width: $small-tablet-bp){
+				font-size: 48px;
+			}
+			@media (max-width: 490px){
+				font-size: px-to-vw(48px, 490px);
+			}
+			@media (max-width: 393px){
+				font-size: 40px;
+			}
 			&>* {
-				font-weight: bold;
-				font-size: 64px;
-				line-height: 128%;
-				letter-spacing: -0.2%;
-				text-transform: uppercase;
 				font-family: $accent-font;
-				line-height: 128%;
-				color: $neutral-dark;
-				@media (max-width: $first-bp){
-					font-size: px-to-vw(64px, $first-bp);
+				&:nth-child(1) {
+					@media (max-width: $tablet-bp){
+						display: none;
+					}
 				}
-				@media (max-width: $tablet-bp){
-					font-size: px-to-vw(58px, $tablet-bp);
+				&:nth-child(2) {
+					@media (min-width: 993px){
+						display: none;
+					}
+					@media (max-width: 722px){
+						display: none;
+					}
 				}
-				@media (max-width: $small-tablet-bp){
-					font-size: 48px;
+				&:nth-child(3) {
+					@media (min-width: 723px){
+						display: none;
+					}
+					@media (max-width: 624px){
+						display: none;
+					}
 				}
-				@media (max-width: 393px){
-					font-size: 40px;
+				&:nth-child(4) {
+					@media (min-width: 625px){
+						display: none;
+					}
+					@media (max-width: 390px){
+						display: none;
+					}
+				}
+				&:nth-child(5) {
+					@media (min-width: 391px){
+						display: none;
+					}
 				}
 			}
 			& span {
 				font-family: $accent-font;
+				background: linear-gradient(170deg, #FE9801, #F4312A);
+				-webkit-background-clip: text;
+				background-clip: text;
+				-webkit-text-fill-color: transparent;
+				color: transparent;
+				display: inline-block;
+				padding-left: 2px;
 			}
-		}
-		&__gradient-text {
-			background: linear-gradient(170deg, #FE9801, #F4312A);
-			-webkit-background-clip: text;
-			background-clip: text;
-			-webkit-text-fill-color: transparent;
-			color: transparent;
-			display: inline-block;
-			padding-left: 2px;
 		}
 		&__right {
 			display: flex;
@@ -62,6 +97,7 @@
 			}
 			@media (max-width: $small-tablet-bp){
 				font-size: 18px;
+				font-weight: 400;
 			}
 			@media (max-width: $mobile-bp){
 				font-size: 16px;

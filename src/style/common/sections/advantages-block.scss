@@ -8,12 +8,12 @@
 			display: flex;
 			flex-direction: column;
 			align-items: center;
-			gap: 80px;
+			gap: 90px;
 			@media (max-width: $first-bp){
-				gap: px-to-vw(80px, $first-bp);
+				gap: px-to-vw(90px, $first-bp);
 			}
 			@media (max-width: $small-tablet-bp){
-				gap: px-to-vw(45px, $small-tablet-bp);
+				gap: px-to-vw(50px, $small-tablet-bp);
 			}
 			@media (max-width: $mobile-bp){
 				gap: 52px;
@@ -72,10 +72,10 @@
 			display: grid;
 			grid-template-columns: repeat(3, 1fr);
 			column-gap: 64px;
-			row-gap: 40px;
+			row-gap: 45px;
 			@media (max-width: $first-bp){
 				column-gap: px-to-vw(64px, $first-bp);
-				row-gap: px-to-vw(40px, $first-bp);
+				row-gap: px-to-vw(45px, $first-bp);
 			}
 			@media (max-width: $mobile-bp){
 				grid-template-columns: repeat(2, 1fr);
@@ -88,6 +88,7 @@
 			display: flex;
 			flex-direction: column;
 			align-items: center;
+			gap: 12px;
 			background-color: transparent;
 			position: relative;
 			padding-bottom: 10px;
@@ -98,10 +99,12 @@
 				padding-bottom: 5px;
 			}
 			& img {
+				min-width: 100%;
 				width: 100%;
 				position: absolute;
 				bottom: 0px;
 				left: 0px;
+				object-fit: cover;
 			}
 			&>*:last-child {
 				opacity: 0;
@@ -128,6 +131,10 @@
 .advantage {
 	&__item {
 		&_title {
+			font-size: 24px;
+			font-weight: 300;
+			padding-bottom: 16px;
+			color: $neutral-dark;
 			@media (max-width: $small-tablet-bp){
 				font-size: 16px;
 				font-weight: 400;
