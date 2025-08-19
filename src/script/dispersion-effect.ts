@@ -41,11 +41,25 @@ class CanvasPhysics {
 		private mouseSpeed: number = 0;
 		private mouseIdleTimeout: number | null = null;
 		private pixelRatio = window.devicePixelRatio || 1;
+    private lastFillStyle: string | null = null;
     private get logicalWidth() { return this.canvas.width / this.pixelRatio; }
     private get logicalHeight() { return this.canvas.height / this.pixelRatio; }
+        // Видимость / активность
+        private isCanvasVisible = false;
+        private isPageVisible = true;
+        private intersectionObserver?: IntersectionObserver;
+        private wasStartedOnce = false; // чтобы повторно не пересоздавать элементы
+
+        // ---- Низкий FPS деградация ----
+        private lowFpsThreshold = 50; // FPS ниже которого считаем «низким» (регулируемо)
+        private lowFpsSamplesNeeded = 8; // сколько подряд низких выборок требуется
+        private lowFpsConsecutive = 0; // текущая серия
+        private lastFrameTime = performance.now();
+        private degradedLowFpsApplied = false; // чтобы не применять многократно
+        private forcePixelRatio: number | null = null; // если выставлено — override devicePixelRatio
     
     private config = {
-        gravity: 0.1,
+    gravity: 0.11, // +0.01 компенсирует уменьшение animationSpeed (меньше интеграционных шагов => чуть усиливаем притяжение)
         friction: 0.15,
         bounce: 0.008,
         mouseForce: 10000,
@@ -62,7 +76,7 @@ class CanvasPhysics {
         maxRotationSpeed: 0.3,
         rotationIntensity: 0.8,
         fallSpeed: 0.5,
-        animationSpeed: 7,
+    		animationSpeed: 6, // меньше шагов перемещения за кадр => ниже коллизий/CPU
         footerVisibilityThreshold: 60,
 				collisionDamping: 0.2, // сильное демпфирование
 
@@ -107,17 +121,17 @@ class CanvasPhysics {
             },
             laptop: {
                 maxWidth: 1024,
-                elementCount: 130,
+                elementCount: 110,
                 elementSize: 35,
-                mouseRadius: 120,
+                mouseRadius: 140,
                 mouseForce: 2200,
 								protectedRadius: 2,
             },
             desktop: {
                 maxWidth: 1440,
-                elementCount: 170,
+                elementCount: 150,
                 elementSize: 38,
-                mouseRadius: 150,
+                mouseRadius: 170,
                 mouseForce: 2500,
 								protectedRadius: 2,
             },
@@ -187,9 +201,10 @@ class CanvasPhysics {
         this.setupEventListeners();
         this.setupScrollListener();
         
-        this.applyAdaptiveSettings();
-        this.createElements();
-        this.startAnimation();
+    this.applyAdaptiveSettings();
+    this.createElements();
+    this.setupVisibilityHandling();
+    // Анимацию запускаем только когда футер / канвас попал во вьюпорт
     }
 
     private getAdaptiveSettings() {
@@ -277,8 +292,12 @@ class CanvasPhysics {
         // Ширина без полосы прокрутки
         const cssW = vv ? vv.width : document.documentElement.clientWidth;
         const cssH = vv ? vv.height : window.innerHeight;
-
-        this.pixelRatio = window.devicePixelRatio || 1;
+        // Если есть принудительный pixelRatio (деградация), используем его
+        if (this.forcePixelRatio != null) {
+            this.pixelRatio = this.forcePixelRatio;
+        } else {
+            this.pixelRatio = window.devicePixelRatio || 1;
+        }
 
         this.canvas.width  = Math.round(cssW * this.pixelRatio);
         this.canvas.height = Math.round(cssH * this.pixelRatio);
@@ -444,6 +463,9 @@ class CanvasPhysics {
             };
 
             element.protectedRadius = this.config.protectedRadius ?? 5;
+            // Кешируем инварианты
+            (element as any).invMass = 1 / element.mass;
+            (element as any).collisionRadiusSq = element.collisionRadius * element.collisionRadius;
             // Инициализируем сглаженные координаты центров
             element.drawX = element.x + element.width / 2;
             element.drawY = element.y + element.height / 2;
@@ -476,8 +498,9 @@ private updatePhysics() {
         }
 
         // (Было ДВА раза обновление позиции — оставляем один)
-        element.x += element.vx * this.config.animationSpeed;
-        element.y += element.vy * this.config.animationSpeed;
+    const animSpeed = this.config.animationSpeed;
+    element.x += element.vx * animSpeed;
+    element.y += element.vy * animSpeed;
 
         this.checkBoundaryCollisions(element);
 
@@ -485,7 +508,9 @@ private updatePhysics() {
             const g = this.config.gravity * element.mass;
             element.vy += g;
 
-            const massEffect = 1 / element.mass;
+            const invMass = (element as any).invMass ?? (1 / element.mass);
+            if ((element as any).invMass === undefined) (element as any).invMass = invMass;
+            const massEffect = invMass;
             element.vx *= this.config.friction * (1 - massEffect * 0.1);
             element.vy *= this.config.friction * (1 - massEffect * 0.1);
             element.vx *= this.config.damping;
@@ -517,9 +542,9 @@ private updatePhysics() {
 
         // Ограничение скорости
         const maxSpeed = 0.8;
-        const speed = Math.hypot(element.vx, element.vy);
-        if (speed > maxSpeed) {
-            const f = maxSpeed / speed;
+        const speedSq = element.vx * element.vx + element.vy * element.vy;
+        if (speedSq > maxSpeed * maxSpeed) {
+            const f = maxSpeed / Math.sqrt(speedSq);
             element.vx *= f;
             element.vy *= f;
         }
@@ -534,20 +559,22 @@ private updatePhysics() {
 }
 
     private applyMouseForcesToAllElements() {
-        const mouseDistance = Math.sqrt(
-            Math.pow(this.mouse.x - this.prevMouse.x, 2) + 
-            Math.pow(this.mouse.y - this.prevMouse.y, 2)
-        );
-        
-        const steps = Math.max(1, Math.ceil(mouseDistance / 10));
-        
-        for (let step = 0; step <= steps; step++) {
-            const t = step / steps;
-            const interpolatedX = this.prevMouse.x + (this.mouse.x - this.prevMouse.x) * t;
-            const interpolatedY = this.prevMouse.y + (this.mouse.y - this.prevMouse.y) * t;
-            
-            for (const element of this.elements) {
-                this.applyMouseForceAtPosition(element, interpolatedX, interpolatedY, t);
+        const dx = this.mouse.x - this.prevMouse.x;
+        const dy = this.mouse.y - this.prevMouse.y;
+        const distSq = dx * dx + dy * dy;
+        if (distSq === 0) return;
+        const dist = Math.sqrt(distSq);
+
+        let steps = Math.round(dist / 20); // базовый расчёт
+        if (steps < 1) steps = 1; else if (steps > 5) steps = 5; // clamp 1..5
+        if (dist < 4) steps = 1; // мелкие движения без интерполяции
+
+        for (let s = 0; s <= steps; s++) {
+            const t = s / steps;
+            const ix = this.prevMouse.x + dx * t;
+            const iy = this.prevMouse.y + dy * t;
+            for (let i = 0; i < this.elements.length; i++) {
+                this.applyMouseForceAtPosition(this.elements[i], ix, iy, t);
             }
         }
     }
@@ -560,7 +587,8 @@ private applyMouseForceAtPosition(
 ) {
     const dx = this.getElementCenterX(element) - mouseX;
     const dy = this.getElementCenterY(element) - mouseY;
-    const distance = Math.sqrt(dx * dx + dy * dy);
+    const distSq = dx * dx + dy * dy;
+    const distance = Math.sqrt(distSq);
 
     // Используем динамический радиус
     const radius = this.dynamicCursorRadius;
@@ -618,10 +646,12 @@ private applyMouseForceAtPosition(
 
     // Ограничение максимальной скорости для плавности
     const maxSpeed = (35 / Math.sqrt(element.mass)) / this.config.animationSpeed;
-    const currentSpeed = Math.sqrt(element.vx * element.vx + element.vy * element.vy);
-    if (currentSpeed > maxSpeed) {
-        element.vx = (element.vx / currentSpeed) * maxSpeed;
-        element.vy = (element.vy / currentSpeed) * maxSpeed;
+    const velSq = element.vx * element.vx + element.vy * element.vy;
+    const maxSpeedSq = maxSpeed * maxSpeed;
+    if (velSq > maxSpeedSq) {
+        const scale = maxSpeed / Math.sqrt(velSq);
+        element.vx *= scale;
+        element.vy *= scale;
     }
 
     // Убираем дребезжание
@@ -646,14 +676,14 @@ private applyMouseForceAtPosition(
 private separateElements(element1: PhysicsElement, element2: PhysicsElement): boolean {
     const dx = this.getElementCenterX(element1) - this.getElementCenterX(element2);
     const dy = this.getElementCenterY(element1) - this.getElementCenterY(element2);
-    const distance = Math.sqrt(dx * dx + dy * dy);
-
-    // Минимальное расстояние между элементами
+    const distSq = dx * dx + dy * dy;
     const minDistance = (element1.collisionRadius + (element1.protectedRadius || 0)) +
                         (element2.collisionRadius + (element2.protectedRadius || 0)) +
                         (this.config.minElementDistance || 0);
+    const minDistanceSq = minDistance * minDistance;
+    if (distSq >= minDistanceSq) return false; // нет пересечения
+    const distance = Math.sqrt(distSq); // sqrt только при коллизии
 
-    if (distance < minDistance) {
         // Волновое демпфирование
         const damping = 0.8;
         const avgVx = (element1.vx + element2.vx) / 2;
@@ -667,21 +697,7 @@ private separateElements(element1: PhysicsElement, element2: PhysicsElement): bo
         let separationMultiplier = 1;
         const edgeBoost = 1.1;
 
-        // --- Новый блок: если вокруг много элементов, уменьшаем separationMultiplier ---
-        let crowdCount = 0;
-        for (const other of this.elements) {
-            if (other === element1 || other === element2) continue;
-            const d1 = Math.sqrt(
-                Math.pow(this.getElementCenterX(element1) - this.getElementCenterX(other), 2) +
-                Math.pow(this.getElementCenterY(element1) - this.getElementCenterY(other), 2)
-            );
-            const d2 = Math.sqrt(
-                Math.pow(this.getElementCenterX(element2) - this.getElementCenterX(other), 2) +
-                Math.pow(this.getElementCenterY(element2) - this.getElementCenterY(other), 2)
-            );
-            if (d1 < minDistance * 1.2 || d2 < minDistance * 1.2) crowdCount++;
-        }
-        if (crowdCount > 4) separationMultiplier *= 0.7; // толпа — меньше толкаемся
+    // Удалён дорогостоящий crowdCount O(n) проход (давал O(n^3) в сумме). При необходимости можно вернуть адаптив через лёгкую сетку.
 
         // Усиливаем у края
         const centerX1 = this.getElementCenterX(element1);
@@ -727,10 +743,7 @@ private separateElements(element1: PhysicsElement, element2: PhysicsElement): bo
             element2.isResting = false;
         }
 
-        this.constrainElementPosition(element1);
-        this.constrainElementPosition(element2);
-
-        // --- Дополнительная обработка для очень сильного перекрытия ---
+    // --- Дополнительная обработка для очень сильного перекрытия ---
         if (distance < 0.1) {
             const angle = Math.random() * Math.PI * 2;
             const separationDistance = minDistance * 0.6;
@@ -741,8 +754,9 @@ private separateElements(element1: PhysicsElement, element2: PhysicsElement): bo
             element2.y -= Math.sin(angle) * separationDistance * massRatio2;
         }
 
-        this.constrainElementPosition(element1);
-        this.constrainElementPosition(element2);
+    // Один финальный constrain после всех коррекций (избегаем двойного вызова)
+    this.constrainElementPosition(element1);
+    this.constrainElementPosition(element2);
 
         // --- Отскок (bounce) ---
         if (distance > 0.1) {
@@ -780,9 +794,6 @@ private separateElements(element1: PhysicsElement, element2: PhysicsElement): bo
 
         return true;
     }
-
-    return false;
-}
 
 
     private getElementCenterX(element: PhysicsElement): number {
@@ -932,7 +943,10 @@ private separateElements(element1: PhysicsElement, element2: PhysicsElement): bo
         this.ctx.translate(element.drawX, element.drawY);
         this.ctx.rotate(element.rotation);
         
-        this.ctx.fillStyle = element.color;
+        if (this.lastFillStyle !== element.color) {
+            this.ctx.fillStyle = element.color;
+            this.lastFillStyle = element.color;
+        }
         this.ctx.globalAlpha = 1.0;
         
     if (element.shape === 'blob') {
@@ -1380,15 +1394,6 @@ private separateElements(element1: PhysicsElement, element2: PhysicsElement): bo
         }
     }
 
-    private startAnimation() {
-        const animate = () => {
-            this.updatePhysics();
-            this.render();
-            this.animationId = requestAnimationFrame(animate);
-        };
-        
-        animate();
-    }
 
     public updateConfig(newConfig: Partial<typeof this.config>) {
         this.config = { ...this.config, ...newConfig };
@@ -1448,10 +1453,117 @@ private separateElements(element1: PhysicsElement, element2: PhysicsElement): bo
         if (this.globalMouseListener) {
             document.removeEventListener('mousemove', this.globalMouseListener);
         }
+        if (this.intersectionObserver) {
+            this.intersectionObserver.disconnect();
+        }
+        document.removeEventListener('visibilitychange', this.handlePageVisibilityChange);
     }
 
     public forceStart() {
         this.startElementsFalling();
+    }
+
+    // ====== Visibility / lifecycle ======
+    private setupVisibilityHandling() {
+        // Наблюдаем именно за футером (если он родитель canvas) иначе за canvas
+        const footer = document.querySelector('footer');
+        const target = footer || this.canvas;
+        this.intersectionObserver = new IntersectionObserver(entries => {
+            for (const entry of entries) {
+                if (entry.target === target) {
+                    this.isCanvasVisible = entry.isIntersecting && entry.intersectionRatio > 0;
+                    this.updateAnimationRunningState();
+                }
+            }
+        }, { threshold: [0, 0.05, 0.15] });
+        this.intersectionObserver.observe(target);
+
+        document.addEventListener('visibilitychange', this.handlePageVisibilityChange, { passive: true });
+    }
+
+    private handlePageVisibilityChange = () => {
+        this.isPageVisible = document.visibilityState === 'visible';
+        this.updateAnimationRunningState();
+    };
+
+    private updateAnimationRunningState() {
+        const shouldRun = this.isCanvasVisible && this.isPageVisible;
+        if (shouldRun) {
+            if (!this.wasStartedOnce) {
+                this.wasStartedOnce = true;
+                // Плавный старт падения при первом появлении
+                this.startElementsFalling();
+            }
+            if (this.animationId == null) {
+                this.startAnimationLoop();
+            }
+        } else {
+            if (this.animationId != null) {
+                cancelAnimationFrame(this.animationId);
+                this.animationId = null;
+            }
+        }
+    }
+
+    private startAnimationLoop() {
+        const loop = () => {
+            if (!this.isCanvasVisible || !this.isPageVisible) {
+                this.animationId = null;
+                return;
+            }
+            // ---- Измерение FPS и проверка устойчивого низкого FPS ----
+            const now = performance.now();
+            const dt = now - this.lastFrameTime; // ms
+            this.lastFrameTime = now;
+            // dt -> fpsEstimate
+            const fpsEstimate = 1000 / (dt || 1);
+            if (!this.degradedLowFpsApplied) {
+                if (fpsEstimate < this.lowFpsThreshold) {
+                    this.lowFpsConsecutive++;
+                    if (this.lowFpsConsecutive >= this.lowFpsSamplesNeeded) {
+                        this.applyLowFpsDegradation();
+                    }
+                } else {
+                    // сброс серии если кадр нормальный
+                    this.lowFpsConsecutive = 0;
+                }
+            }
+            this.updatePhysics();
+            this.render();
+            this.animationId = requestAnimationFrame(loop);
+        };
+        this.animationId = requestAnimationFrame(loop);
+    }
+
+    // Применяем упрощение при устойчиво низком FPS
+    private applyLowFpsDegradation() {
+        this.degradedLowFpsApplied = true;
+        // 1. Снижаем pixelRatio до 1 если он выше
+        if (this.pixelRatio > 1) {
+            this.forcePixelRatio = 1;
+            // Пересоздаём канвас под новый pixelRatio
+            const vv = (window as any).visualViewport;
+            const cssW = vv ? vv.width : document.documentElement.clientWidth;
+            const cssH = vv ? vv.height : window.innerHeight;
+            this.canvas.width = Math.round(cssW * this.forcePixelRatio);
+            this.canvas.height = Math.round(cssH * this.forcePixelRatio);
+            this.canvas.style.width = cssW + 'px';
+            this.canvas.style.height = cssH + 'px';
+            this.ctx.setTransform(1,0,0,1,0,0);
+            this.ctx.scale(this.forcePixelRatio, this.forcePixelRatio);
+        }
+        // 2. Уменьшаем количество элементов (обрезаем хвост) — оставим ~75%
+        const currentCount = this.elements.length;
+        if (currentCount > 20) { // не трогаем если совсем мало
+            const targetCount = Math.max(20, Math.round(currentCount * 0.75));
+            if (targetCount < currentCount) {
+                this.elements.length = targetCount; // усечение хвоста
+                if (this.config.elementCount > targetCount) {
+                    this.config.elementCount = targetCount; // синхронизируем конфиг
+                }
+            }
+        }
+        // Можно добавить визуальный индикатор в будущем
     }
 }
 

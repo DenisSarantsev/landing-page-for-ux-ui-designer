@@ -111,7 +111,7 @@
 .swiper {
 	position: relative;
 	margin-top: -50px;
-	@media (min-width: $tablet-bp){
+	@media (min-width: 993px){
 		display: none !important;
 	}
 	@media (max-width: $mobile-bp){

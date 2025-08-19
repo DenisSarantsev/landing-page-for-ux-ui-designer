@@ -106,8 +106,8 @@
 				}
 			}
     </style>
-    <script type="module" crossorigin src="/assets/index-GVsw9qxb.js"></script>
-    <link rel="stylesheet" crossorigin href="/assets/index-D91sYAiy.css">
+    <script type="module" crossorigin src="/assets/index-BAKTdyyj.js"></script>
+    <link rel="stylesheet" crossorigin href="/assets/index-twhvnPpf.css">
   </head>
   <body style="overflow-y: hidden">
 		<canvas id="canvas"></canvas>
@@ -241,7 +241,7 @@
 					</div>
 					<div class="works__cards"></div>
 					<div class="works__button">
-						<a href="/projects" target="_blank" class="works__button-element works-button light-filled-button">
+						<a href="/projects/" target="_blank" class="works__button-element works-button light-filled-button">
 							<div class="works-button__dot dot"></div>
 							<div class="works-button__text">See more works</div>
 							<img src="/img/icons/arrow-right.svg" alt="right arrow" class="works-button__arrow">
@@ -529,5 +529,11 @@
             startTextAnimation();
         })();
     </script>
+		<script>
+			// Отключаем body loaded
+			setTimeout(() => {
+				document.body.removeAttribute('style');
+			}, 300)
+		</script>
   </body>
 </html>

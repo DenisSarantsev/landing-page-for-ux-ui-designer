@@ -129,7 +129,9 @@
 }
 
 .advantage {
+	width: 100%;
 	&__item {
+		width: 100%;
 		&_title {
 			font-size: 24px;
 			font-weight: 300;
@@ -138,6 +140,7 @@
 			@media (max-width: $small-tablet-bp){
 				font-size: 16px;
 				font-weight: 400;
+				padding-bottom: 14px;
 			}
 		}
 	}

@@ -52,6 +52,9 @@ if ( button instanceof HTMLElement ) {
 	button.addEventListener('mouseleave', implode);
 	button.addEventListener('mousedown', () => {
 		activeButton(button)
+	});
+	button.addEventListener('mouseup', () => {
+		unactiveButton(button)
 	})
 }
 
@@ -110,6 +113,9 @@ if ( worksButton instanceof HTMLElement ) {
 	worksButton.addEventListener('mousedown', () => {
 		activeButton(worksButton)
 	});
+	worksButton.addEventListener('mouseup', () => {
+		unactiveButton(worksButton)
+	});
 }
 
 
@@ -118,5 +124,12 @@ const activeButton = (button: HTMLElement) => {
 	gsap.to(button, {
 		duration: 0,
 		scale: 0.9
+	})
+}
+// Общая функция unactive для всех кнопок
+const unactiveButton = (button: HTMLElement) => {
+	gsap.to(button, {
+		duration: 0,
+		scale: 1
 	})
 }

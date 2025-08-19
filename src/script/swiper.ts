@@ -88,8 +88,9 @@ const calculateSlidesPerView = (containerWidth: number, slideWidth: number): num
 };
 
 // Функция для получения отступа в зависимости от ширины экрана
-const getSpaceBetween = (screenWidth: number): number => {
-	return 20;
+const getSpaceBetween = (width: number): number => {
+    // Можно адаптивно уменьшить отступ на узких экранах
+    return width < 480 ? 20 : 20;
 };
 
 const initSwiper = async () => {
@@ -102,73 +103,43 @@ const initSwiper = async () => {
             // Предполагаемая ширина одного слайда (нужно подставить реальную)
             const slideWidth = 290; // Замените на реальную ширину вашего слайда
             
-            const swiper = new Swiper('.swiper', {
-                slidesPerView: 'auto',
-                spaceBetween: getSpaceBetween(window.innerWidth),
-                
-                // Адаптивные настройки с автоматическим расчетом
-                breakpoints: {
-                    0: {
-                        slidesPerView: 1,
-                        spaceBetween: 0,
-                        centeredSlides: true,
-                    },
-                    360: {
-                        slidesPerView: calculateSlidesPerView(360, slideWidth),
-                        spaceBetween: getSpaceBetween(360),
-                        centeredSlides: false,
-                    },
-                    400: {
-                        slidesPerView: calculateSlidesPerView(400, slideWidth),
-                        spaceBetween: getSpaceBetween(400),
-                        centeredSlides: false,
-                    },
-                    450: {
-                        slidesPerView: calculateSlidesPerView(450, slideWidth),
-                        spaceBetween: getSpaceBetween(450),
-                        centeredSlides: false,
-                    },
-                    500: {
-                        slidesPerView: calculateSlidesPerView(500, slideWidth),
-                        spaceBetween: getSpaceBetween(500),
-                        centeredSlides: false,
-                    },
-                    550: {
-                        slidesPerView: calculateSlidesPerView(550, slideWidth),
-                        spaceBetween: getSpaceBetween(550),
-                        centeredSlides: false,
-                    },
-                    600: {
-                        slidesPerView: calculateSlidesPerView(600, slideWidth),
-                        spaceBetween: getSpaceBetween(600),
-                        centeredSlides: false,
-                    },
-                    640: {
-                        slidesPerView: calculateSlidesPerView(640, slideWidth),
-                        spaceBetween: getSpaceBetween(640),
-                        centeredSlides: false,
-                    },
-                    670: {
-                        slidesPerView: calculateSlidesPerView(670, slideWidth),
-                        spaceBetween: getSpaceBetween(670),
-                        centeredSlides: false,
-                    },
-                },
-                
-                // Обновляем при изменении размера
+            new Swiper('.swiper', {
+                slidesPerView: (() => {
+                    const container = document.querySelector<HTMLElement>('.swiper');
+                    const w = container?.offsetWidth || window.innerWidth;
+                    return w < 360 ? 1 : calculateSlidesPerView(w, slideWidth);
+                })(),
+                spaceBetween: (() => {
+                    const container = document.querySelector<HTMLElement>('.swiper');
+                    const w = container?.offsetWidth || window.innerWidth;
+                    return w < 360 ? 0 : getSpaceBetween(w);
+                })(),
+                centeredSlides: (() => {
+                    const container = document.querySelector<HTMLElement>('.swiper');
+                    const w = container?.offsetWidth || window.innerWidth;
+                    return w < 360;
+                })(),
+                slidesOffsetBefore: 0,
+                slidesOffsetAfter: (() => {
+                    const container = document.querySelector<HTMLElement>('.swiper');
+                    const w = container?.offsetWidth || window.innerWidth;
+                    if (w < 360) return 0;
+                    const gap = getSpaceBetween(w);
+                    const extraTail = 20; // дополнительный “хвост” после последнего слайда
+                    return gap + extraTail;
+                })(),
                 on: {
-                    resize: function() {
-                        const containerWidth = this.el.offsetWidth;
-                        const currentSpaceBetween = getSpaceBetween(containerWidth);
-                        const newSlidesPerView = calculateSlidesPerView(containerWidth, slideWidth);
-                        
-                        // Определяем нужно ли центрирование
+                    resize(sw) {
+                        const containerWidth = (sw as any).el.offsetWidth as number;
+                        const gap = getSpaceBetween(containerWidth);
+                        const newSlidesPerView = containerWidth < 360 ? 1 : calculateSlidesPerView(containerWidth, slideWidth);
                         const shouldCenter = containerWidth < 360;
-                        
-                        this.params.slidesPerView = shouldCenter ? 1 : newSlidesPerView;
-                        this.params.spaceBetween = shouldCenter ? 0 : currentSpaceBetween;
-                        this.params.centeredSlides = shouldCenter;
-                        this.update();
+                        (sw as any).params.slidesPerView = newSlidesPerView;
+                        (sw as any).params.spaceBetween = shouldCenter ? 0 : gap;
+                        (sw as any).params.centeredSlides = shouldCenter;
+                        (sw as any).params.slidesOffsetBefore = 0;
+                        (sw as any).params.slidesOffsetAfter = shouldCenter ? 0 : (gap + 20);
+                        (sw as any).update && (sw as any).update();
                     }
                 }
             });

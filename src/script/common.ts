@@ -34,7 +34,7 @@ export const loadProjects = async (): Promise<Project[]> => {
 
 // Функция для вставки данных проекта в модальное окно
 export const addActualProjectDataToModalWindow = async (id: number): Promise<void> => {
-	//blockBodyScroll()
+	blockBodyScroll()
 	// Получаем модалку
 	const projectModal = document.querySelector<HTMLElement>(".project-modal");
 	const projects: Project[] = await loadProjects();
@@ -91,7 +91,7 @@ export const addActualProjectDataToModalWindow = async (id: number): Promise<voi
 
 // Функция для вставки данных проекта в модальное окно
 export const addActualWorkplaceDataToModalWindow = async (id: number): Promise<void> => {
-	//blockBodyScroll()
+	blockBodyScroll()
 	// Получаем модалку
 	const projectModal = document.querySelector<HTMLElement>(".project-modal");
 	const workplaces: Workplace[] = await loadWorkplaces();
@@ -169,15 +169,55 @@ export const scrollToTop = (element: HTMLElement, smooth: boolean = true): void 
 
 
 // Блокируем и включаем скролл
+// export const blockBodyScroll = () => {
+// 	const bodyElement = document.querySelector<HTMLElement>("body");
+// 	if (bodyElement) {
+// 		bodyElement.style.overflowY = "hidden";
+// 	}
+// };
+// export const unlockBodyScroll = () => {
+// 	const bodyElement = document.querySelector<HTMLElement>("body");
+// 	if (bodyElement) {
+// 		bodyElement.style.overflowY = "";
+// 	}
+// };
+
+
 export const blockBodyScroll = () => {
-	const bodyElement = document.querySelector<HTMLElement>("body");
-	if (bodyElement) {
-		bodyElement.style.overflowY = "hidden";
-	}
+    const body = document.body;
+    if (body.dataset.scrollLocked === '1') return;
+
+    const scrollY = window.scrollY || window.pageYOffset;
+    body.dataset.scrollLocked = '1';
+    body.dataset.scrollY = String(scrollY);
+
+    // Фиксируем тело, чтобы не было прокрутки и не прыгало вверх
+    body.style.position = 'fixed';
+    body.style.top = `-${scrollY}px`;
+    body.style.left = '0';
+    body.style.right = '0';
+    body.style.width = '100%';
+    body.style.overflow = 'hidden';
+    body.style.touchAction = 'none';
 };
+
 export const unlockBodyScroll = () => {
-	const bodyElement = document.querySelector<HTMLElement>("body");
-	if (bodyElement) {
-		bodyElement.style.overflowY = "";
-	}
+    const body = document.body;
+    if (body.dataset.scrollLocked !== '1') return;
+
+    const scrollY = parseInt(body.dataset.scrollY || '0', 10);
+
+    // Сбрасываем только те стили, которые устанавливали
+    body.style.position = '';
+    body.style.top = '';
+    body.style.left = '';
+    body.style.right = '';
+    body.style.width = '';
+    body.style.overflow = '';
+    body.style.touchAction = '';
+
+    delete body.dataset.scrollLocked;
+    delete body.dataset.scrollY;
+
+    window.scrollTo(0, scrollY);
 };
