@@ -8,7 +8,7 @@
 	max-height: var(--real-vh);
 	position: relative;
 		&__wrapper {
-			//background-color: red;
+			min-height: 120px;
 		}
 		&__header {
 		}
@@ -20,8 +20,6 @@
 	display: flex;
 	align-items: center;
 	justify-content: space-between;
-	opacity: 0;
-	animation: opacityHeader 2.5s ease 0.8s forwards;
 	// Абсолютное позиционирование
 	position: absolute;
 	top: 0px;
@@ -41,7 +39,14 @@
 			}
 		}
 		&__logo {
-			
+			//pointer-events: auto !important;
+			// min-width: 154px;
+			// @media (max-width: $tablet-bp){
+			// 	min-width: px-to-vw(154px, $tablet-bp);
+			// }
+			// @media (max-width: $mobile-bp){
+			// 	width: px-to-vw(83px, $mobile-bp);
+			// }
 		}
 		&__logo-letter {
 		}
@@ -51,6 +56,9 @@
 			align-items: center;
 			justify-content: center;
 			gap: 4px;
+			@media (min-width: $tablet-bp){
+				margin-right: -24px;
+			}
 			&>*:nth-child(1) {
 				gap: 2px;
 			}
@@ -99,14 +107,14 @@
 			}
 		}
 		&__button-wrapper {
+			min-width: 154px;
 			@media (max-width: $tablet-bp){
 				min-width: px-to-vw(154px, $tablet-bp);
 				display: flex;
 				justify-content: end;
 			}
-			@media (max-width: $small-mobile-bp){
-				width: 44px;
-				min-width: 44px;
+			@media (max-width: $mobile-bp){
+				width: px-to-vw(83px, $mobile-bp);
 			}
 		}
 		&__button {
@@ -354,4 +362,9 @@
 .widget-visible {
 	opacity: 1;
 	transition: all 0.3s ease 0s;
+}
+
+.opacity-animation {
+	opacity: 0;
+	animation: opacityHeader 2.5s ease 0.8s forwards;
 }

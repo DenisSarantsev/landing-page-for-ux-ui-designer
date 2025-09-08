@@ -104,104 +104,94 @@ function initFluidEffect(oldConfig: SplashCursorProps) {
 
 	let pointers: Pointer[] = [pointerPrototype()];
 
-	const { gl, ext } = getWebGLContext(canvas);
-	if (!gl || !ext) return;
+		const { gl, ext } = getCachedWebGLContext(canvas);
+		if (!gl || !ext) return;
 
-	if (!ext.supportLinearFiltering) {
-		config.DYE_RESOLUTION = 256;
-		config.SHADING = false;
-	}
-
-	function getWebGLContext(canvas: HTMLCanvasElement) {
-    const params = {
-        alpha: true,
-        depth: false,
-        stencil: false,
-        antialias: false,
-        preserveDrawingBuffer: false,
-    };
-
-    let gl = canvas.getContext("webgl", params) as WebGLRenderingContext | null;
-    if (!gl) {
-        gl = canvas.getContext("experimental-webgl", params) as WebGLRenderingContext | null;
-    }
-    if (!gl) {
-        gl = canvas.getContext("webgl2", params) as WebGL2RenderingContext | null;
-    }
-    if (!gl) {
-        alert("WebGL не поддерживается в этом браузере!");
-        throw new Error("Unable to initialize WebGL.");
-    }
-
-		const isWebGL2 = "drawBuffers" in gl;
-
-		let supportLinearFiltering = false;
-		let halfFloat = null;
-
-    if (isWebGL2) {
-        const extColorBufferFloat = (gl as WebGL2RenderingContext).getExtension("EXT_color_buffer_float");
-        const extTextureFloatLinear = (gl as WebGL2RenderingContext).getExtension("OES_texture_float_linear");
-        console.log("EXT_color_buffer_float:", !!extColorBufferFloat);
-        console.log("OES_texture_float_linear:", !!extTextureFloatLinear);
-        supportLinearFiltering = !!extTextureFloatLinear;
-    } else {
-        halfFloat = gl.getExtension("OES_texture_half_float");
-        const extHalfFloatLinear = gl.getExtension("OES_texture_half_float_linear");
-        console.log("OES_texture_half_float:", !!halfFloat);
-        console.log("OES_texture_half_float_linear:", !!extHalfFloatLinear);
-        supportLinearFiltering = !!extHalfFloatLinear;
-    }
-
-		gl.clearColor(0, 0, 0, 1);
-
-		// Проверка float текстур
-    const floatTex = gl.getExtension("OES_texture_float");
-    console.log("OES_texture_float:", !!floatTex);
-
-		const halfFloatTexType = isWebGL2
-			? (gl as WebGL2RenderingContext).HALF_FLOAT
-			: (halfFloat && (halfFloat as any).HALF_FLOAT_OES) || 0;
-
-		let formatRGBA: any;
-		let formatRG: any;
-		let formatR: any;
-
-		if (isWebGL2) {
-			formatRGBA = getSupportedFormat(
-				gl,
-				(gl as WebGL2RenderingContext).RGBA16F,
-				gl.RGBA,
-				halfFloatTexType
-			);
-			formatRG = getSupportedFormat(
-				gl,
-				(gl as WebGL2RenderingContext).RG16F,
-				(gl as WebGL2RenderingContext).RG,
-				halfFloatTexType
-			);
-			formatR = getSupportedFormat(
-				gl,
-				(gl as WebGL2RenderingContext).R16F,
-				(gl as WebGL2RenderingContext).RED,
-				halfFloatTexType
-			);
-		} else {
-			formatRGBA = getSupportedFormat(gl, gl.RGBA, gl.RGBA, halfFloatTexType);
-			formatRG = getSupportedFormat(gl, gl.RGBA, gl.RGBA, halfFloatTexType);
-			formatR = getSupportedFormat(gl, gl.RGBA, gl.RGBA, halfFloatTexType);
+		if (!ext.supportLinearFiltering) {
+			config.DYE_RESOLUTION = 256;
+			config.SHADING = false;
 		}
 
-		return {
-			gl,
-			ext: {
+		// Кэширование WebGL-контекста
+		function getCachedWebGLContext(canvas: HTMLCanvasElement) {
+			// @ts-ignore
+			if (window.__cachedWebGLContext && window.__cachedWebGLContext.canvas === canvas) {
+				return window.__cachedWebGLContext;
+			}
+			const params = {
+				alpha: true,
+				depth: false,
+				stencil: false,
+				antialias: false,
+				preserveDrawingBuffer: false,
+			};
+			let gl = canvas.getContext("webgl", params) as WebGLRenderingContext | null;
+			if (!gl) {
+				gl = canvas.getContext("experimental-webgl", params) as WebGLRenderingContext | null;
+			}
+			if (!gl) {
+				gl = canvas.getContext("webgl2", params) as WebGL2RenderingContext | null;
+			}
+			if (!gl) {
+				alert("WebGL не поддерживается в этом браузере!");
+				throw new Error("Unable to initialize WebGL.");
+			}
+
+			const isWebGL2 = "drawBuffers" in gl;
+			let supportLinearFiltering = false;
+			let halfFloat = null;
+			if (isWebGL2) {
+				const extColorBufferFloat = (gl as WebGL2RenderingContext).getExtension("EXT_color_buffer_float");
+				const extTextureFloatLinear = (gl as WebGL2RenderingContext).getExtension("OES_texture_float_linear");
+				supportLinearFiltering = !!extTextureFloatLinear;
+			} else {
+				halfFloat = gl.getExtension("OES_texture_half_float");
+				const extHalfFloatLinear = gl.getExtension("OES_texture_half_float_linear");
+				supportLinearFiltering = !!extHalfFloatLinear;
+			}
+			gl.clearColor(0, 0, 0, 1);
+			const floatTex = gl.getExtension("OES_texture_float");
+			const halfFloatTexType = isWebGL2
+				? (gl as WebGL2RenderingContext).HALF_FLOAT
+				: (halfFloat && (halfFloat as any).HALF_FLOAT_OES) || 0;
+			let formatRGBA: any;
+			let formatRG: any;
+			let formatR: any;
+			if (isWebGL2) {
+				formatRGBA = getSupportedFormat(
+					gl,
+					(gl as WebGL2RenderingContext).RGBA16F,
+					gl.RGBA,
+					halfFloatTexType
+				);
+				formatRG = getSupportedFormat(
+					gl,
+					(gl as WebGL2RenderingContext).RG16F,
+					(gl as WebGL2RenderingContext).RG,
+					halfFloatTexType
+				);
+				formatR = getSupportedFormat(
+					gl,
+					(gl as WebGL2RenderingContext).R16F,
+					(gl as WebGL2RenderingContext).RED,
+					halfFloatTexType
+				);
+			} else {
+				formatRGBA = getSupportedFormat(gl, gl.RGBA, gl.RGBA, halfFloatTexType);
+				formatRG = getSupportedFormat(gl, gl.RGBA, gl.RGBA, halfFloatTexType);
+				formatR = getSupportedFormat(gl, gl.RGBA, gl.RGBA, halfFloatTexType);
+			}
+			const ext = {
 				formatRGBA,
 				formatRG,
 				formatR,
 				halfFloatTexType,
 				supportLinearFiltering,
-			},
-		};
-	}
+			};
+			// @ts-ignore
+			window.__cachedWebGLContext = { gl, ext, canvas };
+			return { gl, ext };
+		}
 
 	function getSupportedFormat(
 		gl: WebGLRenderingContext | WebGL2RenderingContext,

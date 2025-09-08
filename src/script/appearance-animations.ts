@@ -3,6 +3,7 @@ import { advancedScrollWatcher } from "./scroll-checker";
 import gsap from "gsap";
 // Функции анимаций
 import { animateWordsByWord, animateElementScale, showScaleAndOpacityElement, showScaleAndOpacityElementWithDuration } from "./animations";
+import { showScaleAndOpacityElementsBatch } from "./animations";
 import { changeSlides } from "./about-me-slider";
 import { unlockBodyScroll, blockBodyScroll } from "./common";
 // Отслеживаем первое появление блока advantages
@@ -133,6 +134,8 @@ const aboutBlock = document.querySelector<HTMLElement>(".about");
 //const aboutBlockTitle = document.querySelector<HTMLElement>(".about__title");
 //const aboutBlockSubtitle = document.querySelector<HTMLElement>(".about__subtitle");
 const aboutSlider = document.querySelector<HTMLElement>(".about__slider");
+// Подпись самого первого слайда
+const firstSlideText = document.querySelector<HTMLElement>(".about__text");
 advancedScrollWatcher.watch({
   selector: '.about',
   onScroll: (element, data) => {
@@ -180,27 +183,23 @@ advancedScrollWatcher.watch({
 		};
 		*/
 		}
-		if ( data.scrolledPercentage > 15 && !advantagesCardsWrapper?.classList.contains("cards-scrolled") ) {
-			isCardsShow[0] = 1;
-			advantagesCardsWrapper?.classList.add("cards-scrolled");
-			const cards = advantagesCardsWrapper?.children;
-			if ( cards && [...cards].length > 0 ) {
-				[...cards].forEach((card, index) => {
-					const delay = 0.1 + ((index + 1)/35);
-					if ( card instanceof HTMLElement ) showScaleAndOpacityElement(card, delay);
-				});
+			if ( data.scrolledPercentage > 15 && !advantagesCardsWrapper?.classList.contains("cards-scrolled") ) {
+				isCardsShow[0] = 1;
+				advantagesCardsWrapper?.classList.add("cards-scrolled");
+				const cards = advantagesCardsWrapper?.children;
+				if ( cards && [...cards].length > 0 ) {
+					const cardElements = [...cards].filter(card => card instanceof HTMLElement) as HTMLElement[];
+					showScaleAndOpacityElementsBatch(cardElements, 0.1, 1/35);
+				}
 			}
-		}
-		if ( data.scrolledPercentage > 20 && !itemsCardsWrapper?.classList.contains("items-scrolled") ) {
-			itemsCardsWrapper?.classList.add("items-scrolled");
-			const items = itemsCardsWrapper?.children;
-			if ( items && [...items].length > 0 ) {
-				[...items].forEach((item, index) => {
-					const delay = 0.1 + ((index + 1)/12);
-					if ( item instanceof HTMLElement ) showScaleAndOpacityElement(item, delay);
-				});
+			if ( data.scrolledPercentage > 20 && !itemsCardsWrapper?.classList.contains("items-scrolled") ) {
+				itemsCardsWrapper?.classList.add("items-scrolled");
+				const items = itemsCardsWrapper?.children;
+				if ( items && [...items].length > 0 ) {
+					const itemElements = [...items].filter(item => item instanceof HTMLElement) as HTMLElement[];
+					showScaleAndOpacityElementsBatch(itemElements, 0.1, 1/12);
+				}
 			}
-		}
 	}
 });
 

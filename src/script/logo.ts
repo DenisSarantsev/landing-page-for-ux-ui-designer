@@ -5,6 +5,8 @@ document.addEventListener("DOMContentLoaded", () => {
 
 	const letters = document.querySelectorAll('.header__logo-letter');
 
+	console.log(letters)
+
   // Настройки для каждой буквы: x, y, rotation (можно расширить)
 	const targetPositions = [
 		{ x: "5%", y: "30%", rotation: -10 },
@@ -23,6 +25,7 @@ document.addEventListener("DOMContentLoaded", () => {
   let implodeTweens: gsap.core.Tween[] = [];
 
   const explode = () => {
+		console.log("explode")
     // Отменяем возвратную анимацию, если она еще идет
     implodeTweens.forEach(tween => tween.kill());
     implodeTweens = [];
@@ -58,34 +61,37 @@ document.addEventListener("DOMContentLoaded", () => {
   };
 
 	// -------------------------------- Управление работой функционала в зависимости от размера экрана
-	const logo = document.querySelector('.logotype');
-	let eventsAttached = false; // Отслеживаем, прикреплены ли обработчики событий
-	// Функция управления обработчиками событий
-	const manageEventListeners = () => {
-		if (!logo) return;
+  const logo = document.querySelector('.logotype');
 
-		if (!isMobileScreen && !eventsAttached) {
-			// Включаем обработчики на десктопе
-			logo.addEventListener('mouseenter', explode);
-			logo.addEventListener('mouseleave', implode);
-			eventsAttached = true;
-		} else if (isMobileScreen && eventsAttached) {
-			// Отключаем обработчики на мобильных
-			logo.removeEventListener('mouseenter', explode);
-			logo.removeEventListener('mouseleave', implode);
-			eventsAttached = false;
-			
-			// Возвращаем буквы в исходное положение
-			implode();
-		}
-	};
+	console.log(logo)
 
-	// Инициализация при загрузке
-	manageEventListeners();
+	logo?.addEventListener("mouseenter", () => {
+		console.log("NETER")
+	})
+  // Используем свойство DOM-элемента для отслеживания состояния
+  if (logo) (logo as any)._eventsAttached = false;
 
-	// Слушаем изменения размера экрана
-	window.addEventListener('resize', () => {
-		manageEventListeners();
-	});
-	
-})
+  const manageEventListeners = () => {
+    if (!logo) return;
+
+    // Проверяем флаг на самом элементе
+    const attached = (logo as any)._eventsAttached || false;
+		console.log(isMobileScreen, attached)
+    if (!isMobileScreen && !attached) {
+      logo.addEventListener('mouseenter', explode);
+      logo.addEventListener('mouseleave', implode);
+      (logo as any)._eventsAttached = true;
+    } else if (isMobileScreen && attached) {
+      logo.removeEventListener('mouseenter', explode);
+      logo.removeEventListener('mouseleave', implode);
+      (logo as any)._eventsAttached = false;
+      implode();
+    }
+  };
+
+  manageEventListeners();
+
+  window.addEventListener('resize', () => {
+    manageEventListeners();
+  });
+});

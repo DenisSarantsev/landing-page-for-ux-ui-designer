@@ -23,6 +23,7 @@ class AdvancedScrollWatcher {
   private observer: IntersectionObserver;
   private scrollListener: () => void;
   private watchedElements: Map<Element, ScrollWatcherConfig> = new Map();
+  private elementVisibility: WeakMap<Element, boolean> = new WeakMap();
 
   constructor() {
     // Intersection Observer для базовой видимости
@@ -64,14 +65,15 @@ class AdvancedScrollWatcher {
   private handleIntersection(entries: IntersectionObserverEntry[]): void {
     entries.forEach(entry => {
       const config = this.watchedElements.get(entry.target);
-      if (!config || !config.callback) return;
-
+      if (!config) return;
       const isVisible = config.threshold ? 
         entry.intersectionRatio >= config.threshold : 
         entry.isIntersecting;
-      
-      config.callback(entry.target, isVisible);
-
+      // Сохраняем видимость для scroll-оптимизации
+      this.elementVisibility.set(entry.target, isVisible);
+      if (config.callback) {
+        config.callback(entry.target, isVisible);
+      }
       if (config.once && isVisible) {
         this.observer.unobserve(entry.target);
         this.watchedElements.delete(entry.target);
@@ -83,55 +85,58 @@ class AdvancedScrollWatcher {
   private handleScroll(): void {
     this.watchedElements.forEach((config, element) => {
       if (!config.onScroll) return;
-
+      // Оптимизация: вычисляем scrollData только для видимых элементов
+      const isVisible = this.elementVisibility.get(element);
+      if (!isVisible) return;
       const scrollData = this.calculateScrollData(element);
       config.onScroll(element, scrollData);
     });
   }
 
-  // Вычисление данных прокрутки
-private calculateScrollData(element: Element): ScrollData {
-  const rect = element.getBoundingClientRect();
-  const windowHeight = window.innerHeight;
-  const elementHeight = rect.height;
-
-  // Расстояния
-  const distanceFromTop = rect.top;
-  const distanceFromBottom = windowHeight - rect.bottom;
-
-	console.log(distanceFromTop)
-
-  // Видимая часть элемента
-  const visibleTop = Math.max(0, -distanceFromTop);
-  const visibleBottom = Math.max(0, distanceFromBottom);
-  const pixelsVisible = Math.max(0, elementHeight - visibleTop - visibleBottom);
-  
-  // Проценты видимости
-  const percentageVisible = Math.min(100, (pixelsVisible / elementHeight) * 100);
-  const elementTopY = rect.top; // Позиция верхней границы элемента
-  const hasPassedBottomViewport = elementTopY <= windowHeight; // Верхняя граница прошла низ экрана?
-  
-  let scrolledFromViewportBottom = 0;
-  let scrolledPercentage = 0;
-  
-  if (hasPassedBottomViewport) {
-    // Сколько прокручено после того, как верхняя граница прошла низ экрана
-    scrolledFromViewportBottom = windowHeight - elementTopY;
-    // Процент прокрутки относительно высоты элемента + высоты экрана
-    const totalScrollableDistance = elementHeight + windowHeight;
-    scrolledPercentage = Math.min(100, (scrolledFromViewportBottom / totalScrollableDistance) * 100);
+  // Кэширование getBoundingClientRect на один animation frame
+  private rectCache = new WeakMap<Element, { rect: DOMRect, frame: number }>();
+  private calculateScrollData(element: Element): ScrollData {
+    const nowFrame = window.performance && typeof window.performance.now === 'function'
+      ? Math.floor(window.performance.now() / 16)
+      : Date.now();
+    let cached = this.rectCache.get(element);
+    let rect: DOMRect;
+    if (cached && cached.frame === nowFrame) {
+      rect = cached.rect;
+    } else {
+      rect = element.getBoundingClientRect();
+      this.rectCache.set(element, { rect, frame: nowFrame });
+    }
+    const windowHeight = window.innerHeight;
+    const elementHeight = rect.height;
+    // Расстояния
+    const distanceFromTop = rect.top;
+    const distanceFromBottom = windowHeight - rect.bottom;
+    // Видимая часть элемента
+    const visibleTop = Math.max(0, -distanceFromTop);
+    const visibleBottom = Math.max(0, distanceFromBottom);
+    const pixelsVisible = Math.max(0, elementHeight - visibleTop - visibleBottom);
+    // Проценты видимости
+    const percentageVisible = Math.min(100, (pixelsVisible / elementHeight) * 100);
+    const elementTopY = rect.top;
+    const hasPassedBottomViewport = elementTopY <= windowHeight;
+    let scrolledFromViewportBottom = 0;
+    let scrolledPercentage = 0;
+    if (hasPassedBottomViewport) {
+      scrolledFromViewportBottom = windowHeight - elementTopY;
+      const totalScrollableDistance = elementHeight + windowHeight;
+      scrolledPercentage = Math.min(100, (scrolledFromViewportBottom / totalScrollableDistance) * 100);
+    }
+    return {
+      percentageVisible: Math.round(percentageVisible * 100) / 100,
+      pixelsVisible: Math.round(pixelsVisible),
+      totalHeight: elementHeight,
+      scrolledFromTop: Math.round(scrolledFromViewportBottom),
+      scrolledPercentage: Math.round(scrolledPercentage * 100) / 100,
+      distanceFromTop: Math.round(distanceFromTop),
+      distanceFromBottom: Math.round(distanceFromBottom)
+    };
   }
-
-  return {
-    percentageVisible: Math.round(percentageVisible * 100) / 100,
-    pixelsVisible: Math.round(pixelsVisible),
-    totalHeight: elementHeight,
-    scrolledFromTop: Math.round(scrolledFromViewportBottom), // Теперь это scrolledFromViewportBottom
-    scrolledPercentage: Math.round(scrolledPercentage * 100) / 100,
-    distanceFromTop: Math.round(distanceFromTop),
-    distanceFromBottom: Math.round(distanceFromBottom)
-  };
-}
 
   // Уничтожить наблюдатель
   destroy(): void {
@@ -157,57 +162,71 @@ export const advancedScrollWatcher = new AdvancedScrollWatcher();
 // 1. Отслеживание точного процента видимости блока
 // advancedScrollWatcher.watch({
 //   selector: '.about',
-//   onScroll: (element, data) => {
+//   onScroll: throttle((element, data) => {
 //     console.log(`Блок .about виден на ${data.percentageVisible}%`);
 //     console.log(`Видимо пикселей: ${data.pixelsVisible} из ${data.totalHeight}`);
 //     console.log(`Прокручено от начала: ${data.scrolledPercentage}%`);
-    
-//     // Например, изменяем opacity в зависимости от видимости
 //     if (element instanceof HTMLElement) {
 //       element.style.opacity = `${data.percentageVisible / 100}`;
 //     }
-//   }
+//   }, 80)
 // });
 
 // 2. Запуск слайдера при определённом проценте прокрутки
 // let sliderWorks = false;
 // advancedScrollWatcher.watch({
 //   selector: '.about',
-//   onScroll: (element, data) => {
-//     // Запускаем слайдер, когда блок прокручен на 25%
+//   onScroll: throttle((element, data) => {
 //     if (data.scrolledPercentage >= 25 && !sliderWorks) {
 //       console.log('Блок прокручен на 25%, запускаем слайдер');
 //       // changeSlides(5);
 //       sliderWorks = true;
 //     }
-//   }
+//   }, 80)
 // });
 
 // 3. Анимация в зависимости от прокрутки
 // advancedScrollWatcher.watch({
 //   selector: '.advantage-card',
-//   onScroll: (element, data) => {
+//   onScroll: throttle((element, data) => {
 //     if (data.percentageVisible > 50) {
-//       // Масштабируем карточку в зависимости от видимости
-//       const scale = 0.8 + (data.percentageVisible / 100) * 0.2; // от 0.8 до 1.0
+//       const scale = 0.8 + (data.percentageVisible / 100) * 0.2;
 //       if (element instanceof HTMLElement) {
 //         element.style.transform = `scale(${scale})`;
 //       }
 //     }
-//   }
+//   }, 80)
 // });
 
 // 4. Комбинированное использование (базовая видимость + детальная прокрутка)
 // advancedScrollWatcher.watch({
 //   selector: '.hero-section',
-//   threshold: 0.1, // Базовый порог видимости
+//   threshold: 0.1,
 //   callback: (element, isVisible) => {
 //     console.log(`Секция ${isVisible ? 'появилась' : 'скрылась'}`);
 //   },
-//   onScroll: (element, data) => {
-//     // Детальное отслеживание прокрутки
+//   onScroll: throttle((element, data) => {
 //     if (data.scrolledPercentage > 80) {
 //       console.log('Секция почти полностью прокручена!');
 //     }
-//   }
+//   }, 80)
+// });
+
+// Throttle-функция для оптимизации scroll
+export function throttle(fn: Function, wait: number) {
+  let last = 0;
+  return function (...args: any[]) {
+    const now = Date.now();
+    if (now - last >= wait) {
+      last = now;
+      fn.apply(this, args);
+    }
+  };
+}
+
+// Пример использования:
+// advancedScrollWatcher.watch({
+//   onScroll: throttle((element, data) => {
+//     // ... твой код ...
+//   }, 80)
 // });

@@ -1,3 +1,18 @@
+// Пакетная анимация массива элементов через timeline
+export const showScaleAndOpacityElementsBatch = (elements: HTMLElement[], baseDelay: number = 0, step: number = 0.05) => {
+	const tl = gsap.timeline();
+	elements.forEach((el, i) => {
+		tl.fromTo(el, {
+			opacity: 0,
+			y: 40
+		}, {
+			opacity: 1,
+			duration: 0.4,
+			y: 0,
+			delay: baseDelay + i * step
+		}, 0);
+	});
+};
 import gsap from "gsap";
 
 // Анимация поялвения текста
