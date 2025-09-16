@@ -1,0 +1,196 @@
+@import url("https://fonts.googleapis.com/css2?family=Outfit:wght@100;200;300;400;500;600;700;800;900&display=swap");
+@font-face {
+  font-family: "Futura Bold Condensed BT";
+  src: url("/fonts/77fb6637911ebc8dafcfe5019b57546f.eot");
+  src: url("/fonts/77fb6637911ebc8dafcfe5019b57546f.eot?#iefix") format("embedded-opentype"), url("/fonts/77fb6637911ebc8dafcfe5019b57546f.woff") format("woff"), url("/fonts/77fb6637911ebc8dafcfe5019b57546f.woff2") format("woff2"), url("/fonts/77fb6637911ebc8dafcfe5019b57546f.ttf") format("truetype"), url("/fonts/77fb6637911ebc8dafcfe5019b57546f.svg#Futura Bold Condensed BT") format("svg");
+  font-weight: normal;
+  font-style: normal;
+  font-display: swap;
+}
+.advantages {
+  overflow: hidden;
+}
+.advantages__wrapper {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 90px;
+}
+@media (max-width: 1440px) {
+  .advantages__wrapper {
+    gap: 6.25vw;
+  }
+}
+@media (max-width: 768px) {
+  .advantages__wrapper {
+    gap: 6.5104166667vw;
+  }
+}
+@media (max-width: 480px) {
+  .advantages__wrapper {
+    gap: 52px;
+  }
+}
+@media (max-width: 760px) {
+  .advantages__title-wrapper > *:nth-child(1) {
+    display: none;
+  }
+}
+@media (min-width: 761px) {
+  .advantages__title-wrapper > *:nth-child(2) {
+    display: none;
+  }
+}
+@media (max-width: 520px) {
+  .advantages__title-wrapper > *:nth-child(2) {
+    display: none;
+  }
+}
+@media (min-width: 521px) {
+  .advantages__title-wrapper > *:nth-child(3) {
+    display: none;
+  }
+}
+@media (max-width: 398px) {
+  .advantages__title-wrapper > *:nth-child(3) {
+    font-size: 42px;
+  }
+}
+.advantages__cards {
+  display: flex;
+  justify-content: center;
+}
+@media (max-width: 992px) {
+  .advantages__cards {
+    display: grid;
+    grid-template-columns: repeat(7, 1fr);
+    margin-left: -2.2177419355vw;
+  }
+  .advantages__cards > *:nth-child(8) {
+    display: none;
+  }
+  .advantages__cards > *:nth-child(9) {
+    display: none;
+  }
+  .advantages__cards > *:nth-child(10) {
+    display: none;
+  }
+}
+@media (max-width: 992px) {
+  .advantages__card {
+    margin-left: 20px;
+  }
+}
+.advantages__items {
+  width: 100%;
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  -moz-column-gap: 64px;
+       column-gap: 64px;
+  row-gap: 45px;
+}
+@media (max-width: 1440px) {
+  .advantages__items {
+    -moz-column-gap: 4.4444444444vw;
+         column-gap: 4.4444444444vw;
+    row-gap: 3.125vw;
+  }
+}
+@media (max-width: 480px) {
+  .advantages__items {
+    grid-template-columns: repeat(2, 1fr);
+    row-gap: 5.2083333333vw;
+    -moz-column-gap: 24px;
+         column-gap: 24px;
+  }
+}
+.advantages__item {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 12px;
+  background-color: transparent;
+  position: relative;
+  padding-bottom: 10px;
+}
+@media (max-width: 992px) {
+  .advantages__item {
+    padding-bottom: 7px;
+  }
+}
+@media (max-width: 480px) {
+  .advantages__item {
+    padding-bottom: 5px;
+  }
+}
+.advantages__item img {
+  min-width: 100%;
+  width: 100%;
+  position: absolute;
+  bottom: 0px;
+  left: 0px;
+  -o-object-fit: cover;
+     object-fit: cover;
+}
+.advantages__item > *:last-child {
+  opacity: 0;
+  transition: all 0.2s ease 0s;
+}
+.advantages__item:hover {
+  cursor: default;
+}
+@media (min-width: 992px) {
+  .advantages__item:hover > *:last-child {
+    opacity: 1;
+    transition: all 0.3s ease 0s;
+  }
+  .advantages__item:hover > *:nth-child(2) {
+    opacity: 0;
+    transition: all 0.2s ease 0s;
+  }
+}
+
+.advantage {
+  width: 100%;
+}
+.advantage__item {
+  width: 100%;
+}
+.advantage__item_title {
+  font-size: 24px;
+  font-weight: 300;
+  padding-bottom: 16px;
+  color: #2B2E3A;
+}
+@media (max-width: 768px) {
+  .advantage__item_title {
+    font-size: 16px;
+    font-weight: 400;
+    padding-bottom: 14px;
+  }
+}
+
+@keyframes hiddenCards {
+  0% {
+    opacity: 1;
+  }
+  100% {
+    opacity: 0;
+  }
+}
+@keyframes showCards {
+  0% {
+    opacity: 0;
+  }
+  100% {
+    opacity: 1;
+  }
+}
+.hidden-advantage-cards {
+  animation: hiddenCards 0.4s ease 0s forwards;
+}
+
+.show-advantage-cards {
+  animation: showCards 0.4s ease 0s forwards;
+}/*# sourceMappingURL=advantages-block.css.map */

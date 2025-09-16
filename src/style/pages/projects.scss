@@ -8,6 +8,8 @@
 		flex-direction: column;
 		gap: 80px;
 		min-height: 100vh;
+		opacity: 0;
+		animation: showElement 0.5s ease 0.4s forwards;
 		@media (max-width: $first-bp){
 			gap: px-to-vw(80px, $first-bp);
 			padding-top: px-to-vw(224px, $first-bp);
@@ -20,5 +22,19 @@
 		display: flex;
 		flex-direction: column;
 		align-items: center;
+	}
+}
+
+.header-projects {
+	opacity: 0;
+	animation: showElement 0.5s ease 0.3s forwards;
+}
+
+@keyframes showElement {
+	0% {
+		opacity: 0;
+	}
+	100% {
+		opacity: 1;
 	}
 }

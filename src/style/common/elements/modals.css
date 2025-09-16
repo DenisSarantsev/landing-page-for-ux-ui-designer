@@ -1,0 +1,223 @@
+@import url("https://fonts.googleapis.com/css2?family=Outfit:wght@100;200;300;400;500;600;700;800;900&display=swap");
+@font-face {
+  font-family: "Futura Bold Condensed BT";
+  src: url("/fonts/77fb6637911ebc8dafcfe5019b57546f.eot");
+  src: url("/fonts/77fb6637911ebc8dafcfe5019b57546f.eot?#iefix") format("embedded-opentype"), url("/fonts/77fb6637911ebc8dafcfe5019b57546f.woff") format("woff"), url("/fonts/77fb6637911ebc8dafcfe5019b57546f.woff2") format("woff2"), url("/fonts/77fb6637911ebc8dafcfe5019b57546f.ttf") format("truetype"), url("/fonts/77fb6637911ebc8dafcfe5019b57546f.svg#Futura Bold Condensed BT") format("svg");
+  font-weight: normal;
+  font-style: normal;
+  font-display: swap;
+}
+.project-modal {
+  position: fixed;
+  top: 0px;
+  left: 0px;
+  width: 100%;
+  height: 100%;
+  z-index: 1000;
+  background-color: #787878;
+  padding: 20px;
+  overflow: hidden;
+  scrollbar-width: none; /* Firefox */
+  -ms-overflow-style: none; /* Internet Explorer 10+ */
+}
+.project-modal::-webkit-scrollbar {
+  display: none; /* Chrome, Safari, Opera */
+}
+@media (max-width: 992px) {
+  .project-modal {
+    max-height: 100dvh;
+  }
+}
+@media (max-width: 768px) {
+  .project-modal {
+    padding: 12px;
+  }
+}
+.project-modal__wrapper {
+  height: calc(100dvh - 40px);
+  background-color: #FFFFFF;
+  border-radius: 80px;
+  overflow: hidden;
+  scrollbar-width: none; /* Firefox */
+  -ms-overflow-style: none; /* Internet Explorer 10+ */
+}
+.project-modal__wrapper::-webkit-scrollbar {
+  display: none; /* Chrome, Safari, Opera */
+}
+@media (max-width: 1440px) {
+  .project-modal__wrapper {
+    border-radius: 5.5555555556vw;
+  }
+}
+@media (max-width: 768px) {
+  .project-modal__wrapper {
+    border-radius: 40px;
+    height: calc(100dvh - 25px);
+  }
+}
+.project-modal__content-wrapper {
+  overflow-y: scroll;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 64px;
+  height: 100vh;
+  padding: 150px 24px 170px 24px;
+  scrollbar-width: none; /* Firefox */
+  -ms-overflow-style: none; /* Internet Explorer 10+ */
+}
+.project-modal__content-wrapper::-webkit-scrollbar {
+  display: none; /* Chrome, Safari, Opera */
+}
+@media (max-width: 1440px) {
+  .project-modal__content-wrapper {
+    border-radius: 5.5555555556vw;
+    gap: 4.4444444444vw;
+    padding: 8.3333333333vw 24px 11.8055555556vw 24px;
+  }
+}
+@media (max-width: 992px) {
+  .project-modal__content-wrapper {
+    padding: 80px 24px 11.8055555556vw 24px;
+  }
+}
+@media (max-width: 768px) {
+  .project-modal__content-wrapper {
+    padding: 80px 12px 50px 12px;
+  }
+}
+.project-modal__titles {
+  max-width: 872px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 12px;
+}
+.project-modal__icon {
+  padding-bottom: 30px;
+}
+@media (max-width: 992px) {
+  .project-modal__icon {
+    padding-bottom: 3.0241935484vw;
+  }
+}
+.project-modal__icon img {
+  width: 71px;
+  height: auto;
+}
+@media (max-width: 992px) {
+  .project-modal__icon img {
+    width: 7.1572580645vw;
+    height: auto;
+  }
+}
+@media (max-width: 690px) {
+  .project-modal__icon img {
+    width: 47px;
+    height: auto;
+  }
+}
+.project-modal__company-address {
+  font-size: 14px;
+  line-height: 157%;
+  color: #2B2E3A;
+}
+.project-modal__period {
+  color: #89899D;
+  font-size: 14px;
+  line-height: 157%;
+  letter-spacing: 0.5%;
+}
+@media (max-width: 992px) {
+  .project-modal__period {
+    margin-top: -6px;
+  }
+}
+.project-modal__workplace-description {
+  font-size: 14px;
+  line-height: 157%;
+  color: #2B2E3A;
+  text-align: center;
+  padding-top: 40px;
+}
+@media (max-width: 992px) {
+  .project-modal__workplace-description {
+    padding-top: 3.0241935484vw;
+  }
+}
+.project-modal__subtitle {
+  text-align: center;
+  font-size: 16px;
+  font-weight: 400;
+  max-width: 600px;
+}
+.project-modal__images-wrapper {
+  max-width: 872px;
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+}
+.project-modal__images-wrapper img {
+  border-radius: 16px;
+}
+@media (max-width: 768px) {
+  .project-modal__images-wrapper {
+    gap: 12px;
+  }
+}
+.project-modal__images-wrapper_one img {
+  width: 100%;
+  height: auto;
+}
+.project-modal__images-wrapper_two {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 24px;
+}
+@media (max-width: 768px) {
+  .project-modal__images-wrapper_two {
+    gap: 12px;
+  }
+}
+.project-modal__images-wrapper_two img {
+  width: 100%;
+  height: auto;
+}
+
+.modal-close-button {
+  position: absolute;
+  width: 48px;
+  height: 48px;
+  border-radius: 50%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  top: 50px;
+  right: 60px;
+  background-color: #CAD4DE;
+  filter: drop-shadow(0px 7px 23.4px rgba(0, 0, 0, 0.12));
+  z-index: 100;
+}
+.modal-close-button:hover {
+  cursor: pointer;
+}
+@media (max-width: 1440px) {
+  .modal-close-button {
+    top: 3.4722222222vw;
+    right: 4.1666666667vw;
+  }
+}
+@media (max-width: 480px) {
+  .modal-close-button {
+    top: 15px;
+    right: 20px;
+  }
+}
+.modal-close-button__image {
+  width: 20px;
+  height: 20px;
+}
+
+.modal-hidden {
+  display: none;
+}/*# sourceMappingURL=modals.css.map */

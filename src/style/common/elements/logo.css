@@ -1,0 +1,242 @@
+@import url("https://fonts.googleapis.com/css2?family=Outfit:wght@100;200;300;400;500;600;700;800;900&display=swap");
+@font-face {
+  font-family: "Futura Bold Condensed BT";
+  src: url("/fonts/77fb6637911ebc8dafcfe5019b57546f.eot");
+  src: url("/fonts/77fb6637911ebc8dafcfe5019b57546f.eot?#iefix") format("embedded-opentype"), url("/fonts/77fb6637911ebc8dafcfe5019b57546f.woff") format("woff"), url("/fonts/77fb6637911ebc8dafcfe5019b57546f.woff2") format("woff2"), url("/fonts/77fb6637911ebc8dafcfe5019b57546f.ttf") format("truetype"), url("/fonts/77fb6637911ebc8dafcfe5019b57546f.svg#Futura Bold Condensed BT") format("svg");
+  font-weight: normal;
+  font-style: normal;
+  font-display: swap;
+}
+.logotype {
+  width: 110px;
+  height: 64px;
+  position: relative;
+}
+@media (max-width: 1320px) {
+  .logotype {
+    width: 8.3333333333vw;
+    height: 4.8484848485vw;
+  }
+}
+@media (max-width: 992px) {
+  .logotype {
+    width: 82.6px;
+    height: 48px;
+  }
+}
+@media (max-width: 480px) {
+  .logotype {
+    margin-bottom: -5px;
+  }
+}
+.logotype > *:nth-child(1) {
+  position: absolute;
+  left: 4.5%;
+  right: 87.35%;
+  top: 7.86%;
+  bottom: 36.56%;
+  transform: rotate(10.46deg);
+  width: 8px;
+  height: 36px;
+}
+@media (max-width: 1320px) {
+  .logotype > *:nth-child(1) {
+    width: 0.6060606061vw;
+    height: 2.7272727273vw;
+  }
+}
+@media (max-width: 992px) {
+  .logotype > *:nth-child(1) {
+    width: 6px;
+    height: 27px;
+  }
+}
+@media (max-width: 480px) {
+  .logotype > *:nth-child(1) {
+    width: 4px;
+    height: 24px;
+    left: 6%;
+    transform: rotate(6deg);
+  }
+}
+.logotype > *:nth-child(2) {
+  position: absolute;
+  left: 14.36%;
+  right: 66.17%;
+  top: 50.05%;
+  bottom: 15.61%;
+  transform: rotate(21.16deg);
+  width: 21px;
+  height: 25px;
+}
+@media (max-width: 1320px) {
+  .logotype > *:nth-child(2) {
+    width: 1.5909090909vw;
+    height: 1.8939393939vw;
+  }
+}
+@media (max-width: 992px) {
+  .logotype > *:nth-child(2) {
+    width: 15.8px;
+    height: 18.8px;
+  }
+}
+@media (max-width: 480px) {
+  .logotype > *:nth-child(2) {
+    width: 13.72px;
+    height: 14.08px;
+    left: 11%;
+    top: 43%;
+    transform: rotate(4deg);
+  }
+}
+.logotype > *:nth-child(3) {
+  position: absolute;
+  left: 20.9%;
+  right: 55.89%;
+  top: 6.62%;
+  bottom: 50.1%;
+  width: 26px;
+  height: 28px;
+}
+@media (max-width: 1320px) {
+  .logotype > *:nth-child(3) {
+    width: 1.9696969697vw;
+    height: 2.1212121212vw;
+  }
+}
+@media (max-width: 992px) {
+  .logotype > *:nth-child(3) {
+    width: 19.5px;
+    height: 21px;
+  }
+}
+@media (max-width: 480px) {
+  .logotype > *:nth-child(3) {
+    width: 13.5px;
+    height: 15.5px;
+    left: 20%;
+    top: 12%;
+  }
+}
+.logotype > *:nth-child(4) {
+  position: absolute;
+  left: 32.43%;
+  right: 46.43%;
+  top: 54.93%;
+  bottom: 5.53%;
+  width: 24px;
+  height: 26px;
+}
+@media (max-width: 1320px) {
+  .logotype > *:nth-child(4) {
+    width: 1.8181818182vw;
+    height: 1.9696969697vw;
+  }
+}
+@media (max-width: 992px) {
+  .logotype > *:nth-child(4) {
+    width: 18px;
+    height: 19.5px;
+  }
+}
+@media (max-width: 480px) {
+  .logotype > *:nth-child(4) {
+    width: 13.5px;
+    height: 15px;
+    top: 47%;
+    left: 28%;
+  }
+}
+.logotype > *:nth-child(5) {
+  position: absolute;
+  left: 48%;
+  right: 35.5%;
+  top: 1.67%;
+  bottom: 37.38%;
+  width: 19px;
+  height: 40px;
+}
+@media (max-width: 1320px) {
+  .logotype > *:nth-child(5) {
+    width: 1.4393939394vw;
+    height: 3.0303030303vw;
+  }
+}
+@media (max-width: 992px) {
+  .logotype > *:nth-child(5) {
+    width: 14.2px;
+    height: 30px;
+  }
+}
+@media (max-width: 480px) {
+  .logotype > *:nth-child(5) {
+    width: 12px;
+    height: 24px;
+    top: 5%;
+    left: 40%;
+    transform: rotate(-4deg);
+  }
+}
+.logotype > *:nth-child(6) {
+  position: absolute;
+  left: 63%;
+  right: 20.32%;
+  top: 57%;
+  bottom: -1.37%;
+  transform: rotate(-17.32deg);
+  width: 25px;
+  height: 26px;
+}
+@media (max-width: 1320px) {
+  .logotype > *:nth-child(6) {
+    width: 1.8939393939vw;
+    height: 1.9696969697vw;
+  }
+}
+@media (max-width: 992px) {
+  .logotype > *:nth-child(6) {
+    width: 18.8px;
+    height: 19.5px;
+  }
+}
+@media (max-width: 480px) {
+  .logotype > *:nth-child(6) {
+    width: 15px;
+    height: 16px;
+    left: 55%;
+    top: 47%;
+    transform: rotate(-6deg);
+  }
+}
+.logotype > *:nth-child(7) {
+  position: absolute;
+  left: 72.06%;
+  right: 7.86%;
+  top: 7.21%;
+  bottom: 39.47%;
+  transform: rotate(-11.32deg);
+  width: 29px;
+  height: 34px;
+}
+@media (max-width: 1320px) {
+  .logotype > *:nth-child(7) {
+    width: 2.196969697vw;
+    height: 2.5757575758vw;
+  }
+}
+@media (max-width: 992px) {
+  .logotype > *:nth-child(7) {
+    width: 21.8px;
+    height: 25.55px;
+  }
+}
+@media (max-width: 480px) {
+  .logotype > *:nth-child(7) {
+    width: 17px;
+    height: 21px;
+    left: 60%;
+    top: 5.5%;
+    transform: rotate(-2deg);
+  }
+}/*# sourceMappingURL=logo.css.map */

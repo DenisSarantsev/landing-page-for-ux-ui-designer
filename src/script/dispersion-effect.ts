@@ -286,46 +286,58 @@ class CanvasPhysics {
         }
     }
 
-		private setupCanvas() {
-    const resizeCanvas = () => {
+        private setupCanvas() {
+        const resizeCanvas = () => {
+            const vv = (window as any).visualViewport;
+            const cssW = vv ? vv.width : document.documentElement.clientWidth;
+            const cssH = vv ? vv.height : window.innerHeight;
+            // Защита от слишком маленьких размеров
+            if (cssW < 100 || cssH < 100) {
+                console.warn('Canvas resize prevented: too small dimensions', cssW, cssH);
+                return;
+            }
+            if (this.forcePixelRatio != null) {
+                this.pixelRatio = this.forcePixelRatio;
+            } else {
+                this.pixelRatio = window.devicePixelRatio || 1;
+            }
+
+            this.canvas.width  = Math.round(cssW * this.pixelRatio);
+            this.canvas.height = Math.round(cssH * this.pixelRatio);
+
+            this.canvas.style.width  = cssW + 'px';
+            this.canvas.style.height = cssH + 'px';
+
+            this.ctx.setTransform(1,0,0,1,0,0);
+            this.ctx.scale(this.pixelRatio, this.pixelRatio);
+            this.ctx.imageSmoothingEnabled = true;
+
+            const prevCount = this.config.elementCount;
+            this.applyAdaptiveSettings();
+            if (prevCount !== this.config.elementCount || this.elements.length === 0) {
+                this.createElements();
+            }
+        };
+
+        resizeCanvas();
+        window.addEventListener('resize', resizeCanvas, { passive: true });
+        window.addEventListener('orientationchange', resizeCanvas, { passive: true });
         const vv = (window as any).visualViewport;
-        // Ширина без полосы прокрутки
-        const cssW = vv ? vv.width : document.documentElement.clientWidth;
-        const cssH = vv ? vv.height : window.innerHeight;
-        // Если есть принудительный pixelRatio (деградация), используем его
-        if (this.forcePixelRatio != null) {
-            this.pixelRatio = this.forcePixelRatio;
-        } else {
-            this.pixelRatio = window.devicePixelRatio || 1;
+        if (vv) {
+            vv.addEventListener('resize', resizeCanvas, { passive: true });
+            vv.addEventListener('scroll', resizeCanvas, { passive: true });
         }
-
-        this.canvas.width  = Math.round(cssW * this.pixelRatio);
-        this.canvas.height = Math.round(cssH * this.pixelRatio);
-
-        // CSS размеры (не 100vw — чтобы не захватить скроллбар)
-        this.canvas.style.width  = cssW + 'px';
-        this.canvas.style.height = cssH + 'px';
-
-        this.ctx.setTransform(1,0,0,1,0,0);
-        this.ctx.scale(this.pixelRatio, this.pixelRatio);
-        this.ctx.imageSmoothingEnabled = true;
-
-        const prevCount = this.config.elementCount;
-        this.applyAdaptiveSettings();
-        if (prevCount !== this.config.elementCount || this.elements.length === 0) {
-            this.createElements();
+        // DPR watcher
+        if (window.matchMedia) {
+            try {
+                window.matchMedia(`(resolution: ${window.devicePixelRatio}dppx)`).addEventListener('change', () => {
+                    resizeCanvas();
+                });
+            } catch (e) {
+                // Safari не поддерживает addEventListener на matchMedia
+            }
         }
-    };
-
-    resizeCanvas();
-    window.addEventListener('resize', resizeCanvas, { passive: true });
-    window.addEventListener('orientationchange', resizeCanvas, { passive: true });
-    const vv = (window as any).visualViewport;
-    if (vv) {
-        vv.addEventListener('resize', resizeCanvas, { passive: true });
-        vv.addEventListener('scroll', resizeCanvas, { passive: true }); // iOS адресная строка
     }
-}
 
     private setupEventListeners() {
         // Единый обработчик движения
@@ -1508,6 +1520,12 @@ private separateElements(element1: PhysicsElement, element2: PhysicsElement): bo
     private startAnimationLoop() {
         const loop = () => {
             if (!this.isCanvasVisible || !this.isPageVisible) {
+                this.animationId = null;
+                return;
+            }
+            // Защита от слишком маленьких размеров canvas
+            if (this.logicalWidth < 100 || this.logicalHeight < 100) {
+                this.setupCanvas();
                 this.animationId = null;
                 return;
             }

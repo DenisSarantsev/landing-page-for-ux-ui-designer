@@ -1,0 +1,111 @@
+@import url("https://fonts.googleapis.com/css2?family=Outfit:wght@100;200;300;400;500;600;700;800;900&display=swap");
+@font-face {
+  font-family: "Futura Bold Condensed BT";
+  src: url("/fonts/77fb6637911ebc8dafcfe5019b57546f.eot");
+  src: url("/fonts/77fb6637911ebc8dafcfe5019b57546f.eot?#iefix") format("embedded-opentype"), url("/fonts/77fb6637911ebc8dafcfe5019b57546f.woff") format("woff"), url("/fonts/77fb6637911ebc8dafcfe5019b57546f.woff2") format("woff2"), url("/fonts/77fb6637911ebc8dafcfe5019b57546f.ttf") format("truetype"), url("/fonts/77fb6637911ebc8dafcfe5019b57546f.svg#Futura Bold Condensed BT") format("svg");
+  font-weight: normal;
+  font-style: normal;
+  font-display: swap;
+}
+.dark-filled-button {
+  background-color: #2B2E3A;
+  color: #FFFFFF;
+  height: 54px;
+  padding: 14px 24px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-weight: 400;
+  text-transform: uppercase;
+  border-radius: 360px;
+  transition: all 0.3s ease 0s;
+}
+@media (min-width: 992px) {
+  .dark-filled-button:hover {
+    transition: all 0.3s ease 0s;
+    background-color: #04F;
+    cursor: pointer;
+  }
+}
+@media (max-width: 992px) {
+  .dark-filled-button {
+    background-color: #E4E6EF;
+    padding: 0px;
+  }
+}
+
+.light-filled-button {
+  background-color: #FFFFFF;
+  color: #FFFFFF;
+  height: 54px;
+  padding: 14px 24px;
+  display: flex;
+  align-items: center;
+  font-weight: 400;
+  gap: 10px;
+  text-transform: uppercase;
+  border-radius: 360px;
+  transition: all 0.3s ease 0s;
+}
+@media (min-width: 992px) {
+  .light-filled-button:hover {
+    transition: all 0.3s ease 0s;
+    background-color: #04F;
+    cursor: pointer;
+  }
+}
+@media (max-width: 768px) {
+  .light-filled-button {
+    gap: 8px;
+    padding: 12px 22px 12px 22px;
+    height: 50px;
+    font-size: 14px;
+    font-weight: 500;
+  }
+}
+
+.three-dots-button {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: center;
+  position: absolute;
+  top: 0 !important;
+  left: 0;
+  right: 0;
+  margin: 0 auto;
+  gap: 8px;
+  background-color: #e8ebf7;
+  border: 1px solid rgba(255, 255, 255, 0.4);
+  backdrop-filter: blur(6px);
+  -webkit-backdrop-filter: blur(6px);
+  border-radius: 360px;
+  width: 100%;
+  height: 150px;
+  overflow: hidden;
+}
+.three-dots-button__button-dots {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: center;
+  gap: 45px;
+}
+.three-dots-button__dot {
+  width: 35px;
+  height: 35px;
+  border-radius: 50%;
+  background-color: #89899D;
+  opacity: 1;
+  transition: opacity 0.4s ease 0s;
+}
+.three-dots-button:hover {
+  padding: 12px 18px;
+  border: 1px solid transparent;
+  box-shadow: 0 0 0 0.5px rgba(255, 255, 255, 0.4);
+  transition: border 0.1s ease 0s;
+}
+.three-dots-button:hover .three-dots-button__dot {
+  opacity: 0;
+  transition: opacity 0.08s ease 0s;
+}/*# sourceMappingURL=buttons.css.map */

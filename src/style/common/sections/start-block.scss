@@ -319,6 +319,7 @@
 			padding: 0px 0px;
 			position: relative;
 			margin-bottom: -60px;
+			will-change: transform;
 		}
 		&__socials-button {
 
@@ -338,6 +339,7 @@
 	display: flex;
 	justify-content: center;
 	z-index: 9999;
+	will-change: transform;
 }
 
 .max-height {

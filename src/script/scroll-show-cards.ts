@@ -37,11 +37,14 @@ const createProjectCards = (projects: Project[], count: number) => {
 
     projects.forEach((project, index) => {
         if (index + 1 <= count) {
-            const imagePath = `/img/project/${project.id}/miniature.png`;
+            const imagePath = `/img/project/${project.id}/miniature.webp`;
             const cardHTML = `
                 <div data-project-id="${project.id}" class="works__card work-card">
                     <div class="work-card__card">
-                        <img src="${imagePath}" alt="${project['project-name']}">
+                        <img 
+													loading="lazy"
+													src="${imagePath}" 
+													alt="${project['project-name']}">
                     </div>
                     <div class="work-card__text">${project['project-name']}</div>
                 </div>

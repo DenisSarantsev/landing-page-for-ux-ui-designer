@@ -1,0 +1,48 @@
+@import url("https://fonts.googleapis.com/css2?family=Outfit:wght@100;200;300;400;500;600;700;800;900&display=swap");
+@font-face {
+  font-family: "Futura Bold Condensed BT";
+  src: url("/fonts/77fb6637911ebc8dafcfe5019b57546f.eot");
+  src: url("/fonts/77fb6637911ebc8dafcfe5019b57546f.eot?#iefix") format("embedded-opentype"), url("/fonts/77fb6637911ebc8dafcfe5019b57546f.woff") format("woff"), url("/fonts/77fb6637911ebc8dafcfe5019b57546f.woff2") format("woff2"), url("/fonts/77fb6637911ebc8dafcfe5019b57546f.ttf") format("truetype"), url("/fonts/77fb6637911ebc8dafcfe5019b57546f.svg#Futura Bold Condensed BT") format("svg");
+  font-weight: normal;
+  font-style: normal;
+  font-display: swap;
+}
+.projects-page__wrapper {
+  padding-top: 224px;
+  display: flex;
+  flex-direction: column;
+  gap: 80px;
+  min-height: 100vh;
+  opacity: 0;
+  animation: showElement 0.5s ease 0.1s forwards;
+}
+@media (max-width: 1440px) {
+  .projects-page__wrapper {
+    gap: 5.5555555556vw;
+    padding-top: 15.5555555556vw;
+  }
+}
+@media (max-width: 992px) {
+  .projects-page__wrapper {
+    padding-top: calc(118px + 4.0322580645vh);
+  }
+}
+.projects-page__titles {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.header-projects {
+  opacity: 0;
+  animation: showElement 0.5s ease 0s forwards;
+}
+
+@keyframes showElement {
+  0% {
+    opacity: 0;
+  }
+  100% {
+    opacity: 1;
+  }
+}/*# sourceMappingURL=projects.css.map */
